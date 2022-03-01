@@ -1,0 +1,15 @@
+**/__pycache__
+**/*.png
+**/*.jpg
+**/*.bmp
+**/*.weights
+**/*.pth
+**/*.dll
+**/*.exe
+**/result.json
+**/*.bat
+**/*.db
+**/*.csv
+**/*.txt
+
+dataset
