@@ -1,11 +1,10 @@
 import jwt
-import base64
 
-key = 'auo'
-algorithm = 'HS256'
+algorithm = ['HS256']
+secret = 'auo'
 
 if __name__ == "__main__":
 
-    token = 'eyJ0eXAiOiJhdW8iLCJhbGciOiJIUzI1NiJ9.eyJwcm9qZWN0IjoxLCJleHBlcmltZW50IjoxfQ.w_3oT1ZydG3gFzGURyKnf3uethembV_RV4VuuNbMyUs'
-    deDict = jwt.decode(token, key, algorithms=algorithm, options={"verify_signature": False})
-    print(deDict)
+    encodedJwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwcm9qZWN0IjoxLCJleHBlcmltZW50IjoxfQ.bmXAqoMMAvCx0tXFWa37iaUCy2-XDgU9sf4bGawIP1o'
+    decodedJwt = jwt.decode(encodedJwt, secret, algorithms=algorithm)
+    print(decodedJwt)
