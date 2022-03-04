@@ -1,5 +1,5 @@
 {
-    "Config.datasetPath": "aaa",
+    "Config.datasetPath": "",
     "ConfigPreprocess.PreprocessPara.imageSize": [224, 224],
     "ConfigPreprocess.PreprocessPara.normalize": {"switch": 1, "mode": 4, "mean": [0.49002929, 0.49002929, 0.49002929],"std": [0.26184613, 0.26184613, 0.26184613]},
     "ConfigPreprocess.PreprocessPara.brightness": 0,
