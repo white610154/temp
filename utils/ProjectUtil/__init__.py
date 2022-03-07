@@ -22,13 +22,16 @@ def decode_key(token):
 def create_project(projectName):
     try:
         projectPath = f"{projectsPath}/{projectName}"
-        if not os.path.exists(projectPath):
-            os.makedirs(f"{projectPath}/experiments")
-            os.makedirs(f"{projectPath}/runs")
+        if os.path.exists(projectPath):
+            return False, "Project exists"
+
+        os.makedirs(f"{projectPath}/experiments")
+        os.makedirs(f"{projectPath}/runs")
+
         projectsList = os.listdir(projectsPath)
-        return projectsList
+        return True, projectsList
     except:
-        return None
+        return False, "Create project failed"
 
 def find_project(projectName):
     try:
@@ -38,7 +41,7 @@ def find_project(projectName):
         else:
             return False
     except:
-        return none
+        return None
 
 def save_config_as_json(projectName, config):
     try:
