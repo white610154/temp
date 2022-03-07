@@ -10,62 +10,103 @@ from datetime import datetime
 
 key = 'auo'
 algorithm = 'HS256'
-projectsPath = f"./projects"
+rootProjectPath = f"./projects"
 
 def decode_key(token):
     try:
         deDict = jwt.decode(token, key, algorithms=[algorithm])
-        return deDict
+        return True, deDict
     except:
-        return None
+        return False, "Decode key failed"
 
 def create_project(projectName):
     try:
-        projectPath = f"{projectsPath}/{projectName}"
-        if os.path.exists(projectPath):
-            return False, "Project exists"
-
-        os.makedirs(f"{projectPath}/experiments")
-        os.makedirs(f"{projectPath}/runs")
-
-        projectsList = os.listdir(projectsPath)
-        return True, projectsList
+        projectPath = f"{rootProjectPath}/{projectName}"
+        if not os.path.isdir(projectPath):
+            os.makedirs(f"{projectPath}/experiments")
+            os.makedirs(f"{projectPath}/runs")
+        projectList = os.listdir(rootProjectPath)
+        return True, projectList
     except:
         return False, "Create project failed"
-
-def find_project(projectName):
-    try:
-        projectPath = f"{projectsPath}/{projectName}"
-        if os.path.exists(projectPath):
-            return projectPath
-        else:
-            return False
-    except:
-        return None
 
 def save_config_as_json(projectName, config):
     try:
         jsonName = datetime.now().strftime('%Y%m%d%H%M%S')
-        with open(f"./projects/{projectName}/experiments/{jsonName}.json", 'w') as jsonFile:
+        with open(f"{rootProjectPath}/{projectName}/experiments/{jsonName}.json", 'w') as jsonFile:
             json.dump(config, jsonFile, indent=4)
-        return f"./projects/{projectName}/{jsonName}.json"
+        return True, f"{rootProjectPath}/{projectName}/experiments/{jsonName}.json"
     except:
-        return None
+        return False, "Save config failed"
 
-def get_config(projectFolderPath):
+def find_project(projectName):
     try:
-        configsList = os.listdir(f"{projectFolderPath}/experiments")
+        projectPath = f"{rootProjectPath}/{projectName}"
+        if os.path.isdir(projectPath):
+            return True, projectPath
+        else:
+            return False, "Project doesn't exist"
+    except:
+        return False, "Find project failed"
+
+def get_config(projectPath):
+    try:
+        configList = os.listdir(f"{projectPath}/experiments")
         configDict = {}
-        for configFile in configsList:
-            with open(f"{projectFolderPath}/experiments/{configFile}") as jsonFile:
+        for configFile in configList:
+            with open(f"{projectPath}/experiments/{configFile}") as jsonFile:
                 config = json.load(jsonFile)
                 configDict[str(configFile.split('.')[0])] = config
-        return configDict
+        return True, configDict
     except:
-        return None
+        return False, "Get config failed"
 
-    
-    
+def check_data_uploaded(datasetPath):
+    try:
+        if not os.path.isdir(f"{datasetPath}"):
+            return False, "There is no folder"
+        dataList = os.listdir(f"{datasetPath}")
+        if not dataList:
+            return False, "There is no data"
+        return True, dataList
+    except:
+        return False, "Check data uploaded failed"
 
+def check_data_labeled(datasetPath):
+    try:
+        classList = []
+        dataList = os.listdir(f"{datasetPath}")
+        for data in dataList:
+            if os.path.isdir(f"{datasetPath}/{dataset}"):
+                if check_class_name_legal(dataset): 
+                    classList.append(dataset)
+        if not classList:
+            return False, "There is no classification"
+        return True, classList
+    except:
+        return False, "Check data labeled failed"
 
+def check_class_name_legal(className):
+    try:
+        illegalName = ["Train", "Training", "train", "training",
+                    "Val", "Valid", "Validation", "val", "valid", "validation",
+                    "Test", "Testing", "test", "testing",
+                    "Inference", "Inf", "inference", "inf"]
+        if illegalName.index(className):
+            return False
+    except:
+        return True
 
+def check_data_split(datasetPath):
+    try:
+        datasetList = []
+        dataList = os.listdir(f"{datasetPath}")
+        for data in dataList:
+            if os.path.isdir(f"{datasetPath}/{dataset}"):
+                if not check_class_name_legal(dataset): 
+                    datasetList.append(dataset)
+        if not datasetList:
+            return False, "There is no data split"
+        return True, datasetList
+    except:
+        return False, "Check data labeled failed"

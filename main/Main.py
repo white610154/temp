@@ -9,7 +9,7 @@ def response(code, message, data=None):
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/creat-project-by-key', methods=['POST'])
+@app.route('/create-project-by-key', methods=['POST'])
 def create_project_by_key():
     '''
     decode key to get config
@@ -25,20 +25,21 @@ def create_project_by_key():
     if not data:
         return response(1, "There is no data.")
 
-    projectName = data['name']
-    config = ProjectUtil.decode_key(data['key'])
-    if not config:
-        return response(1, "Wrong key format.")
-
-    ok, output = ProjectUtil.create_project(projectName)
+    key = data['key']
+    ok, config = ProjectUtil.decode_key(data['key'])
     if not ok:
-        return response(1, output)
+        return response(1, config)
 
-    configPath = ProjectUtil.save_config_as_json(projectName, config)
-    if not configPath:
-        return response(1, "Config save error.")
+    projectName = data['name']
+    ok, projectList = ProjectUtil.create_project(projectName)
+    if not ok:
+        return response(1, projectList)
+
+    ok, configPath = ProjectUtil.save_config_as_json(projectName, config)
+    if not ok:
+        return response(1, configPath)
     
-    return response(1, "success", {"projects": output})
+    return response(1, "success", {"projects": projectList})
 
 @app.route('/get-experiments', methods=['POST'])
 def get_experiments():
@@ -50,11 +51,13 @@ def get_experiments():
         return response(1, "There is no data.")
     
     projectName = data['name']
-    projectFolderPath = ProjectUtil.find_project(projectName)
-    if not projectFolderPath:
-        return response(1, "Project does not exist.")
+    ok, projectPath = ProjectUtil.find_project(projectName)
+    if not ok:
+        return response(1, projectPath)
 
-    config = ProjectUtil.get_config(projectFolderPath)
+    ok, config = ProjectUtil.get_config(projectPath)
+    if not ok:
+        return response(1, config)
 
     return response(0, "success", config)
 
@@ -68,10 +71,29 @@ def check_dataset():
     if not data:
         return response(1, "There is no data.")
 
-    return response(0, "success", data)
+    uploaded = labeled = split = False
+    
+    datasetPath = data['datasetPath']
+    ok, dataList = ProjectUtil.check_data_uploaded(datasetPath)
+    if not ok:
+        return response(1, dataList)
+    uploaded = True
+
+    ok, classList = ProjectUtil.check_data_labeled(datasetPath)
+    if not ok:
+        return response(0, "success", {"uploaded": uploaded, "labeled": labeled, "split": split})
+    labeled = True
+
+    ok, datasetList = ProjectUtil.check_data_split(datasetPath)
+    if not ok:
+        return response(0, "success", {"uploaded": uploaded, "labeled": labeled, "split": split})
+    labeled = True
+
+    
+    return response(0, "success", {"uploaded": uploaded, "labeled": labeled, "split": split})
 
 def main():
-    app.run(host='0.0.0.0', port=3000)
+    app.run(host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     main()
