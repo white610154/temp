@@ -39,7 +39,7 @@ def create_project_by_key():
     if not ok:
         return response(1, configPath)
     
-    return response(1, "success", {"projects": projectList})
+    return response(0, "success", {"projects": projectList})
 
 @app.route('/get-experiments', methods=['POST'])
 def get_experiments():

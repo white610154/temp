@@ -77,9 +77,9 @@ def check_data_labeled(datasetPath):
         classList = []
         dataList = os.listdir(f"{datasetPath}")
         for data in dataList:
-            if os.path.isdir(f"{datasetPath}/{dataset}"):
-                if check_class_name_legal(dataset): 
-                    classList.append(dataset)
+            if os.path.isdir(f"{datasetPath}/{data}"):
+                if check_class_name_legal(data): 
+                    classList.append(data)
         if not classList:
             return False, "There is no classification"
         return True, classList
@@ -88,11 +88,9 @@ def check_data_labeled(datasetPath):
 
 def check_class_name_legal(className):
     try:
-        illegalName = ["Train", "Training", "train", "training",
-                    "Val", "Valid", "Validation", "val", "valid", "validation",
-                    "Test", "Testing", "test", "testing",
-                    "Inference", "Inf", "inference", "inf"]
-        if illegalName.index(className):
+        illegalName = ["train", "training", "val", "valid", "validation",
+                    "test", "testing", "inference", "inf"]
+        if illegalName.index(className.lower()):
             return False
     except:
         return True
@@ -102,9 +100,9 @@ def check_data_split(datasetPath):
         datasetList = []
         dataList = os.listdir(f"{datasetPath}")
         for data in dataList:
-            if os.path.isdir(f"{datasetPath}/{dataset}"):
-                if not check_class_name_legal(dataset): 
-                    datasetList.append(dataset)
+            if os.path.isdir(f"{datasetPath}/{data}"):
+                if not check_class_name_legal(data): 
+                    datasetList.append(data)
         if not datasetList:
             return False, "There is no data split"
         return True, datasetList
