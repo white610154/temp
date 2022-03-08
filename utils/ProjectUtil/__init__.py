@@ -20,7 +20,10 @@ def decode_key(token):
         return False, "Decode key failed"
 
 def get_projects():
-    return os.listdir(rootProjectPath)
+    try:
+        return True, os.listdir(rootProjectPath)
+    except:
+        return False, "Get projects failed"
 
 def create_project(projectName):
     try:
@@ -75,6 +78,28 @@ def check_data_uploaded(datasetPath):
     except:
         return False, "Check data uploaded failed"
 
+def check_data_split(datasetPath):
+    try:
+        isTrain = isValid = isTest = 0
+        datasetList = []
+        dataList = os.listdir(f"{datasetPath}")
+        for data in dataList:
+            if os.path.isdir(f"{datasetPath}/{data}"):
+                if data == "train":
+                    isTrain = 1
+                    datasetList.append(data)
+                elif data == "valid":
+                    isValid = 1
+                    datasetList.append(data)
+                elif data == "test":
+                    isTest = 1
+                    datasetList.append(data)
+        if isTrain == 1 and isValid == 1 and isTest == 1:
+            return True, datasetList
+        return False, "Please set train/ valid/ test"
+    except:
+        return False, "Check data split failed"
+
 def check_data_labeled(datasetPath):
     try:
         classList = []
@@ -84,10 +109,11 @@ def check_data_labeled(datasetPath):
                 if check_class_name_legal(data): 
                     classList.append(data)
         if not classList:
-            return False, "There is no classification"
+            return False, "There is no classify"
         return True, classList
     except:
         return False, "Check data labeled failed"
+
 
 def check_class_name_legal(className):
     try:
@@ -98,16 +124,3 @@ def check_class_name_legal(className):
     except:
         return True
 
-def check_data_split(datasetPath):
-    try:
-        datasetList = []
-        dataList = os.listdir(f"{datasetPath}")
-        for data in dataList:
-            if os.path.isdir(f"{datasetPath}/{data}"):
-                if not check_class_name_legal(data): 
-                    datasetList.append(data)
-        if not datasetList:
-            return False, "There is no data split"
-        return True, datasetList
-    except:
-        return False, "Check data labeled failed"

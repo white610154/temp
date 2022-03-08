@@ -11,7 +11,10 @@ CORS(app)
 
 @app.route('/get-projects', methods=['POST'])
 def get_projects():
-    return response(0, "success", {'projects': ProjectUtil.get_projects()})
+    ok, projectList = ProjectUtil.get_projects()
+    if not ok:
+        return response(1, projectList)
+    return response(0, "success", {'projects': projectList})
 
 @app.route('/create-project-by-key', methods=['POST'])
 def create_project_by_key():
@@ -82,21 +85,23 @@ def check_dataset():
         return response(1, dataList)
     uploaded = True
 
-    ok, classList = ProjectUtil.check_data_labeled(datasetPath)
-    if not ok:
-        return response(0, "success", {"uploaded": uploaded, "labeled": labeled, "split": split})
-    labeled = True
-
     ok, datasetList = ProjectUtil.check_data_split(datasetPath)
     if not ok:
-        return response(0, "success", {"uploaded": uploaded, "labeled": labeled, "split": split})
-    labeled = True
+        split = False
+        ok, classList = ProjectUtil.check_data_labeled(datasetPath)
+    elif ok:
+        split = True
+        ok, classList = ProjectUtil.check_data_labeled(f"{datasetPath}/train")
 
-    
+    if not ok:
+        labeled = False
+    elif ok:
+        labeled = True
+   
     return response(0, "success", {"uploaded": uploaded, "labeled": labeled, "split": split})
 
 def main():
-    app.run(host='0.0.0.0', port=3000)
+    app.run(host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     main()
