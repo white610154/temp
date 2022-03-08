@@ -19,6 +19,9 @@ def decode_key(token):
     except:
         return False, "Decode key failed"
 
+def get_projects():
+    return os.listdir(rootProjectPath)
+
 def create_project(projectName):
     try:
         projectPath = f"{rootProjectPath}/{projectName}"
