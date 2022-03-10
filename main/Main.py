@@ -67,6 +67,26 @@ def get_experiments():
 
     return response(0, "success", config)
 
+@app.route('/set-experiment-dataset', methods=['POST'])
+def set_experiment_dataset():
+    '''
+    set dataset of experiment
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'experimentId' in data or not 'datasetPath' in data:
+        return response(1, "There is no data.")
+    
+    found, projectPath = ProjectUtil.find_project(data['projectName'])
+    if not found:
+        return response(1, projectPath)
+
+    ok, config = ProjectUtil.set_config_dataset(projectPath, data['experimentId'], data['datasetPath'])
+    if not ok:
+        return response(1, config)
+    return response(0, "success", config)
+
 @app.route('/get-datasets', methods=['POST'])
 def get_datasets():
     '''
@@ -143,7 +163,7 @@ def check_dataset():
     found, projectPath = ProjectUtil.find_project(data['projectName'])
     if not found:
         return response(1, projectPath)
-    ProjectUtil.save_dataset(projectPath, datasetPath, **status)
+    ProjectUtil.add_dataset(projectPath, datasetPath, **status)
 
     return response(0, "success", status)
 

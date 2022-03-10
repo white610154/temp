@@ -6,6 +6,7 @@ Created on FRI MAR 4 17:00:00 2021
 """
 
 import json, jwt, os
+from pkgutil import get_data
 from datetime import datetime
 
 key = 'auo'
@@ -66,6 +67,30 @@ def get_config(projectPath):
         return True, configDict
     except:
         return False, "Get config failed"
+
+def set_config_dataset(projectPath, experimentId, datasetPath):
+    try:
+        configPath = f"{projectPath}/experiments/{experimentId}.json"
+        if not os.path.isfile(configPath):
+            return False, "Experiment not found"
+
+        datasets = get_datasets(projectPath)
+        if not datasets or not datasetPath in datasets:
+            return False, "Dataset not found"
+
+        config = None
+        with open(configPath, 'r') as fin:
+            config = json.load(fin)
+        if not config:
+            return False, "Load config failed"
+
+        config['Config']['datasetPath'] = datasetPath
+        with open(configPath, 'w') as fout:
+            json.dump(config, fout)
+        return True, config
+    except Exception as err:
+        print(err)
+        return False, err
 
 def check_data_uploaded(datasetPath):
     try:
@@ -149,7 +174,7 @@ def remove_dataset(projectPath, datasetPath):
     except Exception as err:
         print(err)
 
-def save_dataset(projectPath, datasetPath, uploaded=False, labeled=False, split=False):
+def add_dataset(projectPath, datasetPath, uploaded=False, labeled=False, split=False):
     try:
         datasets = {}
         datasetFilePath = f"{projectPath}/datasets.json"
