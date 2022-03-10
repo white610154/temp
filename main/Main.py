@@ -67,6 +67,45 @@ def get_experiments():
 
     return response(0, "success", config)
 
+@app.route('/get-datasets', methods=['POST'])
+def get_datasets():
+    '''
+    get datasets of project
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data:
+        return response(1, "There is no data.")
+
+    found, projectPath = ProjectUtil.find_project(data['projectName'])
+    if not found:
+        return response(1, projectPath)
+
+    datasets = ProjectUtil.get_datasets(projectPath)
+    if not datasets:
+        return response(1, "read file error")
+    return response(0, "success", datasets)
+
+@app.route('/remote-dataset', methods=['POST'])
+def remove_dataset():
+    '''
+    remove dataset from project
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'datasetPath' in data:
+        return response(1, "There is no data.")
+
+    found, projectPath = ProjectUtil.find_project(data['projectName'])
+    if not found:
+        return response(1, projectPath)
+
+    datasets = ProjectUtil.remove_dataset(projectPath)
+    if not datasets:
+        return response(1, "write file error")
+    return response(0, "success", datasets)
 
 @app.route('/check-dataset', methods=['POST'])
 def check_dataset():
@@ -76,32 +115,40 @@ def check_dataset():
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
+    elif not 'datasetPath' in data or not 'projectName' in data:
+        return response(1, "There is no data.")
 
-    uploaded = labeled = split = False
-    
+    status = {
+        'uploaded': False,
+        'labeled': False,
+        'split': False,
+    }
+
     datasetPath = data['datasetPath']
     ok, dataList = ProjectUtil.check_data_uploaded(datasetPath)
     if not ok:
         return response(1, dataList)
-    uploaded = True
+    status['uploaded'] = True
 
     ok, datasetList = ProjectUtil.check_data_split(datasetPath)
     if not ok:
-        split = False
+        status['split'] = False
         ok, classList = ProjectUtil.check_data_labeled(datasetPath)
     elif ok:
-        split = True
+        status['split'] = True
         ok, classList = ProjectUtil.check_data_labeled(f"{datasetPath}/train")
 
-    if not ok:
-        labeled = False
-    elif ok:
-        labeled = True
-   
-    return response(0, "success", {"uploaded": uploaded, "labeled": labeled, "split": split})
+    status['labeled'] = ok
+
+    found, projectPath = ProjectUtil.find_project(data['projectName'])
+    if not found:
+        return response(1, projectPath)
+    ProjectUtil.save_dataset(projectPath, datasetPath, **status)
+
+    return response(0, "success", status)
 
 def main():
-    app.run(host='0.0.0.0', port=3000)
+    app.run(host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     main()

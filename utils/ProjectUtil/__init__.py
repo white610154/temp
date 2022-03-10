@@ -69,9 +69,9 @@ def get_config(projectPath):
 
 def check_data_uploaded(datasetPath):
     try:
-        if not os.path.isdir(f"{datasetPath}"):
+        if not os.path.isdir(datasetPath):
             return False, "There is no folder"
-        dataList = os.listdir(f"{datasetPath}")
+        dataList = os.listdir(datasetPath)
         if not dataList:
             return False, "There is no data"
         return True, dataList
@@ -82,7 +82,7 @@ def check_data_split(datasetPath):
     try:
         isTrain = isValid = isTest = 0
         datasetList = []
-        dataList = os.listdir(f"{datasetPath}")
+        dataList = os.listdir(datasetPath)
         for data in dataList:
             if os.path.isdir(f"{datasetPath}/{data}"):
                 if data == "train":
@@ -103,7 +103,7 @@ def check_data_split(datasetPath):
 def check_data_labeled(datasetPath):
     try:
         classList = []
-        dataList = os.listdir(f"{datasetPath}")
+        dataList = os.listdir(datasetPath)
         for data in dataList:
             if os.path.isdir(f"{datasetPath}/{data}"):
                 if check_class_name_legal(data): 
@@ -114,7 +114,6 @@ def check_data_labeled(datasetPath):
     except:
         return False, "Check data labeled failed"
 
-
 def check_class_name_legal(className):
     try:
         illegalName = ["train", "training", "val", "valid", "validation",
@@ -124,3 +123,47 @@ def check_class_name_legal(className):
     except:
         return True
 
+def get_datasets(projectPath):
+    try:
+        datasets = {}
+        datasetFilePath = f"{projectPath}/datasets.json"
+        if os.path.exists(datasetFilePath):
+            with open(f"{projectPath}/datasets.json", 'r') as fin:
+                datasets = json.load(fin)
+        return datasets
+    except Exception as err:
+        print(err)
+
+def remove_dataset(projectPath, datasetPath):
+    try:
+        datasets = {}
+        datasetFilePath = f"{projectPath}/datasets.json"
+        if os.path.exists(datasetFilePath):
+            with open(f"{projectPath}/datasets.json", 'r') as fin:
+                datasets = json.load(fin)
+        if datasetPath in datasets:
+            del datasets[datasetPath]
+            with open(f"{projectPath}/datasets.json", 'w') as fout:
+                json.dump(datasets, fout)
+        return datasets
+    except Exception as err:
+        print(err)
+
+def save_dataset(projectPath, datasetPath, uploaded=False, labeled=False, split=False):
+    try:
+        datasets = {}
+        datasetFilePath = f"{projectPath}/datasets.json"
+        if os.path.exists(datasetFilePath):
+            with open(f"{projectPath}/datasets.json", 'r') as fin:
+                datasets = json.load(fin)
+        
+        datasets[datasetPath] = {
+            'uploaded': uploaded,
+            'labeled': labeled,
+            'split': split,
+        }
+
+        with open(f"{projectPath}/datasets.json", 'w') as fout:
+            json.dump(datasets, fout)
+    except Exception as err:
+        print(err)
