@@ -56,7 +56,7 @@ def get_experiments():
     if not data:
         return response(1, "There is no data.")
     
-    projectName = data['name']
+    projectName = data['projectName']
     ok, projectPath = ProjectUtil.find_project(projectName)
     if not ok:
         return response(1, projectPath)
@@ -101,7 +101,7 @@ def check_dataset():
     return response(0, "success", {"uploaded": uploaded, "labeled": labeled, "split": split})
 
 def main():
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=3000)
 
 if __name__ == '__main__':
     main()
