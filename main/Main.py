@@ -107,7 +107,7 @@ def get_datasets():
         return response(1, "read file error")
     return response(0, "success", datasets)
 
-@app.route('/remote-dataset', methods=['POST'])
+@app.route('/remove-dataset', methods=['POST'])
 def remove_dataset():
     '''
     remove dataset from project
