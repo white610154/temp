@@ -3,6 +3,9 @@ from .ShowResult import *
 
 def select_show_method(mode, dataSet, totalCorrect, classTotal, classCorrect,
                        cfMatrix, predicted, labels, confidence=None, count=None):
+    """
+    According to configs in ConfigEvaluation, select evaluation methods.
+    """
     if EvaluationPara.showAcc:
         show_total_acc(mode, len(dataSet), totalCorrect)
         
@@ -16,5 +19,5 @@ def select_show_method(mode, dataSet, totalCorrect, classTotal, classCorrect,
         show_rate(len(dataSet), totalCorrect, classTotal, classCorrect,
                   cfMatrix, dataSet.className.index(EvaluationPara.showRate['targetIndex']))
     
-    if EvaluationPara.showWrongFile:
-        show_wrong_file(dataSet.filename, predicted, labels, confidence, dataSet.className, count)
+    # if EvaluationPara.showWrongFile:
+    #     count = show_wrong_file(dataSet.filename, predicted, labels, confidence, dataSet.className, count)

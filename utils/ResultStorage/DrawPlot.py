@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import itertools
 import numpy as np
+from matplotlib.ticker import MaxNLocator
 from config.Config import BasicSetting, PrivateSetting
 from config.ConfigResultStorage import ResultStorage
 
@@ -9,13 +10,14 @@ def draw_acc_curve(accRecord:list):
     Draw accuracy curve.
 
     Args:
-        accRecord:包含每個epoch的testing data準確率
+        accRecord: a list including validation accuracy of all epochs
     """
     if ResultStorage.drawAccCurve:
         plt.plot(accRecord, color='blue')
         plt.title('accuracy curve')
         plt.ylabel('acc')
         plt.xlabel('epoch')
+        plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
         plt.legend(['acc'], loc='upper left')
         plt.grid()
         plt.savefig(f'./{PrivateSetting.outputPath}/ValidAccCurve.jpg')
@@ -27,11 +29,11 @@ def plot_confusion_matrix(cm, classes:list, normalize:bool=True, title:str='Conf
     This function prints and plots the confusion matrix.
 
     Args:
-        cm: 2維的confusion matrix
-        classes: 類別名稱
-        normalize: True:以比例值顯示
-        title: 圖示的標題
-        cmap: 顏色
+        cm: 2D confusion matrix
+        classes: class name
+        normalize: True: show in percentage
+        title: title of the figure
+        cmap: color of confusion matrix
     """
     if ResultStorage.drawConfusionMatrix:
         print(cm)

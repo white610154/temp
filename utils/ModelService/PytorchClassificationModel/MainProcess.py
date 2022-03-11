@@ -4,14 +4,14 @@ import copy
 import numpy as np
 from torch.utils.data import DataLoader
 from .CustomDataset import ImageDataset, InferenceDataset
-from .SelectTransform import select_train_transform, select_transform
+from .SelectTransform import select_train_transform, select_valid_transform, select_transform
 from .SelectModel import select_model
 from .SelectLossFunction import select_loss_function
 from .SelectOptimizer import select_optimizer
 from .SelectScheduler import select_scheduler
+from utils.Postprocess.SetPostprocess import select_postprocess
 from utils.ResultStorage import DrawPlot, SaveAcc, SelectStorageMethod
 from utils.Evaluation import ShowResult, SelectShowMethod
-from utils.Postprocess.SetPostprocess import PostProcess
 from config.ConfigPostprocess import PostProcessPara
 from config.ConfigPytorchModel import ClsModelPara, ClsPath
 
@@ -20,20 +20,21 @@ torch.manual_seed(0)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
+
 def train():
     """
-    Training procedure: 使用train的資料訓練模型，並紀錄訓練中的validation準確率並儲存權重
+    Training procedure: Use training data for model training, and record epoch acc, best weight, and draw validation curve.
 
     Return:
-        CheckPoint.pth、BestWeight.pth、FinalWeight.pth: 儲存記錄點、最佳權重及最終權重
-        ValidAcc.txt: 紀錄valid的準確率變化
-        ValidCurve.jpg: valid準確率變化曲線
+        CheckPoint.pth、BestWeight.pth、FinalWeight.pth
+        ValidAcc.txt: Record the validation accuracy of each epochs.
+        ValidCurve.jpg: Draw the validation accuracy curve.
     """
     ##### GPU setting #####
     cudaDevice = torch.device("cuda:{}".format(ClsModelPara.cudaDevice) if torch.cuda.is_available() else "cpu")
 
     ##### Prepare data #####
-    trainTransform = select_train_transform()
+    trainTransform, mean, std = select_train_transform()
     trainSet = ImageDataset(ClsPath.trainPath, trainTransform)
     trainLoader = DataLoader(dataset=trainSet, batch_size=ClsModelPara.batchSize, shuffle=True, num_workers=0)
     print("Number of class : ", trainSet.numClasses)
@@ -67,7 +68,7 @@ def train():
             optimizer.step()
             trainCorrect += torch.sum(preds == labels)
         ShowResult.show_total_acc('Train', len(trainSet), trainCorrect)        
-        validAcc = valid(cudaDevice, model, epoch)
+        validAcc = valid(cudaDevice, model, epoch, mean, std)
         accRecord.append(validAcc)
         scheduler.step()
 
@@ -76,19 +77,19 @@ def train():
     DrawPlot.draw_acc_curve(accRecord)
 
 
-def valid(device, model, epoch:int):
+def valid(device, model, epoch, mean, std):
     """
-    Validation procedure: 使用valid的資料測試目前訓練階段的模型，得到準確率
+    Validation procedure: Use validation data for model verification.
     
     Args:
-        device: 使用的GPU device
-        model: 要驗證的模型
-        epoch: 目前驗證的是第幾個epoch的模型
+        device: GPU device.
+        model : The model used for verification.
+        epoch : Current epoch of the model.
 
     Return:
-        回傳valid的準確率
+        Record and return validation accuracy
     """
-    validTransform = select_transform()
+    validTransform = select_valid_transform(mean, std)
     validSet = ImageDataset(ClsPath.validPath, validTransform)
     validLoader = DataLoader(dataset=validSet, batch_size=ClsModelPara.batchSize, shuffle=False, num_workers=0)
 
@@ -122,11 +123,11 @@ def valid(device, model, epoch:int):
 
 def test():
     """
-    Testing procedure: 使用test的資料測試指定權重之模型，並輸出結果csv和混淆矩陣
+    Testing procedure: Use test data for model verification, and output the predicted result csv and confusion matrix.
 
     Return:
-        Test_result.csv: 輸出預測結果及信心值分布的csv檔
-        ConfusionMatrix.jpg: 產生分類的混淆矩陣圖
+        Test_result.csv: Record the filenames, labels, model prediction, and confidence.
+        ConfusionMatrix.jpg: Confusion matrix graph.
     """
     cudaDevice = torch.device("cuda:{}".format(ClsModelPara.cudaDevice) if torch.cuda.is_available() else "cpu")
     testTransform = select_transform()
@@ -152,8 +153,7 @@ def test():
             outputs = model(inputs)
             
             ##### Post process #####
-            testPostProcess = PostProcess(outputs, testSet.className)
-            newOutputs = testPostProcess.select_process()
+            newOutputs = select_postprocess(outputs, testSet.className)
             _, predicted = torch.max(newOutputs, 1)
             
             ##### Record the result #####
@@ -177,10 +177,10 @@ def test():
 
 def inference():
     """
-    Inference procedure: 使用訓練完成之模型辨識inference的資料，並輸出結果csv
+    Inference procedure: Use trained model for classifying inference data, and output the result csv.
 
     Return:
-        Inference_result.csv: 輸出預測結果及信心值分布的csv檔
+        Inference_result.csv: Record the filenames, model prediction, and confidence.
     """
     cudaDevice = torch.device("cuda:{}".format(ClsModelPara.cudaDevice) if torch.cuda.is_available() else "cpu")
     inferenceTransform = select_transform()
@@ -203,8 +203,7 @@ def inference():
             outputs = model(inputs)
 
             ##### Post process #####
-            testPostProcess = PostProcess(outputs, className)
-            newOutputs = testPostProcess.select_process()
+            newOutputs = select_postprocess(outputs, className)
             _, predicted = torch.max(newOutputs, 1)
 
             ##### Output result #####

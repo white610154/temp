@@ -14,19 +14,17 @@ from config.ConfigPytorchModel import ClsPath
 from utils.ModelService.PytorchClassificationModel.CustomDataset import ImageDataset
 
 def get_std_mean(imageSize):
-    # imgPath = os.path.join(PrivateSetting.DATASET_PATH, "Train")
     transform = transforms.Compose([transforms.Resize((imageSize[0], imageSize[1])), transforms.ToTensor()])
     trainDataset = ImageDataset(ClsPath.trainPath, transform=transform)
-    dataloader = DataLoader(dataset=trainDataset, batch_size=32, shuffle=False)
+    dataloader = DataLoader(dataset=trainDataset, batch_size=512, shuffle=False)
     
-    channels_sum, channels_squared_sum, num_batches = 0, 0, 0
+    channelsSum, channelsSquaredSum, numBatches = 0, 0, 0
     for data, _ in dataloader:
         # Mean over batch, height and width, but not over the channels
-        channels_sum += torch.mean(data, dim=[0,2,3])
-        channels_squared_sum += torch.mean(data**2, dim=[0,2,3])
-        num_batches += 1
+        channelsSum += torch.mean(data, dim=[0, 2, 3])
+        channelsSquaredSum += torch.mean(data ** 2, dim=[0, 2, 3])
+        numBatches += 1
     
-    mean = channels_sum / num_batches
-    std = (channels_squared_sum / num_batches - mean ** 2) ** 0.5
-
+    mean = channelsSum / numBatches
+    std = (channelsSquaredSum / numBatches - mean ** 2) ** 0.5
     return mean, std

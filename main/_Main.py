@@ -4,14 +4,13 @@
 Created on TUE Dec 7 20:00:00 2021
 @author: OtisChang
 """
-from config.Config import BasicSetting, PrivateSetting
+from config.Config import BasicSetting
 from utils.DatasetClean import CopyUserInput, DataSplit, CropImage
 from utils.ModelService.PytorchClassificationModel import MainProcess
 
 def train():
     '''
-    讀入PROJECT_ID, EXPERIMENT_ID
-    進行本次實驗模型、前處理、後處理查找
+    Call training module
     '''
     # print("Step 1: Dataset Split")
     # dataPath, labelPath = CopyUserInput.copy_user_input(PrivateSetting.DATASET_PATH, **DataSetting.DATA_STATE)
@@ -31,16 +30,14 @@ def train():
 
 def test():
     '''
-    讀入ProjectID = 1; ExperimentID = 1
-    進行本次實驗模型、前處理、後處理查找
+    Call testing module
     '''
     MainProcess.test()
     
 
 def inference():
     '''
-    讀入ProjectID = 1; ExperimentID = 1
-    進行本次實驗模型、前處理、後處理查找
+    Call inference module
     '''
     MainProcess.inference()
 
@@ -55,5 +52,4 @@ def main():
     elif BasicSetting.task == 'Inference':
         inference()
     else:
-        print("請於 config/Config.py 中設定 TASK 模式")
-        exit()
+        raise BaseException("Please set up the correct task mode in config/Config.py.")

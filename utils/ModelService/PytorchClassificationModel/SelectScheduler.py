@@ -1,8 +1,13 @@
-from torch import optim
 from config.ConfigModelService import SchedulerPara
 import torch.optim.lr_scheduler as SchedulerMethod
 
 def select_scheduler(optimizer):
+    """
+    According to configs in ConfigModelService, select scheduler to adjust learning rate of optimizer.
+
+    Return:
+        scheduler
+    """
     if SchedulerPara.stepLR['switch']:
         method = getattr(SchedulerMethod, 'StepLR')
         scheduler = method(optimizer=optimizer, 
@@ -16,5 +21,4 @@ def select_scheduler(optimizer):
                            T_max=SchedulerPara.cosineAnnealingLR['T_max'],
                            eta_min=SchedulerPara.cosineAnnealingLR['eta_min'],
                            )
-    
     return scheduler

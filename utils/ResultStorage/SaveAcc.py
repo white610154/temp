@@ -5,15 +5,15 @@ from config.Config import BasicSetting, PrivateSetting
 
 def save_epoch_acc(epoch:int, total:int, totalCorrect:int, classTotal:list, classCorrect:list, className:list):
     """
-    Save epoch accuracy into txt file.
+    Save epoch accuracy and class accuracy into txt file.
 
     Args:
-        epoch: 目前的epoch數
-        total: 總資料量
-        totalCorrect: 分類正確的總數
-        classTotal: 各類別的資料總數
-        classCorrect: 各類別分類正確的數量
-        className: 類別名稱
+        epoch: current epoch number
+        total: total data amount
+        totalCorrect: correctly predicted data amount
+        classTotal: data amount of each class
+        classCorrect: correctly predicted data amount of each class
+        className: list of class name
     """
     if epoch == 0:
         with open(f'./{PrivateSetting.outputPath}/ValidAcc.txt','w') as fAcc:
@@ -29,17 +29,17 @@ def save_epoch_acc(epoch:int, total:int, totalCorrect:int, classTotal:list, clas
 
 def output_result_csv(nameList:list, predict:tensor, labels:tensor, confidence:tensor, className:list, count:int, mode=BasicSetting.task):
     """
-    Output 2 phase test result into csv file, file name : Data2_test_2phase_d23_c25.csv.
+    Output test result into csv file, file name : Test_result.csv or Inference_result.csv.
 
     Args:
-        nameList: 所有檔案名稱列表
-        predict: 預測類別結果
-        labels: 原始輸入影像的正確類別
-        confidence: 模型output經過softmax後的結果
-        className: 所有的類別名稱
-        count: 用來記錄目前的檔名到第幾個
+        nameList: list include all file names
+        predict: model prediction (dtype: tensor)
+        labels: correct label (dtype:tensor)
+        confidence: predicted confidence
+        className: class name of each class
+        count: use to record current file
 
-    csv檔內的格式: 
+    format in csv file: 
         Filename | Ground truth | Prediction | Confidence of each class
 
     """

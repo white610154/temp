@@ -3,6 +3,17 @@ from config.ConfigPytorchModel import ClsModelPara
 from utils.ResultStorage import SaveWeight
 
 def save_weight(model, bestAcc, currentAcc, epoch):
+    """
+    According to configs in ConfigResultStorage, save different model weight.
+
+    Args:
+        model: whole model
+        bestAcc: best accuracy till now
+        currentAcc: accuracy of the current epoch
+        epoch: current epoch number
+    Return:
+        bestAcc: update best accuracy till now and return
+    """
     if bestAcc <= currentAcc:
         bestAcc = currentAcc
         SaveWeight.save_model_weight(model, 'BestWeight')

@@ -6,27 +6,31 @@ Created on Mon Feb 7 11:00:00 2022
 """
 from config.Config import PrivateSetting
 
-##### 模型選擇 #####
+### Select your model ###
 class SelectedModel:
-    # resnext50_32x4d, regnet_y_400mf, ....
-    model              = {'structure': 'regnet_y_400mf', 'pretrained': True}
+    """
+    The model including: AlexNet, DenseNet, EfficientNet, MnasNet, MobileNetV3, RegNet, ResNet
+                         ShuffleNetV2, VGG, cbam_resnet, se_cbam_resnet, se_resnet
+    For the detail structure name, please check out each code in ./utils/AiModel package.
+    """
+    model              = {'structure': 'se_cbam_resnext50_32x4d', 'pretrained': False}
 
 
-##### 模型參數設定 #####
+### Set up model parameters  ###
 class ClsModelPara:
-    cudaDevice         = 1
-    batchSize          = 8
-    epochs             = 2
+    cudaDevice         = 2   # GPU device used for running program
+    batchSize          = 32   # Number of data use for training at the same time
+    epochs             = 20   # The iteration number of training
 
 
-##### 相關路徑設定 #####
+### Set up path  ###
 class ClsPath:
-    ### 資料路徑 ###
-    trainPath          = './input/Data/ten_type/Train'
-    validPath          = './input/Data/ten_type/Valid'
-    testPath           = './input/Data/ten_type/Test'
-    inferencePath      = './input/Data/ten_type/Inference'
+    ### Data path
+    trainPath          = "./input/Data/seven_type_ok_mmfa/Train"     # Train data path
+    validPath          = "./input/Data/seven_type_ok_mmfa/Valid"     # Validation data path
+    testPath           = "./input/Data/seven_type_ok_mmfa/Test"           # Test data path
+    inferencePath      = "./input/Data/Dimple"             # Inference data path
     
-    ### 權重路徑 ###
-    pretrainedWeight   = f"./input/PretrainedWeight/{SelectedModel.model['structure']}.pth"
-    weightPath         = f'./{PrivateSetting.outputPath}/BestWeight.pth'
+    ### Weight path
+    pretrainedWeight   = f"./input/PretrainedWeight/{SelectedModel.model['structure']}.pth" # Model weight for training
+    weightPath         = f'./{PrivateSetting.outputPath}/BestWeight.pth'                    # Model weight for test and inference

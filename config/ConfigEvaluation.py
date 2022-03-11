@@ -5,10 +5,9 @@ Created on Mon Feb 7 11:00:00 2022
 @author: OtisChang
 """
 
-##### 參數設定 #####
 class EvaluationPara:
-    showAcc          = True
-    showClassAcc     = True
-    showNumOfClasses = False
-    showRate         = {'switch': True, 'targetIndex': 'OK'}
-    showWrongFile    = False
+    showAcc          = True                                    # Show overall accuracy.
+    showClassAcc     = True                                    # Show individual class accuracy.
+    showNumOfClasses = False                                   # Show amount of total images and correctly predicted images.
+    showRate         = {'switch': True, 'targetIndex': 'Pass'}   # Show overkill、leakage、defect accuracy.
+    showWrongFile    = False                                   # Show file name of wrong predicted images.

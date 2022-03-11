@@ -1,8 +1,16 @@
 import torch
 import torch.optim as OptimizerMethod
 from config.ConfigModelService import OptimizerPara, LearningRate
+from distutils.version import LooseVersion
 
 def select_optimizer(modelPara):
+    """
+    According to configs in ConfigModelService, select and set up optimizer.
+    Optimizer: SGD, Adam, Adadelta, AdamW, NAdam
+
+    Return:
+        optimizer
+    """
     if OptimizerPara.SGD['switch']:
         method = getattr(OptimizerMethod, 'SGD')
         optimizer = method(params=modelPara, 
@@ -43,7 +51,7 @@ def select_optimizer(modelPara):
                            )
     
     elif OptimizerPara.NAdam['switch']:
-        if torch.__version__ > '1.10.0':
+        if LooseVersion(torch.__version__) < '1.10.0':
             raise BaseException(f"NAdam needs torch version >= 1.10.0. But the torch version is {torch.__version__}.")
         else:
             method = getattr(OptimizerMethod, 'NAdam')

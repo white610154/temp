@@ -48,21 +48,21 @@ class InferenceDataset(Dataset):
     def __init__(self, rootDir, transform=None):
         self.rootDir = rootDir
         self.x = []
-        self.filename = os.listdir(rootDir)
+        self.filename = []
         self.transform = transform
-        for name in self.filename:
+        for name in os.listdir(rootDir):
             try:
                 Image.open(os.path.join(rootDir, name)).convert('RGB')
+                self.filename.append(name)
+                self.x.append(os.path.join(rootDir, name))
             except:
                 continue
-            self.x.append(os.path.join(rootDir, name))
     
     def __len__(self):
         return len(self.filename)
 
     def __getitem__(self, index):
-        imgPath = os.path.join(self.rootDir, self.filename[index])
-        image = Image.open(imgPath).convert('RGB')
+        image = Image.open(self.x[index]).convert('RGB')
         if self.transform:
             image = self.transform(image)
         # Inference has no label

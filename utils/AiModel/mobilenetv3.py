@@ -4,15 +4,10 @@ from typing import Any, Callable, List, Optional, Sequence
 
 import torch
 from torch import nn, Tensor
-from torch.hub import load_state_dict_from_url
-
-# from .._internally_replaced_utils import load_state_dict_from_url
-from ..misc import ConvNormActivation, SqueezeExcitation as SElayer
-# from ..utils import _log_api_usage_once
-from .._utils import _make_divisible
+from .torchFuture import ConvNormActivation, SqueezeExcitation as SElayer
+from .torchFuture import _make_divisible
 
 __all__ = ["MobileNetV3", "mobilenet_v3_large", "mobilenet_v3_small"]
-
 
 model_urls = {
     "mobilenet_v3_large": "https://download.pytorch.org/models/mobilenet_v3_large-8738ca79.pth",
@@ -292,11 +287,6 @@ def _mobilenet_v3(
     **kwargs: Any,
 ):
     model = MobileNetV3(inverted_residual_setting, last_channel, **kwargs)
-    if pretrained:
-        if model_urls.get(arch, None) is None:
-            raise ValueError(f"No checkpoint is available for model type {arch}")
-        state_dict = load_state_dict_from_url(model_urls[arch], progress=progress)
-        model.load_state_dict(state_dict)
     return model
 
 

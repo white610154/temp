@@ -2,17 +2,17 @@ import os
 import torch
 from config.Config import BasicSetting, PrivateSetting
 
-def save_model_weight(bestModel, weightName):
+def save_model_weight(model, weightName):
     """
-    儲存當下最佳的權重
+    Save the weight of model.
 
     Args:
-        bestModel: 最佳模型
-        savePath: 要儲存的路徑
+        model: the entire model
+        weightName: the saved weight file name
 
     Output:
-        BestWeight.pth: 準確率最佳的權重
+        xxx.pth: the weight file of model
     """
     if not os.path.isdir(PrivateSetting.outputPath):
         os.makedirs(PrivateSetting.outputPath)
-    torch.save(bestModel.state_dict(), f'{PrivateSetting.outputPath}/{weightName}.pth')
+    torch.save(model.state_dict(), f'{PrivateSetting.outputPath}/{weightName}.pth')

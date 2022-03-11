@@ -1,8 +1,6 @@
 # Modified from
 # https://github.com/facebookresearch/ClassyVision/blob/main/classy_vision/models/anynet.py
 # https://github.com/facebookresearch/ClassyVision/blob/main/classy_vision/models/regnet.py
-
-
 import math
 from collections import OrderedDict
 from functools import partial
@@ -11,13 +9,8 @@ from typing import Any, Callable, List, Optional, Tuple
 import torch
 from torch import nn, Tensor
 import numpy as np
-
-# from .._internally_replaced_utils import load_state_dict_from_url
-from torch.hub import load_state_dict_from_url
-from ..misc import ConvNormActivation, SqueezeExcitation
-# from ..utils import _log_api_usage_once
-from .._utils import _make_divisible
-
+# from torch.hub import load_state_dict_from_url
+from .torchFuture import ConvNormActivation, SqueezeExcitation, _make_divisible
 
 __all__ = [
     "RegNet",
@@ -35,6 +28,7 @@ __all__ = [
     "regnet_x_8gf",
     "regnet_x_16gf",
     "regnet_x_32gf",
+    "regnet_y_400mf_cls7",
 ]
 
 
@@ -311,6 +305,8 @@ class RegNet(nn.Module):
         block_type: Optional[Callable[..., nn.Module]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
         activation: Optional[Callable[..., nn.Module]] = None,
+        isAddlayer: bool = False,
+        outputClassNum: int = 1000,
     ) -> None:
         super().__init__()
         # _log_api_usage_once(self)
@@ -367,7 +363,9 @@ class RegNet(nn.Module):
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(in_features=current_width, out_features=num_classes)
-        self.auoFc = nn.Linear(in_features=num_classes, out_features=10)
+        self.isAddlayer = isAddlayer
+        if isAddlayer:
+            self.auoFc = nn.Linear(in_features=num_classes, out_features=outputClassNum)
         # Init weights and good to go
         self._reset_parameters()
 
@@ -378,7 +376,8 @@ class RegNet(nn.Module):
         x = self.avgpool(x)
         x = x.flatten(start_dim=1)
         x = self.fc(x)
-        # x = self.auoFc(x)
+        if self.isAddlayer:
+            x = self.auoFc(x)
 
         return x
 
@@ -400,11 +399,6 @@ class RegNet(nn.Module):
 def _regnet(arch: str, block_params: BlockParams, pretrained: bool, progress: bool, **kwargs: Any) -> RegNet:
     norm_layer = kwargs.pop("norm_layer", partial(nn.BatchNorm2d, eps=1e-05, momentum=0.1))
     model = RegNet(block_params, norm_layer=norm_layer, **kwargs)
-    if pretrained:
-        if arch not in model_urls:
-            raise ValueError(f"No checkpoint is available for model type {arch}")
-        state_dict = load_state_dict_from_url(model_urls[arch], progress=progress)
-        model.load_state_dict(state_dict)
     return model
 
 
@@ -600,18 +594,18 @@ def regnet_x_32gf(pretrained: bool = False, progress: bool = True, **kwargs: Any
     return _regnet("regnet_x_32gf", params, pretrained, progress, **kwargs)
 
 
-# def regnet_y_400mf_cls7(pretrained: bool = False, progress: bool = True, outputClassNum: int = 1000, **kwargs: Any) -> RegNet:
-#     """
-#     Constructs a RegNetY_400MF architecture from
-#     `"Designing Network Design Spaces" <https://arxiv.org/abs/2003.13678>`_.
+def regnet_y_400mf_cls7(pretrained: bool = False, progress: bool = True, outputClassNum: int = 1000, **kwargs: Any) -> RegNet:
+    """
+    Constructs a RegNetY_400MF architecture from
+    `"Designing Network Design Spaces" <https://arxiv.org/abs/2003.13678>`_.
 
-#     Args:
-#         pretrained (bool): If True, returns a model pre-trained on ImageNet
-#         progress (bool): If True, displays a progress bar of the download to stderr
-#     """
-#     kwargs['isAddlayer'] = True
-#     kwargs['outputClassNum'] = outputClassNum
-#     params = BlockParams.from_init_params(depth=16, w_0=48, w_a=27.89, w_m=2.09, group_width=8, se_ratio=0.25, **kwargs)
-#     return _regnet("regnet_y_400mf_cls7", params, pretrained, progress, **kwargs)
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    kwargs['isAddlayer'] = True
+    kwargs['outputClassNum'] = outputClassNum
+    params = BlockParams.from_init_params(depth=16, w_0=48, w_a=27.89, w_m=2.09, group_width=8, se_ratio=0.25, **kwargs)
+    return _regnet("regnet_y_400mf_cls7", params, pretrained, progress, **kwargs)
 
 # TODO(kazhang): Add RegNetZ_500MF and RegNetZ_4GF
