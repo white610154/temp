@@ -9,5 +9,5 @@ class EvaluationPara:
     showAcc          = True                                    # Show overall accuracy.
     showClassAcc     = True                                    # Show individual class accuracy.
     showNumOfClasses = False                                   # Show amount of total images and correctly predicted images.
-    showRate         = {'switch': True, 'targetIndex': 'Pass'}   # Show overkill、leakage、defect accuracy.
+    showRate         = {'switch': False, 'targetIndex': 'Pass'}   # Show overkill、leakage、defect accuracy.
     showWrongFile    = False                                   # Show file name of wrong predicted images.

@@ -6,10 +6,10 @@ Created on Mon Feb 7 11:00:00 2022
 """
 
 class BasicSetting:
-    projectID    = 0         # Project ID
-    experimentID = 0         # Experiment ID
-    task         = "Train"   # 'Train', 'Test' or 'Inference'
+    projectID    = ""
+    experimentID = ""
+    task         = "Train"
 
 class PrivateSetting:
-    datasetPath = "./dataset" # The path for data clean.
-    outputPath  = "output"    # The path that all result place.
+    datasetPath = ""
+    outputPath  = f"./projects/{projectID}/runs/{experimentID}"
