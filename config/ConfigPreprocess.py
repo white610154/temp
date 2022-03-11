@@ -7,7 +7,7 @@ Created on Wed Jan 12 14:00:00 2022
 
 class PreprocessPara:
     ### normalize: 0: ImageNet, 1: CIFAR10, 2: MNIST, 3: Calculate normalize, 4: User Input, 5: ABF, 6: VRS
-    normalize  = {'switch': False, 
+    normalize  = {'switch': True, 
                   'mode': 6,
                   'mean': [0.49002929, 0.49002929, 0.49002929],
                   'std': [0.26184613, 0.26184613, 0.26184613]}

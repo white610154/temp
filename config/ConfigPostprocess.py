@@ -12,6 +12,5 @@ class PostProcessPara:
                         'selectLabel': 'Pass', 
                         # 'classList': ['AU02', 'EN01', 'EN02', 'EN03', 'IT43', 
                         #              'OK', 'SM00.OT08', 'SM03.SM07', 'SM04', 'SM05'],
-                        'classList': ['Copper', 'Dimple', 'Nick', 'Open', 'Pass', 
-                                     'Protrusion', 'Short']
+                        'classList': ['NG', 'OK]
                        }

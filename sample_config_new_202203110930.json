@@ -1,0 +1,105 @@
+{
+    "Config": {
+        "PrivateSetting": {
+            "datasetPath": ""
+        }
+    },
+    "ConfigAugmentation": {
+        "AugmentationPara": {
+            "randomHorizontalFlip": {
+                "switch": 1,
+                "probability": 0.5
+            }
+        }
+    },
+    "ConfigEvaluation": {
+        "EvaluationPara": {
+            "showAcc": 1,
+            "showClassAcc": 1,
+            "showRate": {
+                "switch": 1,
+                "targetIndex": "OK"
+            },
+            "showWrongFile": 0
+        }
+    },
+    "ConfigModelService": {
+        "LossFunctionPara": {
+            "lossFunction": "CrossEntropyLoss"
+        },
+        "LearningRate": {
+            "learningRate": 0.01
+        },
+        "OptimizerPara": {
+            "Adam": {
+                "switch": 1,
+                "betas": [
+                    0.9,
+                    0.999
+                ],
+                "eps": 1e-08,
+                "weightDecay": 0.0005,
+                "amsgrad": 0
+            }
+        },
+        "SchedulerPara": {
+            "stepLR": {
+                "switch": 1,
+                "step_size": 1,
+                "gamma": 0.5
+            }
+        }
+    },
+    "ConfigPostprocess": {
+        "PostProcessPara": {
+            "confidenceFilter": {
+                "switch": 1,
+                "threshold": 0.75,
+                "selectLabel": "OK",
+                "classList": [
+                    "NG",
+                    "OK",
+                ]
+            }
+        }
+    },
+    "ConfigPreprocess": {
+        "PreprocessPara": {
+            "imageSize": [224, 224],
+            "normalize": {
+                "switch": 1,
+                "mode": 4,
+                "mean": [
+                    0.49002929,
+                    0.49002929,
+                    0.49002929
+                ],
+                "std": [
+                    0.26184613,
+                    0.26184613,
+                    0.26184613
+                ]
+            }
+        }
+    },    
+    "ConfigPytorchModel": {
+        "SelectedModel": {
+            "model": {
+                "structure": "regnet_y_400mf",
+                "pretrained": 1
+            }
+        },
+        "ClsModelPara": {
+            "cudaDevice": 0,
+            "batchSize": 8,
+            "epochs": 2
+        }
+    },
+    "ConfigResultStorage": {
+        "ResultStorage": {
+            "saveAccTxt": 1,
+            "drawAccCurve": 1,
+            "drawConfusionMatrix": 1
+        }
+    }
+}

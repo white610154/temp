@@ -13,7 +13,7 @@ class SelectedModel:
                          ShuffleNetV2, VGG, cbam_resnet, se_cbam_resnet, se_resnet
     For the detail structure name, please check out each code in ./utils/AiModel package.
     """
-    model              = {'structure': 'se_cbam_resnext50_32x4d', 'pretrained': False}
+    model              = {'structure': 'regnet_y_400mf', 'pretrained': True}
 
 
 ### Set up model parameters  ###
@@ -26,10 +26,10 @@ class ClsModelPara:
 ### Set up path  ###
 class ClsPath:
     ### Data path
-    trainPath          = "./input/Data/seven_type_ok_mmfa/Train"     # Train data path
-    validPath          = "./input/Data/seven_type_ok_mmfa/Valid"     # Validation data path
-    testPath           = "./input/Data/seven_type_ok_mmfa/Test"           # Test data path
-    inferencePath      = "./input/Data/Dimple"             # Inference data path
+    trainPath          = ""     # Train data path
+    validPath          = ""     # Validation data path
+    testPath           = ""           # Test data path
+    inferencePath      = ""             # Inference data path
     
     ### Weight path
     pretrainedWeight   = f"./input/PretrainedWeight/{SelectedModel.model['structure']}.pth" # Model weight for training
