@@ -16,7 +16,7 @@ from utils.ModelService.PytorchClassificationModel.CustomDataset import ImageDat
 def get_std_mean(imageSize):
     transform = transforms.Compose([transforms.Resize((imageSize[0], imageSize[1])), transforms.ToTensor()])
     trainDataset = ImageDataset(ClsPath.trainPath, transform=transform)
-    dataloader = DataLoader(dataset=trainDataset, batch_size=512, shuffle=False)
+    dataloader = DataLoader(dataset=trainDataset, batch_size=1, shuffle=False)
     
     channelsSum, channelsSquaredSum, numBatches = 0, 0, 0
     for data, _ in dataloader:

@@ -11,14 +11,14 @@ def select_scheduler(optimizer):
     if SchedulerPara.stepLR['switch']:
         method = getattr(SchedulerMethod, 'StepLR')
         scheduler = method(optimizer=optimizer, 
-                           step_size=SchedulerPara.stepLR['step_size'],
+                           step_size=SchedulerPara.stepLR['stepSize'],
                            gamma=SchedulerPara.stepLR['gamma']
                            )
         
     elif SchedulerPara.cosineAnnealingLR['switch']:
         method = getattr(SchedulerMethod, 'CosineAnnealingLR')
         scheduler = method(optimizer=optimizer,
-                           T_max=SchedulerPara.cosineAnnealingLR['T_max'],
-                           eta_min=SchedulerPara.cosineAnnealingLR['eta_min'],
+                           T_max=SchedulerPara.cosineAnnealingLR['tMax'],
+                           eta_min=SchedulerPara.cosineAnnealingLR['etaMin'],
                            )
     return scheduler
