@@ -1,0 +1,78 @@
+{
+    "Config": {
+        "PrivateSetting": {
+            "datasetPath": ""
+        }
+    },
+    "ConfigAugmentation": {
+        "AugmentationPara": {
+            "randomHorizontalFlip": {
+                "probability": 0.5
+            }
+        }
+    },
+    "ConfigEvaluation": {
+        "EvaluationPara": {
+            "showAcc": 1,
+            "showClassAcc": 1
+        }
+    },
+    "ConfigModelService": {
+        "LossFunctionPara": {
+            "lossFunction": "CrossEntropyLoss"
+        },
+        "LearningRate": {
+            "learningRate": 0.01
+        },
+        "OptimizerPara": {
+            "Adam": {
+                "betas": [
+                    0.9,
+                    0.999
+                ],
+                "eps": 1e-08,
+                "weightDecay": 0.0005,
+                "amsgrad": 0
+            }
+        },
+        "SchedulerPara": {
+            "stepLR": {
+                "step_size": 1,
+                "gamma": 0.5
+            }
+        }
+    },
+    "ConfigPostprocess": {
+        "PostProcessPara": {
+            "confidenceFilter": {
+                "threshold": 0.75,
+                "selectLabel": "OK",
+                "classList": [
+                    "NG",
+                    "OK",
+                ]
+            }
+        }
+    },
+    "ConfigPreprocess": {
+        "PreprocessPara": {
+            "imageSize": [224, 224],
+            "normalize": {
+                "mode": 0,
+            }
+        }
+    },    
+    "ConfigPytorchModel": {
+        "SelectedModel": {
+            "model": {
+                "structure": "regnet_y_400mf",
+                "pretrained": 1
+            }
+        },
+        "ClsModelPara": {
+            "cudaDevice": 0,
+            "batchSize": 8,
+            "epochs": 2
+        }
+    },
+}
