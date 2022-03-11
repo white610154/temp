@@ -29,9 +29,10 @@ def get_projects():
 def create_project(projectName):
     try:
         projectPath = f"{rootProjectPath}/{projectName}"
-        if not os.path.isdir(projectPath):
-            os.makedirs(f"{projectPath}/experiments")
-            os.makedirs(f"{projectPath}/runs")
+        if os.path.isdir(projectPath):
+            return False, "Project already exists"
+        os.makedirs(f"{projectPath}/experiments")
+        os.makedirs(f"{projectPath}/runs")
         projectList = os.listdir(rootProjectPath)
         return True, projectList
     except:
