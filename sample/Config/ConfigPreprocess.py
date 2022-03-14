@@ -1,5 +1,5 @@
 class PreprocessPara:
-    normalize = {'switch': True, 
+    normalize = {'switch': False, 
                 'mode': 0,
                 'mean': [],
                 'std': []}

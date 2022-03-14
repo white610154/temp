@@ -78,8 +78,8 @@ def set_experiment_dataset():
     elif not 'projectName' in data or not 'experimentId' in data or not 'datasetPath' in data:
         return response(1, "There is no data.")
     
-    found, projectPath = ProjectUtil.find_project(data['projectName'])
-    if not found:
+    ok, projectPath = ProjectUtil.find_project(data['projectName'])
+    if not ok:
         return response(1, projectPath)
 
     ok, config = ProjectUtil.set_config_dataset(projectPath, data['experimentId'], data['datasetPath'])
@@ -166,6 +166,8 @@ def check_dataset():
     ProjectUtil.add_dataset(projectPath, datasetPath, **status)
 
     return response(0, "success", status)
+
+
 
 def main():
     app.run(host='0.0.0.0', port=5000)

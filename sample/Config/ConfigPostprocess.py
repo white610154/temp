@@ -1,5 +1,5 @@
 class PostProcessPara:
-    confidenceFilter = {'switch': True, 
+    confidenceFilter = {'switch': False, 
                         'threshold': 0.75, 
                         'selectLabel': 'OK', 
                         'classList': ['NG', 'OK]
