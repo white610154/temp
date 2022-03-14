@@ -167,7 +167,23 @@ def check_dataset():
 
     return response(0, "success", status)
 
-
+@app.route('/run-experiment-train', methods=['POST'])
+def run_experiment_train():
+    '''
+    run experiment
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'experimentId' in data or not 'datasetPath' in data:
+        return response(1, "There is no data.")
+    projectName  = data['projectName']
+    experimentId = data['experimentId']
+    datasetPath  = data['datasetPath']
+    ok, config = ProjectUtil.create_python_config(projectName, experimentId, datasetPath)
+    if not ok:
+        return response(1, config)
+    return response(0, "success", config)
 
 def main():
     app.run(host='0.0.0.0', port=5000)

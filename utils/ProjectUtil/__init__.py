@@ -5,7 +5,7 @@ Created on FRI MAR 4 17:00:00 2021
 @author: ShanYang
 """
 
-import json, jwt, os
+import json, jwt, os, shutil
 from pkgutil import get_data
 from datetime import datetime
 
@@ -193,3 +193,41 @@ def add_dataset(projectPath, datasetPath, uploaded=False, labeled=False, split=F
             json.dump(datasets, fout, indent=4)
     except Exception as err:
         print(err)
+
+def create_python_config(projectName, experimentId, datasetPath):
+    try:
+        projectPath = f"{rootProjectPath}/{projectName}"
+        runName = create_run(projectPath, experimentId)
+        if not runName:
+            return False, "create run failed"
+        
+        ConfigPath = f"{projectPath}/runs/{runName}/{runName}.json"        
+        config = None
+        with open(ConfigPath, 'r') as configFile:
+            config = json.load(configFile)
+        if not config:
+            return False, "Load config failed"
+
+        # write_python_config(config)
+
+        return True, config
+    except Exception as err:
+        print(err)
+        return False, err
+
+def create_run(projectPath, experimentId):
+    try:
+        runName = datetime.now().strftime('%Y%m%d%H%M%S')
+        runPath = f"{projectPath}/runs/{runName}"
+        if os.path.isdir(runPath):
+            return False, "Run already exists"
+        os.makedirs(runPath)
+        experimentConfigPath = f"{projectPath}/experiments/{experimentId}.json"
+        runConfigPath = f"{runPath}/{runName}.json"
+        shutil.copy(experimentConfigPath, runConfigPath)
+        return runName
+    except:
+        return None
+
+def write_python_config(config):
+    return
