@@ -208,8 +208,13 @@ def create_python_config(projectName, experimentId, datasetPath):
         if not config:
             return False, "Load config failed"
 
-        # write_python_config(config)
-
+        configFolderPath = f"config"
+        if os.path.isdir(configFolderPath):
+            shutil.rmtree(configFolderPath)
+        os.makedirs(configFolderPath)
+        ok = write_python_config_model_service(config["ConfigModelService"])
+        if not ok:
+            return False, "write model service failed"
         return True, config
     except Exception as err:
         print(err)
@@ -229,5 +234,63 @@ def create_run(projectPath, experimentId):
     except:
         return None
 
-def write_python_config(config):
-    return
+def write_python_config_model_service(configList):
+    sampleConfigPath = f"sample/Config/ConfigModelService.py"
+    configPath = f"config/ConfigModelService.py"
+    lines = []
+    with open(sampleConfigPath, "r") as sampleConfigFile:
+        fileLines = sampleConfigFile.readlines()
+        for fileLine in fileLines:
+            lines.append(fileLine)
+    classLineNumDict = get_class_line_num(lines, configList)
+    if not classLineNumDict:
+        return False
+    for config in configList:
+        parameterDict = get_parameter(lines, classLineNumDict[config][0], classLineNumDict[config][1])
+        if not parameterDict:
+            return False
+        for parameter in parameterDict:
+            for config_parameter in configList[config]:
+                if parameter == config_parameter:
+                    replace_word = configList[config][config_parameter]
+                    if isinstance(configList[config][config_parameter], str):
+                        replace_word = f'"{configList[config][config_parameter]}"'
+                    lines[parameterDict[parameter][0]] = f"{lines[parameterDict[parameter][0]][0:parameterDict[parameter][1]]}{replace_word}\n"
+    with open(configPath, "w") as ConfigFile:
+        for line in lines:
+            ConfigFile.write(line)
+    return True
+
+def get_class_line_num(lines, configList):
+    try:
+        classLineNumDict = {}
+        for config in configList:
+            line_cnt = 0
+            isClass = False
+            for line_cnt in range(0, len(lines)):
+                if isClass == False:
+                    if lines[line_cnt].find(config) >= 0:
+                        classLineNumDict[config] = [line_cnt, -1]
+                        isClass = True
+                elif isClass == True:
+                    if lines[line_cnt].find("class") >= 0:
+                        classLineNumDict[config] = [classLineNumDict[config][0], line_cnt]
+                        break
+            if classLineNumDict[config][-1] == -1:
+                classLineNumDict[config] = [classLineNumDict[config][0], len(lines)]
+        return classLineNumDict
+    except:
+        return None
+
+def get_parameter(lines, start_location, end_location):
+    try:
+        parameterDict = {}
+        for line_cnt in range(start_location, end_location + 1):
+                if line_cnt < len(lines):
+                    equal_location = lines[line_cnt].find("=")
+                    if equal_location >= 0:
+                        parameter = lines[line_cnt][0:equal_location].replace(" ", "")
+                        parameterDict[parameter] = [line_cnt, equal_location + 1]
+        return parameterDict
+    except:
+        return None
