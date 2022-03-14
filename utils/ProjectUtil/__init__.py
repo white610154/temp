@@ -212,9 +212,18 @@ def create_python_config(projectName, experimentId, datasetPath):
         if os.path.isdir(configFolderPath):
             shutil.rmtree(configFolderPath)
         os.makedirs(configFolderPath)
-        ok = write_python_config_model_service(config["ConfigModelService"])
-        if not ok:
-            return False, "write model service failed"
+
+        configFileList = ["", "Augmentation", "Evaluation", "ModelService",
+                          "Postprocess", "Preprocess", "PytorchModel", "ResultStorage"]
+        for configFileName in configFileList:
+            if f"Config{configFileName}" in config:
+                ok = rewrite_python_config(f"Config{configFileName}", config[f"Config{configFileName}"])
+                if not ok:
+                    return False, "write model service failed"
+            else:
+                ok = write_python_config(f"Config{configFileName}")
+                if not ok:
+                    return False, "write model service failed"
         return True, config
     except Exception as err:
         print(err)
@@ -234,32 +243,35 @@ def create_run(projectPath, experimentId):
     except:
         return None
 
-def write_python_config_model_service(configList):
-    sampleConfigPath = f"sample/Config/ConfigModelService.py"
-    configPath = f"config/ConfigModelService.py"
-    lines = []
-    with open(sampleConfigPath, "r") as sampleConfigFile:
-        fileLines = sampleConfigFile.readlines()
-        for fileLine in fileLines:
-            lines.append(fileLine)
-    classLineNumDict = get_class_line_num(lines, configList)
-    if not classLineNumDict:
-        return False
-    for config in configList:
-        parameterDict = get_parameter(lines, classLineNumDict[config][0], classLineNumDict[config][1])
-        if not parameterDict:
+def rewrite_python_config(configFileName, configList):
+    try:
+        sampleConfigPath = f"sample/Config/{configFileName}.py"
+        configPath = f"config/{configFileName}.py"
+        lines = []
+        with open(sampleConfigPath, "r") as sampleConfigFile:
+            fileLines = sampleConfigFile.readlines()
+            for fileLine in fileLines:
+                lines.append(fileLine)
+        classLineNumDict = get_class_line_num(lines, configList)
+        if not classLineNumDict:
             return False
-        for parameter in parameterDict:
-            for config_parameter in configList[config]:
-                if parameter == config_parameter:
-                    replace_word = configList[config][config_parameter]
-                    if isinstance(configList[config][config_parameter], str):
-                        replace_word = f'"{configList[config][config_parameter]}"'
-                    lines[parameterDict[parameter][0]] = f"{lines[parameterDict[parameter][0]][0:parameterDict[parameter][1]]}{replace_word}\n"
-    with open(configPath, "w") as ConfigFile:
-        for line in lines:
-            ConfigFile.write(line)
-    return True
+        for config in configList:
+            parameterDict = get_parameter(lines, classLineNumDict[config][0], classLineNumDict[config][1])
+            if not parameterDict:
+                return False
+            for parameter in parameterDict:
+                for config_parameter in configList[config]:
+                    if parameter == config_parameter:
+                        replace_word = configList[config][config_parameter]
+                        if isinstance(configList[config][config_parameter], str):
+                            replace_word = f'"{configList[config][config_parameter]}"'
+                        lines[parameterDict[parameter][0]] = f"{lines[parameterDict[parameter][0]][0:parameterDict[parameter][1]]}{replace_word}\n"
+        with open(configPath, "w") as ConfigFile:
+            for line in lines:
+                ConfigFile.write(line)
+        return True
+    except:
+        return False
 
 def get_class_line_num(lines, configList):
     try:
@@ -294,3 +306,12 @@ def get_parameter(lines, start_location, end_location):
         return parameterDict
     except:
         return None
+
+def write_python_config(configFileName):
+    try:
+        sampleConfigPath = f"sample/Config/{configFileName}.py"
+        configPath = f"config/{configFileName}.py"
+        shutil.copy(sampleConfigPath, configPath)
+        return True
+    except:
+        return False
