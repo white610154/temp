@@ -5,7 +5,6 @@ Created on TUE Dec 7 20:00:00 2021
 @author: OtisChang
 """
 from config.Config import BasicSetting
-from utils.DatasetClean import CopyUserInput, DataSplit, CropImage
 from utils.ModelService.PytorchClassificationModel import MainProcess
 
 def train():
@@ -43,7 +42,7 @@ def inference():
 
 
 def main():
-    print(f"========== Project: {BasicSetting.projectID}, Experiment:{BasicSetting.experimentID}, Mode:{BasicSetting.task} ==========")
+    print(f"========== Project: {BasicSetting.projectName}, Run:{BasicSetting.runId}, Mode:{BasicSetting.task} ==========")
     
     if BasicSetting.task == 'Train':
         train()

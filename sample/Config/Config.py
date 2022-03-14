@@ -1,8 +1,8 @@
 class BasicSetting:
-    projectName  = ""
-    experimentId = ""
-    task         = ""
+    projectName = ""
+    runId       = ""
+    task        = ""
 
 class PrivateSetting:
     datasetPath  = ""
-    outputPath   = f"./projects/{projectID}/runs/{experimentID}"
+    outputPath   = f"projects/{BasicSetting.projectName}/runs/{BasicSetting.runId}"

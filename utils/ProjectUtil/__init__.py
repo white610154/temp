@@ -194,14 +194,14 @@ def add_dataset(projectPath, datasetPath, uploaded=False, labeled=False, split=F
     except Exception as err:
         print(err)
 
-def create_python_config(projectName, experimentId, datasetPath):
+def create_python_config(projectName, experimentId, task):
     try:
         projectPath = f"{rootProjectPath}/{projectName}"
-        runName = create_run(projectPath, experimentId)
-        if not runName:
+        runId = create_run(projectPath, experimentId)
+        if not runId:
             return False, "create run failed"
         
-        ConfigPath = f"{projectPath}/runs/{runName}/{runName}.json"        
+        ConfigPath = f"{projectPath}/runs/{runId}/{runId}.json"        
         config = None
         with open(ConfigPath, 'r') as configFile:
             config = json.load(configFile)
@@ -217,13 +217,22 @@ def create_python_config(projectName, experimentId, datasetPath):
                           "Postprocess", "Preprocess", "PytorchModel", "ResultStorage"]
         for configFileName in configFileList:
             if f"Config{configFileName}" in config:
-                ok = rewrite_python_config(f"Config{configFileName}", config[f"Config{configFileName}"])
+                ok = rewrite_python_config(f"Config{configFileName}", config[f"Config{configFileName}"], mode=1)
                 if not ok:
                     return False, "write model service failed"
             else:
                 ok = write_python_config(f"Config{configFileName}")
                 if not ok:
                     return False, "write model service failed"
+        projectConfigList = {"BasicSetting": {"projectName": projectName,
+                                              "runId": runId,
+                                              "task": task}}
+        ok = rewrite_python_config("Config", projectConfigList, mode=2)
+        if not ok:
+            return False, "set project information failed"
+        ok = rewrite_python_config("Config", projectConfigList, mode=2)
+        if not ok:
+            return False, "set project information failed"
         return True, config
     except Exception as err:
         print(err)
@@ -243,9 +252,11 @@ def create_run(projectPath, experimentId):
     except:
         return None
 
-def rewrite_python_config(configFileName, configList):
+def rewrite_python_config(configFileName, configList, mode):
     try:
         sampleConfigPath = f"sample/Config/{configFileName}.py"
+        if mode == 2:
+            sampleConfigPath = f"config/{configFileName}.py"
         configPath = f"config/{configFileName}.py"
         lines = []
         with open(sampleConfigPath, "r") as sampleConfigFile:
@@ -265,7 +276,7 @@ def rewrite_python_config(configFileName, configList):
                         replace_word = configList[config][config_parameter]
                         if isinstance(configList[config][config_parameter], str):
                             replace_word = f'"{configList[config][config_parameter]}"'
-                        lines[parameterDict[parameter][0]] = f"{lines[parameterDict[parameter][0]][0:parameterDict[parameter][1]]}{replace_word}\n"
+                        lines[parameterDict[parameter][0]] = f"{lines[parameterDict[parameter][0]][0:parameterDict[parameter][1]]} {replace_word}\n"
         with open(configPath, "w") as ConfigFile:
             for line in lines:
                 ConfigFile.write(line)
