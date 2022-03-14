@@ -29,9 +29,10 @@ def get_projects():
 def create_project(projectName):
     try:
         projectPath = f"{rootProjectPath}/{projectName}"
-        if not os.path.isdir(projectPath):
-            os.makedirs(f"{projectPath}/experiments")
-            os.makedirs(f"{projectPath}/runs")
+        if os.path.isdir(projectPath):
+            return False, "Project already exists"
+        os.makedirs(f"{projectPath}/experiments")
+        os.makedirs(f"{projectPath}/runs")
         projectList = os.listdir(rootProjectPath)
         return True, projectList
     except:
@@ -84,9 +85,9 @@ def set_config_dataset(projectPath, experimentId, datasetPath):
         if not config:
             return False, "Load config failed"
 
-        config['Config']['datasetPath'] = datasetPath
+        config['Config']['PrivateSetting']['datasetPath'] = datasetPath
         with open(configPath, 'w') as fout:
-            json.dump(config, fout)
+            json.dump(config, fout, indent=4)
         return True, config
     except Exception as err:
         print(err)
@@ -110,18 +111,18 @@ def check_data_split(datasetPath):
         dataList = os.listdir(datasetPath)
         for data in dataList:
             if os.path.isdir(f"{datasetPath}/{data}"):
-                if data == "train":
+                if data == "Train":
                     isTrain = 1
                     datasetList.append(data)
-                elif data == "valid":
+                elif data == "Valid":
                     isValid = 1
                     datasetList.append(data)
-                elif data == "test":
+                elif data == "Test":
                     isTest = 1
                     datasetList.append(data)
         if isTrain == 1 and isValid == 1 and isTest == 1:
             return True, datasetList
-        return False, "Please set train/ valid/ test"
+        return False, "Please set Train/ Valid/ Test"
     except:
         return False, "Check data split failed"
 
@@ -169,7 +170,7 @@ def remove_dataset(projectPath, datasetPath):
         if datasetPath in datasets:
             del datasets[datasetPath]
             with open(f"{projectPath}/datasets.json", 'w') as fout:
-                json.dump(datasets, fout)
+                json.dump(datasets, fout, indent=4)
         return datasets
     except Exception as err:
         print(err)
@@ -189,6 +190,6 @@ def add_dataset(projectPath, datasetPath, uploaded=False, labeled=False, split=F
         }
 
         with open(f"{projectPath}/datasets.json", 'w') as fout:
-            json.dump(datasets, fout)
+            json.dump(datasets, fout, indent=4)
     except Exception as err:
         print(err)

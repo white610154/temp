@@ -1,6 +1,6 @@
 class EvaluationPara:
-    showAcc          = True
-    showClassAcc     = True
+    showAcc          = False
+    showClassAcc     = False
     showNumOfClasses = False
     showRate         = {'switch': False, 'targetIndex': 'OK'}
     showWrongFile    = False
