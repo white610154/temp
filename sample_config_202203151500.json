@@ -1,0 +1,81 @@
+{
+    "Config": {
+        "PrivateSetting": {
+            "datasetPath": ""
+        }
+    },
+    "ConfigAugmentation": {
+        "AugmentationPara": {
+            "randomHorizontalFlip": {
+                "switch": 1,
+                "probability": 0.5
+            }
+        }
+    },
+    "ConfigEvaluation": {
+        "EvaluationPara": {
+            "showAcc": 1,
+            "showClassAcc": 1
+        }
+    },
+    "ConfigModelService": {
+        "LossFunctionPara": {
+            "lossFunction": "CrossEntropyLoss"
+        },
+        "LearningRate": {
+            "learningRate": 0.001
+        },
+        "OptimizerPara": {
+            "Adam": {
+                "switch": 1,
+                "betas": [
+                    0.9,
+                    0.999
+                ],
+                "eps": 1e-08,
+                "weightDecay": 5e-04,
+                "amsgrad": 0
+            }
+        },
+        "SchedulerPara": {
+            "stepLR": {
+                "switch": 1,
+                "stepSize": 1,
+                "gamma": 0.5
+            }
+        }
+    },
+    "ConfigPostprocess": {
+        "PostProcessPara": {
+            "confidenceFilter": {
+                "switch": 1,
+                "threshold": 0.75,
+                "selectLabel": "OK",
+                "classList": [
+                    "NG",
+                    "OK"
+                ]
+            }
+        }
+    },
+    "ConfigPreprocess": {
+        "PreprocessPara": {
+            "normalize": {
+                "switch": 1, 
+                "mode": 0
+            }
+        }
+    },    
+    "ConfigPytorchModel": {
+        "SelectedModel": {
+            "model": {
+                "structure": "auo_unrestricted_powerful_model",
+                "pretrained": 1
+            }
+        },
+        "ClsModelPara": {
+            "batchSize": 16,
+            "epochs": 2
+        }
+    }
+}
