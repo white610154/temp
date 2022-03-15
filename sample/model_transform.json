@@ -1,0 +1,15 @@
+{
+    "auo_tiny_focus_model": "alexnet",
+    "auo_classic_deep_model": "vgg16_bn",
+    "auo_anti_degeneration_model": "resnet50",
+    "auo_transform_aggregate_model": "resnext50_32x4d",
+    "auo_narrow_intensive_model": "densenet121",
+    "auo_feature_enhance_model_a": "se_resnet50",
+    "auo_feature_enhance_model_b": "cbam_resnet50",
+    "auo_feature_enhance_model_c": "se_cbam_resnet50",
+    "auo_faster_convergency_model": "efficientnet_b0",
+    "auo_unrestricted_powerful_model": "regnet_y_400mf",
+    "auo_feature_reuse_model": "shufflenetv2_x0.5",
+    "auo_lighten_efficient_model": "mnasnet0_5",
+    "auo_horizontal_sample_model": "mobilenet_v3_small"
+}

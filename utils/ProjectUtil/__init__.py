@@ -230,9 +230,9 @@ def create_python_config(projectName, experimentId, task):
         ok = rewrite_python_config("Config", projectConfigList, mode=2)
         if not ok:
             return False, "set project information failed"
-        ok = rewrite_python_config("Config", projectConfigList, mode=2)
+        ok = transform_model()
         if not ok:
-            return False, "set project information failed"
+            return False, "transform model failed"
         return True, config
     except Exception as err:
         print(err)
@@ -323,6 +323,34 @@ def write_python_config(configFileName):
         sampleConfigPath = f"sample/Config/{configFileName}.py"
         configPath = f"config/{configFileName}.py"
         shutil.copy(sampleConfigPath, configPath)
+        return True
+    except:
+        return False
+
+def transform_model():
+    try:
+        modelTransDict = None
+        with open(f"./sample/model_transform.json") as jsonFile:
+            modelTransDict = json.load(jsonFile)
+        if not modelTransDict:
+            return False
+        lines = []
+        configPath = f"config/ConfigPytorchModel.py"
+        with open(configPath, "r") as configFile:
+            fileLines = configFile.readlines()
+            for fileLine in fileLines:
+                lines.append(fileLine)
+        newLines = []
+        for line in lines:
+            for origianlModel in modelTransDict:
+                if line.find(origianlModel) >= 0:
+                    line = line.replace(origianlModel, modelTransDict[origianlModel])
+                    break
+            newLines.append(line)
+        print(newLines)
+        with open(configPath, "w") as configFile:
+            for newLine in newLines:
+                configFile.write(newLine)
         return True
     except:
         return False
