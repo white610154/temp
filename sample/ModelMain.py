@@ -41,7 +41,7 @@ def inference():
     MainProcess.inference()
 
 
-def main():
+def model_main():
     print(f"========== Project: {BasicSetting.projectName}, Run:{BasicSetting.runId}, Mode:{BasicSetting.task} ==========")
     
     if BasicSetting.task == 'Train':

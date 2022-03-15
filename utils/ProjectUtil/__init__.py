@@ -347,7 +347,6 @@ def transform_model():
                     line = line.replace(origianlModel, modelTransDict[origianlModel])
                     break
             newLines.append(line)
-        print(newLines)
         with open(configPath, "w") as configFile:
             for newLine in newLines:
                 configFile.write(newLine)
