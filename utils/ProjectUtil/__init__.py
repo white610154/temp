@@ -213,27 +213,34 @@ def create_python_config(projectName, experimentId, task):
             shutil.rmtree(configFolderPath)
         os.makedirs(configFolderPath)
 
-        configFileList = ["", "Augmentation", "Evaluation", "ModelService",
-                          "Postprocess", "Preprocess", "PytorchModel", "ResultStorage"]
+        configFileList = ["Config", "ConfigAugmentation", "ConfigEvaluation", "ConfigModelService",
+                          "ConfigPostprocess", "ConfigPreprocess", "ConfigPytorchModel", "ConfigResultStorage"]
         for configFileName in configFileList:
-            if f"Config{configFileName}" in config:
-                ok = rewrite_python_config(f"Config{configFileName}", config[f"Config{configFileName}"], mode=1)
+            if configFileName in config:
+                ok = write_python_config(configFileName, config[configFileName], mode=1)
                 if not ok:
                     return False, "write model service failed"
             else:
-                ok = write_python_config(f"Config{configFileName}")
+                ok = write_python_config(configFileName, None, mode=0)
                 if not ok:
                     return False, "write model service failed"
-        projectConfigList = {"BasicSetting": {"projectName": projectName,
-                                              "runId": runId,
-                                              "task": task}}
-        ok = rewrite_python_config("Config", projectConfigList, mode=2)
+        
+        projectConfigList = {
+            "BasicSetting": {
+                "projectName": projectName,
+                "runId": runId,
+                "task": task
+                }
+            }
+        ok = write_python_config("Config", projectConfigList, mode=2)
         if not ok:
             return False, "set project information failed"
+        
         ok = transform_model()
         if not ok:
             return False, "transform model failed"
         return True, config
+
     except Exception as err:
         print(err)
         return False, err
@@ -252,8 +259,19 @@ def create_run(projectPath, experimentId):
     except:
         return None
 
-def rewrite_python_config(configFileName, configList, mode):
+def write_python_config(configFileName, configList, mode):
+    '''
+    mode = 0: copy
+    mode = 1: write a new config
+    mode = 2: rewrite a config
+    '''
     try:
+        if mode == 0:
+            sampleConfigPath = f"sample/Config/{configFileName}.py"
+            configPath = f"config/{configFileName}.py"
+            shutil.copy(sampleConfigPath, configPath)
+            return True
+        
         sampleConfigPath = f"sample/Config/{configFileName}.py"
         if mode == 2:
             sampleConfigPath = f"config/{configFileName}.py"
@@ -263,13 +281,16 @@ def rewrite_python_config(configFileName, configList, mode):
             fileLines = sampleConfigFile.readlines()
             for fileLine in fileLines:
                 lines.append(fileLine)
+                
         classLineNumDict = get_class_line_num(lines, configList)
         if not classLineNumDict:
             return False
+
         for config in configList:
             parameterDict = get_parameter(lines, classLineNumDict[config][0], classLineNumDict[config][1])
             if not parameterDict:
                 return False
+
             for parameter in parameterDict:
                 for config_parameter in configList[config]:
                     if parameter == config_parameter:
@@ -277,6 +298,7 @@ def rewrite_python_config(configFileName, configList, mode):
                         if isinstance(configList[config][config_parameter], str):
                             replace_word = f'"{configList[config][config_parameter]}"'
                         lines[parameterDict[parameter][0]] = f"{lines[parameterDict[parameter][0]][0:parameterDict[parameter][1]]} {replace_word}\n"
+
         with open(configPath, "w") as ConfigFile:
             for line in lines:
                 ConfigFile.write(line)
@@ -317,15 +339,6 @@ def get_parameter(lines, start_location, end_location):
         return parameterDict
     except:
         return None
-
-def write_python_config(configFileName):
-    try:
-        sampleConfigPath = f"sample/Config/{configFileName}.py"
-        configPath = f"config/{configFileName}.py"
-        shutil.copy(sampleConfigPath, configPath)
-        return True
-    except:
-        return False
 
 def transform_model():
     try:
