@@ -179,7 +179,6 @@ def run_experiment_train():
         return response(1, "There is no data.")
     projectName  = data['projectName']
     experimentId = data['experimentId']
-    datasetPath  = data['datasetPath']
     ok, config = ProjectUtil.create_python_config(projectName, experimentId, "Train")
     if not ok:
         return response(1, config)
