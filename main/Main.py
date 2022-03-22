@@ -182,8 +182,8 @@ def run_experiment_train():
     ok, config = ProjectUtil.create_python_config(projectName, experimentId, "Train")
     if not ok:
         return response(1, config)
-    from sample.ModelMain import model_main
-    model_main()
+    from main.AiProcess import ai_model
+    ai_model()
     
     return response(0, "success")
 
