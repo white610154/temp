@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-
-"""
-Created on TUE Dec 7 20:00:00 2021
-@author: OtisChang
-"""
 from config.Config import BasicSetting
 from utils.ModelService.PytorchClassificationModel import MainProcess
 
@@ -16,7 +10,6 @@ def test():
 def inference():
     MainProcess.inference()
 
-
 def ai_model():
     print(f"========== Project: {BasicSetting.projectName}, Run:{BasicSetting.runId}, Mode:{BasicSetting.task} ==========")
     
@@ -28,3 +21,7 @@ def ai_model():
         inference()
     else:
         raise BaseException("Please set up the correct task mode in config/Config.py.")
+
+if __name__ == '__main__':
+    
+            

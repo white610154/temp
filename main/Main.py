@@ -175,15 +175,17 @@ def run_experiment_train():
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
-    elif not 'projectName' in data or not 'experimentId' in data or not 'datasetPath' in data:
+    elif not 'projectName' in data or not 'experimentId' in data:
         return response(1, "There is no data.")
-    projectName  = data['projectName']
-    experimentId = data['experimentId']
-    ok, config = ProjectUtil.create_python_config(projectName, experimentId, "Train")
+    ok, msg = ProjectUtil.save_in_run_queue(data['projectName'], data['experimentId'], task="Train")
     if not ok:
-        return response(1, config)
-    from main.AiProcess import ai_model
-    ai_model()
+        return response(1, msg)
+    
+    # ok, config = ProjectUtil.create_python_config(projectName, experimentId, )
+    # if not ok:
+    #     return response(1, config)
+    # from main.AiProcess import ai_model
+    # ai_model()
     
     return response(0, "success")
 
