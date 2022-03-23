@@ -9,7 +9,7 @@ def response(code, message, data=None):
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/get-projects', methods=['POST'])
+@app.route('/get-projects', methods=['POST', 'GET'])
 def get_projects():
     ok, projectList = ProjectUtil.get_projects()
     if not ok:
@@ -180,17 +180,10 @@ def run_experiment_train():
     ok, msg = ProjectUtil.save_in_run_queue(data['projectName'], data['experimentId'], task="Train")
     if not ok:
         return response(1, msg)
-    
-    # ok, config = ProjectUtil.create_python_config(projectName, experimentId, )
-    # if not ok:
-    #     return response(1, config)
-    # from main.AiProcess import ai_model
-    # ai_model()
-    
-    return response(0, "success")
+    return response(0, "success", msg)
 
 def main():
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5028)
 
 if __name__ == '__main__':
     main()

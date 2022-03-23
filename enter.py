@@ -1,18 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """
-Created on FRI MAR 4 17:00:00 2021
+Created on WED MAR 24 17:00:00 2022
 @author: ShanYang
 """
 
-from main.Main import main, run_experiment_train
+from main.Main import main
+
 if __name__ == "__main__":
     main()
-
-# from main.Run import run_process
-# if __name__ == "__main__":
-#     run_process()
-
-# from utils import ProjectUtil
-# if __name__ == "__main__":
-#     ProjectUtil.save_in_run_queue("20220315-a", "20220315163104", "train")

@@ -205,24 +205,26 @@ def save_in_run_queue(projectName, experimentId, task):
             return False, "create run failed"
 
         runQueueJsonPath = f"main/run_queue.json"
-        if os.path.exists(runQueueJsonPath):
-            with open(runQueueJsonPath, 'r') as queueFile:
-                queueDict = json.load(queueFile)
-            queue = queueDict["queue"]
-            newRun = {
+        queue = []
+        newRun = {
                 "projectName": projectName,
                 "experimentId": experimentId,
                 "runId": runId,
                 "task": task
             }
-            queue.append(newRun)
-            queueDict = {"queue": queue}
-            with open(runQueueJsonPath, 'w') as queueFile:
-                json.dump(queueDict, queueFile, indent = 4)
+        if os.path.exists(runQueueJsonPath):
+            with open(runQueueJsonPath, 'r') as queueFile:
+                queueDict = json.load(queueFile)
+            queue = queueDict["queue"]
+        queue.append(newRun)
+        queueDict = {"queue": queue}
+        with open(runQueueJsonPath, 'w') as queueFile:
+            json.dump(queueDict, queueFile, indent = 4)
+        return True, queue
 
     except Exception as err:
         print(err)
-        return False
+        return False, err
 
 def create_run(projectPath, experimentId):
     """

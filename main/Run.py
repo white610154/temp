@@ -9,14 +9,15 @@ import json, os, shutil, time
 # waiting/ training/ testing
 
 rootProjectPath = f"./projects"
+runQueueJsonPath = f"main/run_queue.json"
 
 def get_first_run():
     try:
-        if not os.path.exists("main/run_queue.json"):
+        if not os.path.exists(runQueueJsonPath):
             return False, "there is no run queue"
-        with open(f"main/run_queue.json", 'r') as queueFile:
+        with open(runQueueJsonPath, 'r') as queueFile:
             queueDict = json.load(queueFile)
-            queue = queueDict["queue"]
+        queue = queueDict["queue"]
         if len(queue) <= 0:
             return False, "There is no run"
         return True, queue[0]
@@ -189,10 +190,28 @@ def transform_model():
     except:
         return False
 
+def delete_first_run():
+    try:
+        if not os.path.exists(runQueueJsonPath):
+            return False, "there is no run queue"
+        with open(runQueueJsonPath, 'r') as queueFile:
+            queueDict = json.load(queueFile)
+        queue = queueDict["queue"]
+        del(queue[0])
+        queueDict = {"queue": queue}
+        with open(runQueueJsonPath, 'w') as queueFile:
+            json.dump(queueDict, queueFile, indent = 4)
+        return True
+    except Exception as err:
+        print(err)
+        return False
+
 def run_process():
     while True:
-        try:
+        time.sleep(1)
+        try:           
             ok, run = get_first_run()
+            print(run)
             if not ok:
                 continue
             ok, config = load_run_config(run["projectName"], run["runId"])
@@ -202,7 +221,18 @@ def run_process():
             if not ok:
                 continue
             ok = create_python_config(config, run["projectName"], run["runId"], run["task"])
-            if ok:
-                break
+            if not ok:
+                continue
+            from sample.ModelMain import model_main
+            ok = model_main()
+            if not ok:
+                continue
+            ok = delete_first_run()
+            if not ok:
+                continue
+
         except Exception as err:
             print(err)
+
+if __name__ == "__main__":
+    run_process()
