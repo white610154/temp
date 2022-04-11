@@ -1,9 +1,9 @@
-import os, csv
+import os, csv, json
 from torch import tensor
 from config.Config import BasicSetting, PrivateSetting
 
 
-def save_epoch_acc(epoch:int, total:int, totalCorrect:int, classTotal:list, classCorrect:list, className:list):
+def save_epoch_acc_txt(epoch:int, total:int, totalCorrect:int, classTotal:list, classCorrect:list, className:list):
     """
     Save epoch accuracy and class accuracy into txt file.
 
@@ -25,6 +25,43 @@ def save_epoch_acc(epoch:int, total:int, totalCorrect:int, classTotal:list, clas
             print('\nValidation acc of epoch {}: {:.4f} %'.format(epoch+1, 100 * totalCorrect / total), file = fAcc)
             for i, cls in enumerate(className):
                 print('- Accuracy of class {:.5s} : {:.4f} %'.format(cls, 100 * classCorrect[i] / classTotal[i]), file = fAcc)
+
+
+def save_epoch_acc_json(epoch:int, totalEpoch: int, total:int, totalCorrect:int, classTotal:list, classCorrect:list, className:list):
+    """
+    Save epoch accuracy and class accuracy into json file.
+
+    Args:
+        epoch: current epoch number
+        total: total data amount
+        totalCorrect: correctly predicted data amount
+        classTotal: data amount of each class
+        classCorrect: correctly predicted data amount of each class
+        className: list of class name
+    """
+    jsonFilePath = f'./{PrivateSetting.outputPath}/modelTraining.json'
+    epochDict = {
+        "model": {
+            "epoch": epoch + 1,
+            "total": totalEpoch
+        },
+        "valid": {
+            "accuracy": totalCorrect / total
+        }
+    }
+    infoDict = {}
+    if epoch == 0:
+        infoDict = {}
+        infoDict[str(epoch + 1)] = epochDict
+        with open(jsonFilePath,'w') as fAcc:
+            json.dump(infoDict, fAcc, indent=4)
+    else:
+        if os.path.exists(jsonFilePath):
+            with open(jsonFilePath, 'r') as fAcc:
+                infoDict = json.load(fAcc)
+        infoDict[str(epoch + 1)] = epochDict
+        with open(jsonFilePath, 'w') as fAcc:
+            json.dump(infoDict, fAcc, indent=4)
 
 
 def output_result_csv(nameList:list, predict:tensor, labels:tensor, confidence:tensor, className:list, count:int, mode=BasicSetting.task):

@@ -114,7 +114,8 @@ def valid(device, model, epoch, mean, std):
                 classCorrect[labels[i]] += c[i].item()
                 classTotal[labels[i]] += 1
 
-        SaveAcc.save_epoch_acc(epoch, total, totalCorrect, classTotal, classCorrect, validSet.className)
+        SaveAcc.save_epoch_acc_txt(epoch, total, totalCorrect, classTotal, classCorrect, validSet.className)
+        SaveAcc.save_epoch_acc_json(epoch, ClsModelPara.epochs, total, totalCorrect, classTotal, classCorrect, validSet.className)
     ##### Show predicted result #####
     SelectShowMethod.select_show_method('Valid', validSet, totalCorrect, classTotal, classCorrect, 
                                          cfMatrix, predicted, labels, confidence=None, count=None)
