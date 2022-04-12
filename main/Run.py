@@ -8,7 +8,7 @@ import json, os, shutil, time
 # statue
 # waiting/ training/ testing
 
-rootProjectPath = f"./projects"
+rootProjectPath = f"projects"
 runQueueJsonPath = f"main/run_queue.json"
 
 def get_first_run():
@@ -166,7 +166,7 @@ def get_parameter(lines, start_location, end_location):
 def transform_model():
     try:
         modelTransDict = None
-        with open(f"./sample/model_transform.json") as jsonFile:
+        with open(f"sample/model_transform.json") as jsonFile:
             modelTransDict = json.load(jsonFile)
         if not modelTransDict:
             return False
@@ -206,6 +206,16 @@ def delete_first_run():
         print(err)
         return False
 
+def delete_config():
+    try:
+        if not os.path.exists(f"config"):
+            return False, "there is no run queue"
+        shutil.rmtree(f"config")
+        return True
+    except Exception as err:
+        print(err)
+        return False
+
 def run_process():
     while True:
         time.sleep(1)
@@ -230,7 +240,9 @@ def run_process():
             ok = delete_first_run()
             if not ok:
                 continue
-
+            ok = delete_config()
+            if not ok:
+                continue
         except Exception as err:
             print(err)
 
