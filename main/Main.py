@@ -182,10 +182,10 @@ def run_experiment_train():
         return response(1, msg)
     return response(0, "success", msg)
 
-@app.route('/get-infomation-train', methods=['POST'])
-def get_infomation_train():
+@app.route('/get-information-train', methods=['POST'])
+def get_information_train():
     '''
-    get infomation
+    get information
     '''
     ok, firstRun = ProjectUtil.get_first_run()
     if not ok:
@@ -194,7 +194,7 @@ def get_infomation_train():
     return response(0, "success", firstRun)
 
 def main():
-    app.run(host='0.0.0.0', port=5028)
+    app.run(host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     main()
