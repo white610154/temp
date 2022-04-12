@@ -13,5 +13,5 @@ class ClsPath:
     validPath        = f"./{PrivateSetting.datasetPath}/Valid"
     testPath         = f"./{PrivateSetting.datasetPath}/Test"
     inferencePath    = f"./{PrivateSetting.datasetPath}/Inference"
-    pretrainedWeight = f"./Sample/PretrainedWeight/{SelectedModel.model['structure']}.pth"
+    pretrainedWeight = f"./sample/PretrainedWeight/{SelectedModel.model['structure']}.pth"
     weightPath       = f"./{PrivateSetting.outputPath}/BestWeight.pth"
