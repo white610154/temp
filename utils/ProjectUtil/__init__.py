@@ -11,28 +11,28 @@ from datetime import datetime
 
 key = 'auo'
 algorithm = 'HS256'
-rootProjectPath = f"./projects"
+rootProjectPath = f'./projects'
 
 def decode_key(token):
     try:
         deDict = jwt.decode(token, key, algorithms=[algorithm])
         return True, deDict
     except:
-        return False, "Decode key failed"
+        return False, f'Decode key failed'
 
 def get_projects():
     try:
         return True, os.listdir(rootProjectPath)
     except:
-        return False, "Get projects failed"
+        return False, f'Get projects failed'
 
 def create_project(projectName):
     try:
-        projectPath = f"{rootProjectPath}/{projectName}"
+        projectPath = f'{rootProjectPath}/{projectName}'
         if os.path.isdir(projectPath):
             return False, "Project already exists"
-        os.makedirs(f"{projectPath}/experiments")
-        os.makedirs(f"{projectPath}/runs")
+        os.makedirs(f'{projectPath}/experiments')
+        os.makedirs(f'{projectPath}/runs')
         projectList = os.listdir(rootProjectPath)
         return True, projectList
     except:
@@ -41,15 +41,15 @@ def create_project(projectName):
 def save_config_as_json(projectName, config):
     try:
         jsonName = datetime.now().strftime('%Y%m%d%H%M%S')
-        with open(f"{rootProjectPath}/{projectName}/experiments/{jsonName}.json", 'w') as jsonFile:
+        with open(f'{rootProjectPath}/{projectName}/experiments/{jsonName}.json', 'w') as jsonFile:
             json.dump(config, jsonFile, indent=4)
-        return True, f"{rootProjectPath}/{projectName}/experiments/{jsonName}.json"
+        return True, f'{rootProjectPath}/{projectName}/experiments/{jsonName}.json'
     except:
         return False, "Save config failed"
 
 def find_project(projectName):
     try:
-        projectPath = f"{rootProjectPath}/{projectName}"
+        projectPath = f'{rootProjectPath}/{projectName}'
         if os.path.isdir(projectPath):
             return True, projectPath
         else:
@@ -59,10 +59,10 @@ def find_project(projectName):
 
 def get_config(projectPath):
     try:
-        configList = os.listdir(f"{projectPath}/experiments")
+        configList = os.listdir(f'{projectPath}/experiments')
         configDict = {}
         for configFile in configList:
-            with open(f"{projectPath}/experiments/{configFile}") as jsonFile:
+            with open(f'{projectPath}/experiments/{configFile}') as jsonFile:
                 config = json.load(jsonFile)
                 configDict[str(configFile.split('.')[0])] = config
         return True, configDict
@@ -71,7 +71,7 @@ def get_config(projectPath):
 
 def set_config_dataset(projectPath, experimentId, datasetPath):
     try:
-        configPath = f"{projectPath}/experiments/{experimentId}.json"
+        configPath = f'{projectPath}/experiments/{experimentId}.json'
         if not os.path.isfile(configPath):
             return False, "Experiment not found"
 
@@ -262,8 +262,7 @@ def get_first_run():
 
 def get_process(runDict):
     try:
-        print(":)")
-        runProcessPath = f'projects/{runDict["projectName"]}/runs/{runDict["runId"]}/modelTraining.json'
+        runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/modelTraining.json'
         if not os.path.exists(runProcessPath):
             runDict["process"] = "Training has not started"
             return False, runDict
