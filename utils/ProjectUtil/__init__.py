@@ -241,5 +241,36 @@ def create_run(projectPath, experimentId):
         runConfigPath = f"{runPath}/{runName}.json"
         shutil.copy(experimentConfigPath, runConfigPath)
         return runName
-    except:
+    except Exception as err:
+        print(err)
         return None
+
+def get_first_run():
+    try:
+        runQueueJsonPath = f"main/run_queue.json"
+        if not os.path.exists(runQueueJsonPath):
+            return False, "there is no run queue"
+        with open(runQueueJsonPath) as jsonFile:
+            jsonDict = json.load(jsonFile)
+            queue = jsonDict["queue"]
+        if len(queue) <= 0:
+            return False, "There is no run"
+        return True, queue[0]
+    except Exception as err:
+        print(err)
+        return False, err
+
+def get_process(runDict):
+    try:
+        print(":)")
+        runProcessPath = f'projects/{runDict["projectName"]}/runs/{runDict["runId"]}/modelTraining.json'
+        if not os.path.exists(runProcessPath):
+            runDict["process"] = "Training has not started"
+            return False, runDict
+        with open(runProcessPath) as jsonFile:
+            trainingProcess = json.load(jsonFile)
+            runDict["process"] = trainingProcess
+        return True, runDict
+    except Exception as err:
+        print(err)
+        return False, err   

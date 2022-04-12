@@ -209,7 +209,7 @@ def delete_first_run():
 def delete_config():
     try:
         if not os.path.exists(f"config"):
-            return False, "there is no run queue"
+            return False, "there is no config folder"
         shutil.rmtree(f"config")
         return True
     except Exception as err:
