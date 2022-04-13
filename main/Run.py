@@ -216,6 +216,22 @@ def delete_config():
         print(err)
         return False
 
+def run_model():
+    try:
+        batFilePath = 'model.bat'
+        modelMainPath = './sample/ModelMain.py'
+        runModelMainPath = './ModelMain.py'
+        with open(batFilePath, 'w') as batFile:
+            batFile.write('python modelMain.py')
+        shutil.copyfile(modelMainPath, runModelMainPath)
+        os.system(batFilePath)
+        os.remove(batFilePath)
+        os.remove(runModelMainPath)
+        return True
+    except Exception as err:
+        print(err)
+        return False
+
 def run_process():
     while True:
         time.sleep(1)
@@ -233,8 +249,7 @@ def run_process():
             ok = create_python_config(config, run["projectName"], run["runId"], run["task"])
             if not ok:
                 continue
-            from sample.ModelMain import model_main
-            ok = model_main()
+            ok = run_model()
             if not ok:
                 continue
             ok = delete_first_run()

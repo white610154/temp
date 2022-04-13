@@ -194,7 +194,7 @@ def get_information_train():
     return response(0, "success", firstRun)
 
 def main():
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5028)
 
 if __name__ == '__main__':
     main()

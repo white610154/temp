@@ -25,6 +25,6 @@ def model_main():
     except Exception as err:
         print(err)
         return False
-    
-    
-            
+
+if __name__ == "__main__":
+    model_main()
