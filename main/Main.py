@@ -156,7 +156,7 @@ def check_dataset():
         ok, classList = ProjectUtil.check_data_labeled(datasetPath)
     elif ok:
         status['split'] = True
-        ok, classList = ProjectUtil.check_data_labeled(f"{datasetPath}/train")
+        ok, classList = ProjectUtil.check_data_labeled(f"{datasetPath}/Train")
 
     status['labeled'] = ok
 

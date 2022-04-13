@@ -244,6 +244,8 @@ def run_process():
             if not ok:
                 continue
         except Exception as err:
+            _ = delete_first_run()
+            _ = delete_config()
             print(err)
 
 if __name__ == "__main__":
