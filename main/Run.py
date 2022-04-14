@@ -3,7 +3,7 @@ Created on TUE MAR 22 17:00:00 2021
 @author: ShanYang
 """
 
-import json, os, shutil, time
+import json, os, shutil, time, platform
 
 # statue
 # waiting/ training/ testing
@@ -218,14 +218,10 @@ def delete_config():
 
 def run_model():
     try:
-        batFilePath = 'model.bat'
         modelMainPath = './sample/ModelMain.py'
         runModelMainPath = './ModelMain.py'
-        with open(batFilePath, 'w') as batFile:
-            batFile.write('python modelMain.py')
         shutil.copyfile(modelMainPath, runModelMainPath)
-        os.system(batFilePath)
-        os.remove(batFilePath)
+        os.system('python ModelMain.py')
         os.remove(runModelMainPath)
         return True
     except Exception as err:
