@@ -278,3 +278,31 @@ def get_queue_process(runDict, mode):
     except Exception as err:
         print(err)
         return False, err
+
+def delete_run_in_queue(projectName, runId):
+    try:
+        runQueueJsonPath = f"main/run_queue.json"
+        if not os.path.exists(runQueueJsonPath):
+            return False, "there is no run queue"
+        with open(runQueueJsonPath) as jsonFile:
+            jsonDict = json.load(jsonFile)
+            doneList = jsonDict["done"]
+            workList = jsonDict["work"]
+        if len(workList) > 0:
+            if workList[0]["projectName"] == projectName and workList[0]["runId"] == runId:
+                return False, "This run is running"
+        newDoneList = []
+        for done in doneList:
+            if done["projectName"] != projectName or done["runId"] != runId:
+                newDoneList.append(done)
+        newWorkList = []
+        for work in workList:
+            if work["projectName"] != projectName or work["runId"] != runId:
+                newWorkList.append(work)
+        jsonDict = {"done": newDoneList, "work": newWorkList}
+        with open(runQueueJsonPath, 'w') as jsonFile:
+            json.dump(jsonDict, jsonFile, indent=4)
+        return True, jsonDict
+    except Exception as err:
+        print(err)
+        return False, err

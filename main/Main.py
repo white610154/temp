@@ -207,6 +207,21 @@ def get_information_train():
         newRuns = {"done": newRuns["done"], "work": newWorkList}   
     return response(0, "success", newRuns)
 
+@app.route('/delete-run', methods=['POST'])
+def delete_run():
+    '''
+    delete run
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'runId' in data:
+        return response(1, "There is no data.")
+    ok, msg = ProjectUtil.delete_run_in_queue(data["projectName"], data["runId"])
+    if not ok:
+        return response(1, msg)
+    return response(0, "success")
+
 def main():
     app.run(host='0.0.0.0', port=5028)
 
