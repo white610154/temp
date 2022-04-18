@@ -205,7 +205,7 @@ def save_in_run_queue(projectName, experimentId, task):
             return False, "create run failed"
 
         runQueueJsonPath = f"main/run_queue.json"
-        queue = []
+        workList = []
         newRun = {
                 "projectName": projectName,
                 "experimentId": experimentId,
@@ -215,12 +215,13 @@ def save_in_run_queue(projectName, experimentId, task):
         if os.path.exists(runQueueJsonPath):
             with open(runQueueJsonPath, 'r') as queueFile:
                 queueDict = json.load(queueFile)
-            queue = queueDict["queue"]
-        queue.append(newRun)
-        queueDict = {"queue": queue}
+            doneList = queueDict["done"]
+            workList = queueDict["work"]
+        workList.append(newRun)
+        queueDict = {"done": doneList, "work": workList}
         with open(runQueueJsonPath, 'w') as queueFile:
             json.dump(queueDict, queueFile, indent = 4)
-        return True, queue
+        return True, newRun
 
     except Exception as err:
         print(err)
@@ -245,26 +246,30 @@ def create_run(projectPath, experimentId):
         print(err)
         return None
 
-def get_first_run():
+def get_runs():
     try:
         runQueueJsonPath = f"main/run_queue.json"
         if not os.path.exists(runQueueJsonPath):
             return False, "there is no run queue"
         with open(runQueueJsonPath) as jsonFile:
             jsonDict = json.load(jsonFile)
-            queue = jsonDict["queue"]
-        if len(queue) <= 0:
-            return False, "There is no run"
-        return True, queue[0]
+        #     queue = jsonDict["queue"]
+        # if len(queue) <= 0:
+        #     return False, "There is no run"
+        return True, jsonDict
     except Exception as err:
         print(err)
         return False, err
 
-def get_process(runDict):
+def get_queue_process(runDict, mode):
     try:
+        if mode == "work":
+            wrongMsg = "Training has not started"
+        else:
+            wrongMsg = "This run has been deleted"
         runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/modelTraining.json'
         if not os.path.exists(runProcessPath):
-            runDict["process"] = "Training has not started"
+            runDict["process"] = wrongMsg
             return False, runDict
         with open(runProcessPath) as jsonFile:
             trainingProcess = json.load(jsonFile)
@@ -272,4 +277,4 @@ def get_process(runDict):
         return True, runDict
     except Exception as err:
         print(err)
-        return False, err   
+        return False, err

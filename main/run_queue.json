@@ -1,3 +1,11 @@
 {
-    "queue": []
+    "done": [
+        {
+            "projectName": "20220414-a",
+            "experimentId": "20220414144214",
+            "runId": "20220418142244",
+            "task": "Train"
+        }
+    ],
+    "work": []
 }

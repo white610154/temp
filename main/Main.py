@@ -187,14 +187,28 @@ def get_information_train():
     '''
     get information
     '''
-    ok, firstRun = ProjectUtil.get_first_run()
+    ok, runs = ProjectUtil.get_runs()
     if not ok:
-        return response(1, firstRun)
-    ok, firstRun = ProjectUtil.get_process(firstRun)
-    return response(0, "success", firstRun)
+        return response(1, runs)
+    if len(runs["done"]) <= 0 and len(runs["work"]) <= 0:
+        return response(1, runs)
+    newRuns = {"done": runs["done"], "work": runs["work"]}
+    if len(runs["done"]) > 0:
+        newDoneList = []
+        for run in runs["done"]:
+            ok, newRun = ProjectUtil.get_queue_process(run, "done")
+            newDoneList.append(newRun)
+        newRuns = {"done": newDoneList, "work": newRuns["work"]}
+    if len(runs["work"]) > 0:
+        newWorkList = []
+        for run in runs["work"]:
+            ok, newRun = ProjectUtil.get_queue_process(run, "work")
+            newWorkList.append(newRun)
+        newRuns = {"done": newRuns["done"], "work": newWorkList}   
+    return response(0, "success", newRuns)
 
 def main():
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5028)
 
 if __name__ == '__main__':
     main()

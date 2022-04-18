@@ -17,10 +17,10 @@ def get_first_run():
             return False, "there is no run queue"
         with open(runQueueJsonPath, 'r') as queueFile:
             queueDict = json.load(queueFile)
-        queue = queueDict["queue"]
-        if len(queue) <= 0:
+        workList = queueDict["work"]
+        if len(workList) <= 0:
             return False, "There is no run"
-        return True, queue[0]
+        return True, workList[0]
     except Exception as err:
         print(err)
         return False, err
@@ -190,15 +190,17 @@ def transform_model():
     except:
         return False
 
-def delete_first_run():
+def move_first_run():
     try:
         if not os.path.exists(runQueueJsonPath):
             return False, "there is no run queue"
         with open(runQueueJsonPath, 'r') as queueFile:
             queueDict = json.load(queueFile)
-        queue = queueDict["queue"]
-        del(queue[0])
-        queueDict = {"queue": queue}
+        doneList = queueDict["done"]
+        workList = queueDict["work"]
+        doneList.append(workList[0])
+        del(workList[0])
+        queueDict = {"done": doneList, "work": workList}
         with open(runQueueJsonPath, 'w') as queueFile:
             json.dump(queueDict, queueFile, indent = 4)
         return True
@@ -248,7 +250,7 @@ def run_process():
             ok = run_model()
             if not ok:
                 continue
-            ok = delete_first_run()
+            ok = move_first_run()
             if not ok:
                 continue
             ok = delete_config()
