@@ -1,4 +1,17 @@
 {
-    "done": [],
+    "done": [
+        {
+            "projectName": "epoch100",
+            "experimentId": "20220414021211",
+            "runId": "20220420005717",
+            "task": "Train"
+        },
+        {
+            "projectName": "epoch100",
+            "experimentId": "20220414021211",
+            "runId": "20220420010436",
+            "task": "Train"
+        }
+    ],
     "work": []
 }
