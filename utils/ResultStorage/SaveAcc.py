@@ -1,6 +1,7 @@
 import os, csv, json
 from torch import tensor
 from config.Config import BasicSetting, PrivateSetting
+from config.ConfigResultStorage import ResultStorage
 
 
 def save_epoch_acc_txt(epoch:int, total:int, totalCorrect:int, classTotal:list, classCorrect:list, className:list):
@@ -14,30 +15,36 @@ def save_epoch_acc_txt(epoch:int, total:int, totalCorrect:int, classTotal:list, 
         classTotal: data amount of each class
         classCorrect: correctly predicted data amount of each class
         className: list of class name
+    Return:
+        ValidAcc.txt
     """
-    if epoch == 0:
-        with open(f'./{PrivateSetting.outputPath}/ValidAcc.txt','w') as fAcc:
-            print('Validation acc of epoch {}: {:.4f} %'.format(epoch+1, 100 * totalCorrect / total), file = fAcc)
-            for i, cls in enumerate(className):
-                print('- Accuracy of class {:.5s} : {:.4f} %'.format(cls, 100 * classCorrect[i] / classTotal[i]), file = fAcc)
-    else:
-        with open(f'./{PrivateSetting.outputPath}/ValidAcc.txt','a') as fAcc:
-            print('\nValidation acc of epoch {}: {:.4f} %'.format(epoch+1, 100 * totalCorrect / total), file = fAcc)
-            for i, cls in enumerate(className):
-                print('- Accuracy of class {:.5s} : {:.4f} %'.format(cls, 100 * classCorrect[i] / classTotal[i]), file = fAcc)
+    if ResultStorage.saveAccTxt["switch"]:
+        if epoch == 0:
+            with open(f'./{PrivateSetting.outputPath}/ValidAcc.txt','w') as fAcc:
+                print('Validation acc of epoch {}: {:.4f} %'.format(epoch+1, 100 * totalCorrect / total), file = fAcc)
+                for i, cls in enumerate(className):
+                    print('- Accuracy of class {:.5s} : {:.4f} %'.format(cls, 100 * classCorrect[i] / classTotal[i]), file = fAcc)
+        else:
+            with open(f'./{PrivateSetting.outputPath}/ValidAcc.txt','a') as fAcc:
+                print('\nValidation acc of epoch {}: {:.4f} %'.format(epoch+1, 100 * totalCorrect / total), file = fAcc)
+                for i, cls in enumerate(className):
+                    print('- Accuracy of class {:.5s} : {:.4f} %'.format(cls, 100 * classCorrect[i] / classTotal[i]), file = fAcc)
 
 
-def save_epoch_acc_json(epoch:int, totalEpoch: int, total:int, totalCorrect:int, classTotal:list, classCorrect:list, className:list):
+def save_epoch_acc_json(epoch:int, totalEpoch: int, total:int, totalCorrect:int):
     """
     Save epoch accuracy and class accuracy into json file.
 
     Args:
         epoch: current epoch number
+        totalEpoch: total epoch number
         total: total data amount
         totalCorrect: correctly predicted data amount
         classTotal: data amount of each class
         classCorrect: correctly predicted data amount of each class
         className: list of class name
+    Return:
+        modelTraining.json
     """
     jsonFilePath = f'./{PrivateSetting.outputPath}/modelTraining.json'
     epochDict = {
@@ -50,18 +57,13 @@ def save_epoch_acc_json(epoch:int, totalEpoch: int, total:int, totalCorrect:int,
         }
     }
     infoDict = {}
-    if epoch == 0:
-        infoDict = {}
-        infoDict[str(epoch + 1)] = epochDict
-        with open(jsonFilePath,'w') as fAcc:
-            json.dump(infoDict, fAcc, indent=4)
-    else:
+    if epoch != 0:
         if os.path.exists(jsonFilePath):
             with open(jsonFilePath, 'r') as fAcc:
                 infoDict = json.load(fAcc)
-        infoDict[str(epoch + 1)] = epochDict
-        with open(jsonFilePath, 'w') as fAcc:
-            json.dump(infoDict, fAcc, indent=4)
+    infoDict[str(epoch + 1)] = epochDict
+    with open(jsonFilePath, 'w') as fAcc:
+        json.dump(infoDict, fAcc, indent=4)
 
 
 def output_result_csv(nameList:list, predict:tensor, labels:tensor, confidence:tensor, className:list, count:int, mode=BasicSetting.task):
@@ -103,7 +105,7 @@ def output_result_csv(nameList:list, predict:tensor, labels:tensor, confidence:t
                 result = [fullname, className[int(labels[i])], className[int(predict[i])]]
             elif mode == "Inference":
                 result = [fullname, className[int(predict[i])]]
-            result.extend(confidence[i][:10])
+            result.extend(confidence[i][:len(className)])
             writer = csv.writer(csvfile)
             writer.writerow(result)
         count += 1

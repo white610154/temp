@@ -41,8 +41,8 @@ def show_num_data(classTotal:list, classCorrect:list):
         classTotal: data amount of each class
         classCorrect: correctly predicted data amount of each class
     """
-    print("Total data for each class : ", classTotal)
-    print("Correct data for each class: ", classCorrect)
+    print('Total data for each class : ', classTotal)
+    print('Correct data for each class: ', classCorrect)
 
 
 def show_rate(total, totalCorrect, classTotal, classCorrect, cfMatrix, targetIndex):
@@ -57,10 +57,26 @@ def show_rate(total, totalCorrect, classTotal, classCorrect, cfMatrix, targetInd
         cfMatrix: confusion matrix
         targetIndex: the class index of "OK" or "Pass" in the className list 
     """
-    leakage = (sum(row[targetIndex] for row in cfMatrix) - cfMatrix[targetIndex][targetIndex]) / (total - classTotal[targetIndex]) * 100
-    overkill = 100 - (100 * classCorrect[targetIndex] / classTotal[targetIndex])
-    defectAcc = (totalCorrect - classCorrect[targetIndex]) / (total - classTotal[targetIndex]) * 100
-    print("leakage: {:.4f}%, overkill: {:.4f}%, defectAcc: {:.4f}%".format(leakage, overkill, defectAcc))
+    if len(targetIndex) == len(classTotal):
+        raise BaseException('The targetClass should not include all class. Please check showRate["targetClass"] in config/ConfigEvaluation.py.')
+    predictPass = 0
+    correctPass = 0
+    totalPass = 0
+    wrongPass = 0
+    actualPass = 0
+    for index1 in targetIndex:
+        predictPass += sum(row[index1] for row in cfMatrix)
+        correctPass += cfMatrix[index1][index1]
+        totalPass += classTotal[index1]
+        actualPass += classCorrect[index1]
+        for index2 in targetIndex:
+            if index1 == index2:
+                continue
+            wrongPass += cfMatrix[index2][index1]
+    leakageRate = (predictPass - correctPass - wrongPass) / (total - totalPass) * 100
+    overkillRate = 100 - ((actualPass + wrongPass) / totalPass * 100)
+    defectAcc = (totalCorrect - correctPass) / (total - totalPass) * 100
+    print('leakage: {:.4f}%, overkill: {:.4f}%, defectAcc: {:.4f}%'.format(leakageRate, overkillRate, defectAcc))
 
 
 def show_wrong_file(nameList, predict:tensor, labels:tensor, confidence:tensor, className, count:int):
@@ -75,13 +91,13 @@ def show_wrong_file(nameList, predict:tensor, labels:tensor, confidence:tensor, 
         className: class name of each class
         count: use to record current file
     """
-    if EvaluationPara.showWrongFile:
+    if EvaluationPara.showWrongFile["switch"]:
         confid = confidence.cpu().numpy()
         confid = confid[:, :len(className)]
         for i in range(len(predict)):
             fullname = nameList[count]
             count += 1
             if not eq(predict[i], labels[i]):
-                print("Wrong file: {}, Label: {}, Pred: {}".format(fullname, className[int(labels[i])], className[int(predict[i])]))
-                print("Confid: {}\n".format(confid[i])) 
+                print('Wrong file: {}, Label: {}, Pred: {}'.format(fullname, className[int(labels[i])], className[int(predict[i])]))
+                print('Confid: {}\n'.format(confid[i])) 
         return count

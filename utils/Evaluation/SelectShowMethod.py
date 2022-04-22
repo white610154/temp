@@ -1,23 +1,21 @@
 from config.ConfigEvaluation import EvaluationPara
 from .ShowResult import *
 
-def select_show_method(mode, dataSet, totalCorrect, classTotal, classCorrect,
-                       cfMatrix, predicted, labels, confidence=None, count=None):
+def select_show_method(mode, dataSet, totalCorrect, classTotal, classCorrect, cfMatrix):
     """
     According to configs in ConfigEvaluation, select evaluation methods.
     """
-    if EvaluationPara.showAcc:
+    if EvaluationPara.showAcc["switch"]:
         show_total_acc(mode, len(dataSet), totalCorrect)
         
-    if EvaluationPara.showClassAcc:
+    if EvaluationPara.showClassAcc["switch"]:
         show_class_acc(classTotal, classCorrect, dataSet.className)
 
-    if EvaluationPara.showNumOfClasses:
+    if EvaluationPara.showNumOfClasses["switch"]:
         show_num_data(classTotal, classCorrect)
     
-    if EvaluationPara.showRate['switch']:
-        show_rate(len(dataSet), totalCorrect, classTotal, classCorrect,
-                  cfMatrix, dataSet.className.index(EvaluationPara.showRate['targetIndex']))
-    
-    # if EvaluationPara.showWrongFile:
-    #     count = show_wrong_file(dataSet.filename, predicted, labels, confidence, dataSet.className, count)
+    if EvaluationPara.showRate["switch"]:
+        targetIndex = []
+        for name in EvaluationPara.showRate["targetClass"]:
+            targetIndex.append(dataSet.className.index(name))
+        show_rate(len(dataSet), totalCorrect, classTotal, classCorrect, cfMatrix, targetIndex)

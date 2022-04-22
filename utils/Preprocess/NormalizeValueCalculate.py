@@ -14,7 +14,10 @@ from config.ConfigPytorchModel import ClsPath
 from utils.ModelService.PytorchClassificationModel.CustomDataset import ImageDataset
 
 def get_std_mean(imageSize):
-    transform = transforms.Compose([transforms.Resize((imageSize[0], imageSize[1])), transforms.ToTensor()])
+    if PreprocessPara.resize["switch"]:
+        transform = transforms.Compose([transforms.Resize((imageSize[0], imageSize[1])), transforms.ToTensor()])
+    else:
+        transform = transforms.ToTensor()
     trainDataset = ImageDataset(ClsPath.trainPath, transform=transform)
     dataloader = DataLoader(dataset=trainDataset, batch_size=1, shuffle=False)
     

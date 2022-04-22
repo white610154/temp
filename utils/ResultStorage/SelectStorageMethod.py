@@ -1,6 +1,7 @@
+from utils.ResultStorage.SaveOnnxModel import onnx_pack
 from config.ConfigResultStorage import ResultStorage
 from config.ConfigPytorchModel import ClsModelPara
-from utils.ResultStorage import SaveWeight
+from utils.ResultStorage import SaveWeight, SaveAcc
 
 def save_weight(model, bestAcc, currentAcc, epoch):
     """
@@ -17,11 +18,22 @@ def save_weight(model, bestAcc, currentAcc, epoch):
     if bestAcc <= currentAcc:
         bestAcc = currentAcc
         SaveWeight.save_model_weight(model, 'BestWeight')
+        if ResultStorage.saveOnnxModel["switch"]:
+            onnx_pack(model=model, packageName=ResultStorage.saveOnnxModel["fileName"])
 
-    if ResultStorage.saveFinalWeight and epoch + 1 == ClsModelPara.epochs:
+
+    if ResultStorage.saveFinalWeight["switch"] and epoch + 1 == ClsModelPara.epochs:
         SaveWeight.save_model_weight(model, 'FinalWeight')
 
-    if ResultStorage.saveCheckpoint['switch'] and (epoch + 1) % ResultStorage.saveCheckpoint['saveIter'] == 0:
+    if ResultStorage.saveCheckpoint['switch'] and (epoch + 1) % ResultStorage.saveCheckpoint["saveIter"] == 0:
         SaveWeight.save_model_weight(model, 'CheckPoint')
         
     return bestAcc
+
+
+def save_acc(epoch:int, total:int, totalCorrect:int, classTotal:list, classCorrect:list, className:list):
+    if ResultStorage.saveAccTxt["switch"]:
+        SaveAcc.save_epoch_acc_txt(epoch, total, totalCorrect, classTotal, classCorrect, className)
+    
+    if ResultStorage.saveAccJson["switch"]:
+        SaveAcc.save_epoch_acc_json(epoch, ClsModelPara.epochs, total, totalCorrect)

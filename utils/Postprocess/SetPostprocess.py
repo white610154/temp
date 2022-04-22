@@ -14,6 +14,6 @@ def select_postprocess(outputs, className):
     className.sort()
     className.sort(key=lambda x:x)
 
-    if PostProcessPara.confidenceFilter['switch']:
-        outputs = confidence_threshold(outputs, className, PostProcessPara.confidenceFilter['selectLabel'], PostProcessPara.confidenceFilter['threshold'])
+    if PostProcessPara.confidenceFilter["switch"]:
+        outputs = confidence_threshold(outputs, className, PostProcessPara.confidenceFilter["selectLabel"], PostProcessPara.confidenceFilter["threshold"])
     return outputs

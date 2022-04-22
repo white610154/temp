@@ -8,17 +8,17 @@ def select_scheduler(optimizer):
     Return:
         scheduler
     """
-    if SchedulerPara.stepLR['switch']:
+    if SchedulerPara.stepLR["switch"]:
         method = getattr(SchedulerMethod, 'StepLR')
         scheduler = method(optimizer=optimizer, 
-                           step_size=SchedulerPara.stepLR['stepSize'],
-                           gamma=SchedulerPara.stepLR['gamma']
+                           step_size=SchedulerPara.stepLR["stepSize"],
+                           gamma=SchedulerPara.stepLR["gamma"]
                            )
         
-    elif SchedulerPara.cosineAnnealingLR['switch']:
+    elif SchedulerPara.cosineAnnealingLR["switch"]:
         method = getattr(SchedulerMethod, 'CosineAnnealingLR')
         scheduler = method(optimizer=optimizer,
-                           T_max=SchedulerPara.cosineAnnealingLR['tMax'],
-                           eta_min=SchedulerPara.cosineAnnealingLR['etaMin'],
+                           T_max=SchedulerPara.cosineAnnealingLR["tMax"],
+                           eta_min=SchedulerPara.cosineAnnealingLR["etaMin"],
                            )
     return scheduler

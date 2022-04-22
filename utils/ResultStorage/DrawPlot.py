@@ -12,7 +12,7 @@ def draw_acc_curve(accRecord:list):
     Args:
         accRecord: a list including validation accuracy of all epochs
     """
-    if ResultStorage.drawAccCurve:
+    if ResultStorage.drawAccCurve["switch"]:
         plt.plot(accRecord, color='blue')
         plt.title('accuracy curve')
         plt.ylabel('acc')
@@ -35,7 +35,7 @@ def plot_confusion_matrix(cm, classes:list, normalize:bool=True, title:str='Conf
         title: title of the figure
         cmap: color of confusion matrix
     """
-    if ResultStorage.drawConfusionMatrix:
+    if ResultStorage.drawConfusionMatrix["switch"]:
         print(cm)
         if normalize:
             cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
@@ -52,8 +52,8 @@ def plot_confusion_matrix(cm, classes:list, normalize:bool=True, title:str='Conf
 
         for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
             plt.text(j, i, format(cm[i, j], fmt),
-                    horizontalalignment="center",
-                    color="white" if cm[i, j] > thresh else "black")
+                    horizontalalignment='center',
+                    color='white' if cm[i, j] > thresh else 'black')
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
         plt.tight_layout()

@@ -104,23 +104,20 @@ def write_python_config(configFileName, configList, mode):
             fileLines = sampleConfigFile.readlines()
             for fileLine in fileLines:
                 lines.append(fileLine)
-                
         classLineNumDict = get_class_line_num(lines, configList)
         if not classLineNumDict:
             return False
-
         for config in configList:
             parameterDict = get_parameter(lines, classLineNumDict[config][0], classLineNumDict[config][1])
             if not parameterDict:
                 return False
-
             for parameter in parameterDict:
-                for config_parameter in configList[config]:
-                    if parameter == config_parameter:
-                        replace_word = configList[config][config_parameter]
-                        if isinstance(configList[config][config_parameter], str):
-                            replace_word = f'"{configList[config][config_parameter]}"'
-                        lines[parameterDict[parameter][0]] = f"{lines[parameterDict[parameter][0]][0:parameterDict[parameter][1]]} {replace_word}\n"
+                for configParameter in configList[config]:
+                    if parameter == configParameter:
+                        replaceWord = configList[config][configParameter]
+                        if isinstance(configList[config][configParameter], str):
+                            replaceWord = f"'{configList[config][configParameter]}'"
+                        lines[parameterDict[parameter][0]] = f'{lines[parameterDict[parameter][0]][0:parameterDict[parameter][1]]} {replaceWord}\n'
 
         with open(configPath, "w") as ConfigFile:
             for line in lines:

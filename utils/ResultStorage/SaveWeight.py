@@ -1,6 +1,6 @@
 import os
 import torch
-from config.Config import BasicSetting, PrivateSetting
+from config.Config import PrivateSetting
 
 def save_model_weight(model, weightName):
     """
