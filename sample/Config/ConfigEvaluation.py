@@ -1,6 +1,6 @@
 class EvaluationPara:
-    showAcc          = {"switch": True}
-    showClassAcc     = {"switch": True}
-    showNumOfClasses = {"switch": True}
+    showAcc          = {"switch": False}
+    showClassAcc     = {"switch": False}
+    showNumOfClasses = {"switch": False}
     showRate         = {"switch": False, "targetClass": ['OK']}
     showWrongFile    = {"switch": False}
