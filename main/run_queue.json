@@ -1,16 +1,22 @@
 {
     "done": [
         {
-            "projectName": "20220422-a",
-            "experimentId": "20220422154610",
-            "runId": "20220422154723",
+            "projectName": "20220425-a",
+            "experimentId": "20220425164636",
+            "runId": "20220425164723",
             "task": "Train"
         },
         {
-            "projectName": "20220422-b",
-            "experimentId": "20220422155739",
-            "runId": "20220422155828",
-            "task": "Train"
+            "projectName": "20220425-a",
+            "experimentId": "20220425164636",
+            "runId": "20220425164723",
+            "task": "Test"
+        },
+        {
+            "projectName": "20220425-a",
+            "experimentId": "20220425164636",
+            "runId": "20220425164723",
+            "task": "Test"
         }
     ],
     "work": []

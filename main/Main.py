@@ -176,7 +176,7 @@ def run_experiment_train():
         return response(1, "There is no data.")
     elif not 'projectName' in data or not 'experimentId' in data:
         return response(1, "There is no data.")
-    ok, msg = ProjectUtil.save_in_run_queue(data['projectName'], data['experimentId'], task="Train")
+    ok, msg = ProjectUtil.save_run_in_queue(data, task="Train")
     if not ok:
         return response(1, msg)
     return response(0, "success", msg)
@@ -220,6 +220,21 @@ def delete_run():
     if not ok:
         return response(1, msg)
     return response(0, "success")
+
+@app.route('/run-experiment-test', methods=['POST'])
+def run_experiment_test():
+    '''
+    run experiment
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'experimentId' in data:
+        return response(1, "There is no data.")
+    ok, msg = ProjectUtil.save_run_in_queue(data, task="Test")
+    if not ok:
+        return response(1, msg)
+    return response(0, "success", msg)
 
 def main():
     app.run(host='0.0.0.0', port=5028)

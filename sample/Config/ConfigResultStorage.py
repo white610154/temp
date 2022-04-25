@@ -2,6 +2,7 @@ class ResultStorage:
     saveFinalWeight     = {"switch": True}
     saveAccTxt          = {"switch": True}
     saveAccJson         = {"switch": True}
+    testAccJson         = {"switch": True}
     drawAccCurve        = {"switch": False}
     drawConfusionMatrix = {"switch": False}
     saveOnnxModel       = {"switch": False,  "fileName": 'onnxModel'}

@@ -194,16 +194,20 @@ def add_dataset(projectPath, datasetPath, uploaded=False, labeled=False, split=F
     except Exception as err:
         print(err)
 
-def save_in_run_queue(projectName, experimentId, task):
+def save_run_in_queue(runInfo, task):
     '''
     save a run process in run queue
     '''
     try:
+        projectName = runInfo["projectName"]
+        experimentId = runInfo["experimentId"]
         projectPath = f"{rootProjectPath}/{projectName}"
-        runId = create_run(projectPath, experimentId)
-        if not runId:
-            return False, "create run failed"
-
+        if task == 'Train':
+            runId = create_run(projectPath, experimentId)
+            if not runId:
+                return False, "create run failed"
+        elif task == 'Test':
+            runId = runInfo["runId"]
         runQueueJsonPath = f"main/run_queue.json"
         workList = []
         newRun = {
@@ -267,7 +271,7 @@ def get_queue_process(runDict, mode):
             wrongMsg = "Training has not started"
         else:
             wrongMsg = "This run has been deleted"
-        runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/modelTraining.json'
+        runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/model{runDict["task"]}ing.json'
         if not os.path.exists(runProcessPath):
             runDict["process"] = wrongMsg
             return False, runDict

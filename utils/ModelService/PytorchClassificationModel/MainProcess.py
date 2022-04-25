@@ -117,7 +117,6 @@ def valid(device, model, epoch, normalization):
             for i in range(labels.size(0)):
                 classCorrect[labels[i]] += c[i].item()
                 classTotal[labels[i]] += 1
-
         SelectStorageMethod.save_acc(epoch, total, totalCorrect, classTotal, classCorrect, validSet.className)
     ##### Show predicted result #####
     SelectShowMethod.select_show_method('Valid', validSet, totalCorrect, classTotal, classCorrect, cfMatrix)
@@ -167,16 +166,17 @@ def test():
             for i in range(labels.size(0)):
                 classCorrect[labels[i]] += c[i].item()
                 classTotal[labels[i]] += 1
-                cfMatrix[int(labels[i]), int(predicted[i])] += 1
+                # cfMatrix[int(labels[i]), int(predicted[i])] += 1
 
             ##### Output prediction csv #####
             confidence = torch.nn.functional.softmax(newOutputs, dim=1)
             countUnknown = SaveUnknown.unknown_threshold(testSet.filename, predicted, labels, confidence, testSet.className, countUnknown)
-            count = SaveAcc.output_result_csv(testSet.filename, predicted, labels, confidence, testSet.className, count)
+            # count = SaveAcc.output_result_csv(testSet.filename, predicted, labels, confidence, testSet.className, count)
             countW = ShowResult.show_wrong_file(testSet.filename, predicted, labels, confidence, testSet.className, countW)
 
     ##### Show predicted result #####
     SelectShowMethod.select_show_method('Test', testSet, totalCorrect, classTotal, classCorrect, cfMatrix)
+    SelectStorageMethod.test_acc(totalCorrect, classTotal, classCorrect)
     DrawPlot.plot_confusion_matrix(cfMatrix, classes=testSet.className, normalize=True, title='Prediction result')
 
 
