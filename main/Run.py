@@ -30,6 +30,8 @@ def load_run_config(projectName, runId):
         projectPath = f"{rootProjectPath}/{projectName}"
         configPath = f"{projectPath}/runs/{runId}/{runId}.json"        
         config = None
+        if not os.path.exists(configPath):
+            return False, "There is no config"
         with open(configPath, 'r') as configFile:
             config = json.load(configFile)
         if not config:

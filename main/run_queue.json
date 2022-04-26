@@ -1,23 +1,4 @@
 {
-    "done": [
-        {
-            "projectName": "20220425-a",
-            "experimentId": "20220425164636",
-            "runId": "20220425164723",
-            "task": "Train"
-        },
-        {
-            "projectName": "20220425-a",
-            "experimentId": "20220425164636",
-            "runId": "20220425164723",
-            "task": "Test"
-        },
-        {
-            "projectName": "20220425-a",
-            "experimentId": "20220425164636",
-            "runId": "20220425164723",
-            "task": "Test"
-        }
-    ],
+    "done": [],
     "work": []
 }
