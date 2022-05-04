@@ -9,42 +9,85 @@ def response(code, message, data=None):
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/get-projects', methods=['POST', 'GET'])
-def get_projects():
-    ok, projectList = ProjectUtil.get_projects()
-    if not ok:
-        return response(1, projectList)
-    return response(0, "success", {'projects': projectList})
+### project
 
 @app.route('/create-project-by-key', methods=['POST'])
 def create_project_by_key():
     '''
-    decode key to get config
-    create a new project folder/ or already existed
-    save config as json
-
-    {
-        "name": "aaaa",
-        "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDb25maWciOnsiUHJpdmF0ZVNldHRpbmciOnsiZGF0YXNldFBhdGgiOiIifX0sIkNvbmZpZ0F1Z21lbnRhdGlvbiI6eyJBdWdtZW50YXRpb25QYXJhIjp7InJhbmRvbUhvcml6b250YWxGbGlwIjp7InN3aXRjaCI6MSwicHJvYmFiaWxpdHkiOjAuNX19fSwiQ29uZmlnRXZhbHVhdGlvbiI6eyJFdmFsdWF0aW9uUGFyYSI6eyJzaG93QWNjIjp7InN3aXRjaCI6MX0sInNob3dDbGFzc0FjYyI6eyJzd2l0Y2giOjF9fX0sIkNvbmZpZ01vZGVsU2VydmljZSI6eyJMb3NzRnVuY3Rpb25QYXJhIjp7Imxvc3NGdW5jdGlvbiI6IkNyb3NzRW50cm9weUxvc3MifSwiTGVhcm5pbmdSYXRlIjp7ImxlYXJuaW5nUmF0ZSI6MC4wMDF9LCJPcHRpbWl6ZXJQYXJhIjp7IkFkYW0iOnsic3dpdGNoIjoxLCJiZXRhcyI6WzAuOSwwLjk5OV0sImVwcyI6MWUtOCwid2VpZ2h0RGVjYXkiOjAuMDAwNSwiYW1zZ3JhZCI6MH19LCJTY2hlZHVsZXJQYXJhIjp7InN0ZXBMUiI6eyJzd2l0Y2giOjEsInN0ZXBTaXplIjoxLCJnYW1tYSI6MC41fX19LCJDb25maWdQb3N0cHJvY2VzcyI6eyJQb3N0UHJvY2Vzc1BhcmEiOnsiY29uZmlkZW5jZUZpbHRlciI6eyJzd2l0Y2giOjEsInRocmVzaG9sZCI6MC43NSwic2VsZWN0TGFiZWwiOiJPSyIsImNsYXNzTGlzdCI6WyJORyIsIk9LIl19fX0sIkNvbmZpZ1ByZXByb2Nlc3MiOnsiUHJlcHJvY2Vzc1BhcmEiOnsibm9ybWFsaXplIjp7InN3aXRjaCI6MSwibW9kZSI6MH19fSwiQ29uZmlnUHl0b3JjaE1vZGVsIjp7IlNlbGVjdGVkTW9kZWwiOnsibW9kZWwiOnsic3RydWN0dXJlIjoiYXVvX3VucmVzdHJpY3RlZF9wb3dlcmZ1bF9tb2RlbCIsInByZXRyYWluZWQiOjF9fSwiQ2xzTW9kZWxQYXJhIjp7ImJhdGNoU2l6ZSI6MTYsImVwb2NocyI6Mn19fQ.gMuiZ6nWPq3mkkn2_X4DNm7TyYIL_a6uK7Dk91jcCS0"
-        '''
+    input: name, config/ output: prejectList
+    '''
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
+    elif not 'name' in data or not 'key' in data:
+        return response(1, "There is no name or key.")
 
     ok, config = ProjectUtil.decode_key(data['key'])
     if not ok:
         return response(1, config)
 
-    projectName = data['name']
-    ok, projectList = ProjectUtil.create_project(projectName)
+    ok, message = ProjectUtil.create_project(data['name'])
+    if not ok:
+        return response(1, message)
+
+    ok, configPath = ProjectUtil.save_config_as_json(data['name'], config)
+    if not ok:
+        return response(1, configPath)
+
+    ok, projectList = ProjectUtil.get_projects()
+    if not ok:
+        return response(1, projectList)
+    
+    return response(0, "success", {"projects": projectList})
+
+@app.route('/delete-project', methods=['POST'])
+def delete_projects():
+    '''
+    input: projectName/ output: projectList
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data:
+        return response(1, "There is no projectName.")
+    
+    ok, projectPath = ProjectUtil.find_project(data["projectName"])
+    if not ok:
+        return response(1, projectPath)
+    
+    ok, message = ProjectUtil.delete_project(projectPath)
+    if not ok:
+        return response(1, message)
+    
+    ok, projectList = ProjectUtil.get_projects()
+    if not ok:
+        return response(1, projectList)
+    
+    return response(0, "success", {'projects': projectList})
+
+@app.route('/get-projects', methods=['POST', 'GET'])
+def get_projects():
+    ok, projectList = ProjectUtil.get_projects()
     if not ok:
         return response(1, projectList)
 
-    ok, configPath = ProjectUtil.save_config_as_json(projectName, config)
-    if not ok:
-        return response(1, configPath)
+    return response(0, "success", {'projects': projectList})
+
+@app.route('/check-project', methods=['POST'])
+def check_projects():
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data:
+        return response(1, "There is no projectName.")
     
-    return response(0, "success", {"projects": projectList})
+    ok, projectPath = ProjectUtil.find_project(data["projectName"])
+    if not ok:
+        return response(1, projectPath)
+
+    return response(0, "success", {'projectPath': projectPath})
+
+### experiment
 
 @app.route('/get-experiments', methods=['POST'])
 def get_experiments():
@@ -229,7 +272,7 @@ def run_experiment_test():
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
-    elif not 'projectName' in data or not 'experimentId' in data:
+    elif not 'projectName' in data or not 'experimentId' in data or not 'runId' in data:
         return response(1, "There is no data.")
     ok, msg = ProjectUtil.save_run_in_queue(data, task="Test")
     if not ok:
