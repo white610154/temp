@@ -335,3 +335,13 @@ def delete_run_in_queue(projectName, runId):
     except Exception as err:
         print(err)
         return False, err
+
+def find_onnx(projectPath: str, runId: str):
+    try:
+        onnxPath = os.path.abspath(f'{projectPath}/runs/{runId}/{runId}.onnx')
+        if not os.path.isfile(onnxPath):
+            return False, "Model not found"
+        return True, onnxPath
+    except Exception as err:
+        print(err)
+        return False, err

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from utils import ProjectUtil
 
@@ -332,8 +332,32 @@ def run_experiment_test():
         return response(1, msg)
     return response(0, "success", msg)
 
+@app.route('/download-model/<string:header>/<string:payload>/<string:signature>', methods=['GET'])
+def download_model(header, payload, signature):
+    '''
+    download model with filename setting
+    '''
+    jwt = f'{header}.{payload}.{signature}'
+    ok, data = ProjectUtil.decode_key(jwt)
+    print(data)
+    if not ok or not data:
+        return response(1, "There is no data")
+    elif not 'projectName' in data or not 'runId' in data or not 'filename' in data:
+        return response(1, "There is no data")
+    
+    ok, projectPath = ProjectUtil.find_project(data['projectName'])
+    if not ok:
+        return response(1, projectPath)
+
+    ok, onnxPath = ProjectUtil.find_onnx(projectPath, data['runId'])
+    if not ok:
+        return response(1, onnxPath)
+    print(onnxPath)
+
+    return send_file(onnxPath, download_name=f"{data['filename']}.onnx")
+
 def main():
-    app.run(host='0.0.0.0', port=5028)
+    app.run(host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     main()
