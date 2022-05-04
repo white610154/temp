@@ -40,8 +40,8 @@ def create_project_by_key():
     
     return response(0, "success", {"projects": projectList})
 
-@app.route('/delete-project', methods=['POST'])
-def delete_projects():
+@app.route('/remove-project', methods=['POST'])
+def remove_projects():
     '''
     input: projectName/ output: projectList
     '''
@@ -67,6 +67,9 @@ def delete_projects():
 
 @app.route('/get-projects', methods=['POST', 'GET'])
 def get_projects():
+    '''
+    input: / output: projectList
+    '''
     ok, projectList = ProjectUtil.get_projects()
     if not ok:
         return response(1, projectList)
@@ -74,7 +77,10 @@ def get_projects():
     return response(0, "success", {'projects': projectList})
 
 @app.route('/check-project', methods=['POST'])
-def check_projects():
+def check_project():
+    '''
+    input: projectName/ output: projectPath
+    '''
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
@@ -92,14 +98,15 @@ def check_projects():
 @app.route('/get-experiments', methods=['POST'])
 def get_experiments():
     '''
-    return experiment config
+    input: projectName/ output: config
     '''
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
+    elif not 'projectName' in data:
+        return response(1, "There is no projectName.")
     
-    projectName = data['projectName']
-    ok, projectPath = ProjectUtil.find_project(projectName)
+    ok, projectPath = ProjectUtil.find_project(data['projectName'])
     if not ok:
         return response(1, projectPath)
 
@@ -109,16 +116,126 @@ def get_experiments():
 
     return response(0, "success", config)
 
+@app.route('/check-experiment', methods=['POST'])
+def check_experiments():
+    '''
+    input: projectName, experimentId/ output: experimentJsonPath
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'experimentId' in data:
+        return response(1, "There is no projectName or experimentId.")
+    
+    ok, projectPath = ProjectUtil.find_project(data["projectName"])
+    if not ok:
+        return response(1, projectPath)
+
+    ok, experimentJsonPath = ProjectUtil.find_experiment(projectPath, data['experimentId'])
+    if not ok:
+        return response(1, experimentJsonPath)
+
+    return response(0, "success", experimentJsonPath)
+
+### dataset
+
+@app.route('/check-dataset', methods=['POST'])
+def check_dataset():
+    '''
+    input: projectName, datasetPath/ output: {uploaded: bool, labeled: bool, split: bool}
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'datasetPath' in data:
+        return response(1, "There is no projectName or datasetPath.")
+
+    status = {
+        'uploaded': False,
+        'labeled': False,
+        'split': False
+    }
+
+    ok, message = ProjectUtil.check_data_uploaded(data['datasetPath'])
+    if not ok:
+        return response(1, message)
+    status['uploaded'] = True
+
+    ok, message = ProjectUtil.check_data_split(data['datasetPath'])
+    if ok:
+        status['split'] = True
+        datasetPath = f'{data["datasetPath"]}/Train'
+    elif not ok:
+        datasetPath = data["datasetPath"]
+    
+    ok, message = ProjectUtil.check_data_labeled(datasetPath)
+    if not ok:
+        return response(1, message)
+    
+    status['labeled'] = True
+
+    ok, projectPath = ProjectUtil.find_project(data['projectName'])
+    if not ok:
+        return response(1, projectPath)
+    
+    ok, message = ProjectUtil.add_dataset(projectPath, data["datasetPath"], **status)
+    if not ok:
+        return response(1, message)
+
+    return response(0, "success", status)
+
+@app.route('/remove-dataset', methods=['POST'])
+def remove_dataset():
+    '''
+    input: projectName, datasetPath/ output: datasets
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'datasetPath' in data:
+        return response(1, "There is no projectName or datasetPath.")
+
+    ok, projectPath = ProjectUtil.find_project(data['projectName'])
+    if not ok:
+        return response(1, projectPath)
+
+    ok, datasets = ProjectUtil.remove_dataset(projectPath, data['datasetPath'])
+    if not ok:
+        return response(1, datasets)
+    
+    return response(0, "success", datasets)
+
+@app.route('/get-datasets', methods=['POST'])
+def get_datasets():
+    '''
+    input: projectName/ output: datasets
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data:
+        return response(1, "There is no data.")
+
+    ok, projectPath = ProjectUtil.find_project(data['projectName'])
+    if not ok:
+        return response(1, projectPath)
+
+    ok, datasets = ProjectUtil.get_datasets(projectPath)
+    if not ok:
+        return response(1, datasets)
+    
+    return response(0, "success", datasets)
+
 @app.route('/set-experiment-dataset', methods=['POST'])
 def set_experiment_dataset():
     '''
-    set dataset of experiment
+    input: projectName, experimentId, dataPath/ output: config
     '''
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
     elif not 'projectName' in data or not 'experimentId' in data or not 'datasetPath' in data:
-        return response(1, "There is no data.")
+        return response(1, "There is no projectName or experimentId or datasetPath.")
     
     ok, projectPath = ProjectUtil.find_project(data['projectName'])
     if not ok:
@@ -127,87 +244,10 @@ def set_experiment_dataset():
     ok, config = ProjectUtil.set_config_dataset(projectPath, data['experimentId'], data['datasetPath'])
     if not ok:
         return response(1, config)
+    
     return response(0, "success", config)
 
-@app.route('/get-datasets', methods=['POST'])
-def get_datasets():
-    '''
-    get datasets of project
-    '''
-    data = request.get_json()
-    if not data:
-        return response(1, "There is no data.")
-    elif not 'projectName' in data:
-        return response(1, "There is no data.")
-
-    found, projectPath = ProjectUtil.find_project(data['projectName'])
-    if not found:
-        return response(1, projectPath)
-
-    datasets = ProjectUtil.get_datasets(projectPath)
-    if not datasets:
-        return response(1, "read file error")
-    return response(0, "success", datasets)
-
-@app.route('/remove-dataset', methods=['POST'])
-def remove_dataset():
-    '''
-    remove dataset from project
-    '''
-    data = request.get_json()
-    if not data:
-        return response(1, "There is no data.")
-    elif not 'projectName' in data or not 'datasetPath' in data:
-        return response(1, "There is no data.")
-
-    found, projectPath = ProjectUtil.find_project(data['projectName'])
-    if not found:
-        return response(1, projectPath)
-
-    datasets = ProjectUtil.remove_dataset(projectPath)
-    if not datasets:
-        return response(1, "write file error")
-    return response(0, "success", datasets)
-
-@app.route('/check-dataset', methods=['POST'])
-def check_dataset():
-    '''
-    check dataset status: {uploaded: bool, labeled: bool, split: bool}
-    '''
-    data = request.get_json()
-    if not data:
-        return response(1, "There is no data.")
-    elif not 'datasetPath' in data or not 'projectName' in data:
-        return response(1, "There is no data.")
-
-    status = {
-        'uploaded': False,
-        'labeled': False,
-        'split': False,
-    }
-
-    datasetPath = data['datasetPath']
-    ok, dataList = ProjectUtil.check_data_uploaded(datasetPath)
-    if not ok:
-        return response(1, dataList)
-    status['uploaded'] = True
-
-    ok, datasetList = ProjectUtil.check_data_split(datasetPath)
-    if not ok:
-        status['split'] = False
-        ok, classList = ProjectUtil.check_data_labeled(datasetPath)
-    elif ok:
-        status['split'] = True
-        ok, classList = ProjectUtil.check_data_labeled(f"{datasetPath}/Train")
-
-    status['labeled'] = ok
-
-    found, projectPath = ProjectUtil.find_project(data['projectName'])
-    if not found:
-        return response(1, projectPath)
-    ProjectUtil.add_dataset(projectPath, datasetPath, **status)
-
-    return response(0, "success", status)
+### run
 
 @app.route('/run-experiment-train', methods=['POST'])
 def run_experiment_train():
@@ -216,13 +256,39 @@ def run_experiment_train():
     '''
     data = request.get_json()
     if not data:
-        return response(1, "There is no data.")
+        return response(1, 'There is no data.')
     elif not 'projectName' in data or not 'experimentId' in data:
-        return response(1, "There is no data.")
+        return response(1, 'There is no projectName or experimentId.')
+    
+    ok, projectPath = ProjectUtil.find_project(data["projectName"])
+    if not ok:
+        return response(1, projectPath)
+
+    ok, experimentJsonPath = ProjectUtil.find_experiment(projectPath, data['experimentId'])
+    if not ok:
+        return response(1, experimentJsonPath)
+
     ok, msg = ProjectUtil.save_run_in_queue(data, task="Train")
     if not ok:
         return response(1, msg)
     return response(0, "success", msg)
+
+@app.route('/delete-run', methods=['POST'])
+def delete_run():
+    '''
+    delete run
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'runId' in data:
+        return response(1, "There is no data.")
+    ok, msg = ProjectUtil.delete_run_in_queue(data["projectName"], data["runId"])
+    if not ok:
+        return response(1, msg)
+    return response(0, "success")
+
+
 
 @app.route('/get-information-train', methods=['POST'])
 def get_information_train():
@@ -249,20 +315,7 @@ def get_information_train():
         newRuns = {"done": newRuns["done"], "work": newWorkList}   
     return response(0, "success", newRuns)
 
-@app.route('/delete-run', methods=['POST'])
-def delete_run():
-    '''
-    delete run
-    '''
-    data = request.get_json()
-    if not data:
-        return response(1, "There is no data.")
-    elif not 'projectName' in data or not 'runId' in data:
-        return response(1, "There is no data.")
-    ok, msg = ProjectUtil.delete_run_in_queue(data["projectName"], data["runId"])
-    if not ok:
-        return response(1, msg)
-    return response(0, "success")
+
 
 @app.route('/run-experiment-test', methods=['POST'])
 def run_experiment_test():
