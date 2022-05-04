@@ -6,37 +6,30 @@ Created on FRI MAR 4 17:00:00 2021
 """
 
 import json, jwt, os, shutil
-from pkgutil import get_data
 from datetime import datetime
 
 key = 'auo'
 algorithm = 'HS256'
 rootProjectPath = f'./projects'
 
+### project
+
 def decode_key(token):
     try:
         deDict = jwt.decode(token, key, algorithms=[algorithm])
         return True, deDict
     except:
-        return False, f'Decode key failed'
-
-def get_projects():
-    try:
-        return True, os.listdir(rootProjectPath)
-    except:
-        return False, f'Get projects failed'
+        return False, 'Decode key failed'
 
 def create_project(projectName):
     try:
-        projectPath = f'{rootProjectPath}/{projectName}'
-        if os.path.isdir(projectPath):
-            return False, "Project already exists"
-        os.makedirs(f'{projectPath}/experiments')
-        os.makedirs(f'{projectPath}/runs')
-        projectList = os.listdir(rootProjectPath)
-        return True, projectList
+        if os.path.isdir(f'{rootProjectPath}/{projectName}'):
+            return False, 'Project already exists'
+        os.makedirs(f'{rootProjectPath}/{projectName}/experiments')
+        os.makedirs(f'{rootProjectPath}/{projectName}/runs')
+        return True, 'success'
     except:
-        return False, "Create project failed"
+        return False, 'Create project failed'
 
 def save_config_as_json(projectName, config):
     try:
@@ -45,7 +38,20 @@ def save_config_as_json(projectName, config):
             json.dump(config, jsonFile, indent=4)
         return True, f'{rootProjectPath}/{projectName}/experiments/{jsonName}.json'
     except:
-        return False, "Save config failed"
+        return False, 'Save config failed'
+
+def get_projects():
+    try:
+        return True, os.listdir(rootProjectPath)
+    except:
+        return False, f'Get projects failed'
+
+def delete_project(projectPath):
+    try:
+        shutil.rmtree(projectPath)
+        return True, "Success"
+    except:
+        return False, "Delete project failed"
 
 def find_project(projectName):
     try:
@@ -56,6 +62,8 @@ def find_project(projectName):
             return False, "Project doesn't exist"
     except:
         return False, "Find project failed"
+
+### experiment
 
 def get_config(projectPath):
     try:
