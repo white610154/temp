@@ -229,7 +229,7 @@ def run_experiment_test():
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
-    elif not 'projectName' in data or not 'experimentId' in data:
+    elif not 'projectName' in data or not 'experimentId' in data or not 'runId' in data:
         return response(1, "There is no data.")
     ok, msg = ProjectUtil.save_run_in_queue(data, task="Test")
     if not ok:
