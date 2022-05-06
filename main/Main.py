@@ -252,7 +252,7 @@ def set_experiment_dataset():
 @app.route('/run-experiment-train', methods=['POST'])
 def run_experiment_train():
     '''
-    run experiment
+    input: projectName, experimentId/ output: projectName, experimentId, runId, task
     '''
     data = request.get_json()
     if not data:
@@ -273,10 +273,38 @@ def run_experiment_train():
         return response(1, msg)
     return response(0, "success", msg)
 
-@app.route('/delete-run', methods=['POST'])
-def delete_run():
+@app.route('/run-experiment-test', methods=['POST'])
+def run_experiment_test():
     '''
-    delete run
+    input: projectName, experimentId/ output: projectName, experimentId, runId, task
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'experimentId' in data or not 'runId' in data:
+        return response(1, "There is no data.")
+    
+    ok, projectPath = ProjectUtil.find_project(data["projectName"])
+    if not ok:
+        return response(1, projectPath)
+
+    ok, experimentJsonPath = ProjectUtil.find_experiment(projectPath, data['experimentId'])
+    if not ok:
+        return response(1, experimentJsonPath)
+
+    ok, runJsonPath = ProjectUtil.find_run(projectPath, data['runId'])
+    if not ok:
+        return response(1, runJsonPath)
+
+    ok, msg = ProjectUtil.save_run_in_queue(data, task="Test")
+    if not ok:
+        return response(1, msg)
+    return response(0, "success", msg)
+
+@app.route('/remove-run-in-queue', methods=['POST'])
+def remove_run_in_queue():
+    '''
+    input: projectName, runId/ output: none
     '''
     data = request.get_json()
     if not data:
@@ -286,51 +314,86 @@ def delete_run():
     ok, msg = ProjectUtil.delete_run_in_queue(data["projectName"], data["runId"])
     if not ok:
         return response(1, msg)
+
     return response(0, "success")
 
-
-
-@app.route('/get-information-train', methods=['POST'])
-def get_information_train():
+@app.route('/remove-run', methods=['POST'])
+def remove_run():
     '''
-    get information
-    '''
-    ok, runs = ProjectUtil.get_runs()
-    if not ok:
-        return response(1, runs)
-    if len(runs["done"]) <= 0 and len(runs["work"]) <= 0:
-        return response(1, runs)
-    newRuns = {"done": runs["done"], "work": runs["work"]}
-    if len(runs["done"]) > 0:
-        newDoneList = []
-        for run in runs["done"]:
-            ok, newRun = ProjectUtil.get_queue_process(run, "done")
-            newDoneList.append(newRun)
-        newRuns = {"done": newDoneList, "work": newRuns["work"]}
-    if len(runs["work"]) > 0:
-        newWorkList = []
-        for run in runs["work"]:
-            ok, newRun = ProjectUtil.get_queue_process(run, "work")
-            newWorkList.append(newRun)
-        newRuns = {"done": newRuns["done"], "work": newWorkList}   
-    return response(0, "success", newRuns)
-
-
-
-@app.route('/run-experiment-test', methods=['POST'])
-def run_experiment_test():
-    '''
-    run experiment
+    input: projectName, runId/ output: none
     '''
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
-    elif not 'projectName' in data or not 'experimentId' in data or not 'runId' in data:
+    elif not 'projectName' in data or not 'runId' in data:
         return response(1, "There is no data.")
-    ok, msg = ProjectUtil.save_run_in_queue(data, task="Test")
+    
+    ok, projectPath = ProjectUtil.find_project(data["projectName"])
+    if not ok:
+        return response(1, projectPath)
+
+    ok, runJsonPath = ProjectUtil.find_run(projectPath, data['runId'])
+    if not ok:
+        return response(1, runJsonPath)
+    
+    ok, msg = ProjectUtil.delete_run(projectPath, data["runId"])
     if not ok:
         return response(1, msg)
-    return response(0, "success", msg)
+
+    return response(0, "success")
+
+@app.route('/get-queue-information', methods=['POST'])
+def get_queue_information():
+    '''
+    get queueinformation
+    '''
+    ok, queue = ProjectUtil.get_runs()
+    if not ok:
+        return response(1, queue)
+    newQueue = {"done": queue["done"], "work": queue["work"]}
+    if len(queue["done"]) > 0:
+        newDoneList = []
+        for run in queue["done"]:
+            ok, newRun = ProjectUtil.get_queue_process(run, "done")
+            newDoneList.append(newRun)
+        newQueue = {"done": newDoneList, "work": newQueue["work"]}
+    if len(queue["work"]) > 0:
+        newWorkList = []
+        for run in queue["work"]:
+            ok, newRun = ProjectUtil.get_queue_process(run, "work")
+            newWorkList.append(newRun)
+        newQueue = {"done": newQueue["done"], "work": newWorkList}   
+    return response(0, "success", newQueue)
+
+@app.route('/get-model-information', methods=['POST'])
+def get_model_information():
+    '''
+    get model information
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data:
+        return response(1, "There is no data.")
+    
+    ok, projectPath = ProjectUtil.find_project(data["projectName"])
+    if not ok:
+        return response(1, projectPath)
+    
+    ok, modelList = ProjectUtil.get_models(projectPath)
+    if not ok:
+        return response(1, modelList)
+    newModelList = []
+    for model in modelList:
+        ok, newModel = ProjectUtil.get_queue_process(model, "model")
+        newModelList.append(newModel)
+
+    modelList = newModelList
+    newModelList = []
+    for model in modelList:
+        ok, newModel = ProjectUtil.get_model_architecture(projectPath, model)
+        newModelList.append(newModel)
+    return response(0, "success", newModelList)
 
 @app.route('/download-model/<string:header>/<string:payload>/<string:signature>', methods=['GET'])
 def download_model(header, payload, signature):
@@ -357,7 +420,7 @@ def download_model(header, payload, signature):
     return send_file(onnxPath, download_name=f"{data['filename']}.onnx")
 
 def main():
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5028)
 
 if __name__ == '__main__':
     main()

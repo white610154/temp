@@ -150,7 +150,7 @@ def add_dataset(projectPath, datasetPath, uploaded=False, labeled=False, split=F
     try:
         datasets = {}
         datasetFilePath = f'{projectPath}/datasets.json'
-        if os.path.exists(datasetFilePath):
+        if os.path.isfile(datasetFilePath):
             with open(datasetFilePath, 'r') as jsonFile:
                 datasets = json.load(jsonFile)
         
@@ -170,7 +170,7 @@ def remove_dataset(projectPath, datasetPath):
     try:
         datasets = {}
         datasetFilePath = f'{projectPath}/datasets.json'
-        if os.path.exists(datasetFilePath):
+        if os.path.isfile(datasetFilePath):
             with open(datasetFilePath, 'r') as jsonFile:
                 datasets = json.load(jsonFile)
         if datasetPath in datasets:
@@ -185,7 +185,7 @@ def get_datasets(projectPath):
     try:
         datasets = {}
         datasetFilePath = f'{projectPath}/datasets.json'
-        if os.path.exists(datasetFilePath):
+        if os.path.isfile(datasetFilePath):
             with open(datasetFilePath, 'r') as jsonFile:
                 datasets = json.load(jsonFile)
         return True, datasets
@@ -228,20 +228,21 @@ def save_run_in_queue(runInfo, task):
         experimentId = runInfo["experimentId"]
         projectPath = f"{rootProjectPath}/{projectName}"
         if task == 'Train':
-            runId = create_run(projectPath, experimentId)
-            if not runId:
-                return False, "create run failed"
+            ok, runId = create_run(projectPath, experimentId)
+            if not ok:
+                return False, runId
         elif task == 'Test':
             runId = runInfo["runId"]
-        runQueueJsonPath = f"main/run_queue.json"
+        runQueueJsonPath = f'main/run_queue.json'
         workList = []
+        doneList = []
         newRun = {
                 "projectName": projectName,
                 "experimentId": experimentId,
                 "runId": runId,
                 "task": task
             }
-        if os.path.exists(runQueueJsonPath):
+        if os.path.isfile(runQueueJsonPath):
             with open(runQueueJsonPath, 'r') as queueFile:
                 queueDict = json.load(queueFile)
             doneList = queueDict["done"]
@@ -251,10 +252,8 @@ def save_run_in_queue(runInfo, task):
         with open(runQueueJsonPath, 'w') as queueFile:
             json.dump(queueDict, queueFile, indent=4)
         return True, newRun
-
-    except Exception as err:
-        print(err)
-        return False, err
+    except:
+        return False, 'save run in queue failed'
 
 def create_run(projectPath, experimentId):
     """
@@ -262,64 +261,40 @@ def create_run(projectPath, experimentId):
     2. copy exp config to run
     """
     try:
-        runName = datetime.now().strftime('%Y%m%d%H%M%S')
-        runPath = f"{projectPath}/runs/{runName}"
+        runId = datetime.now().strftime('%Y%m%d%H%M%S')
+        runPath = f'{projectPath}/runs/{runId}'
         if os.path.isdir(runPath):
-            return False
+            return False, 'run has already existed'
         os.makedirs(runPath)
-        experimentConfigPath = f"{projectPath}/experiments/{experimentId}.json"
-        runConfigPath = f"{runPath}/{runName}.json"
+        experimentConfigPath = f'{projectPath}/experiments/{experimentId}.json'
+        runConfigPath = f'{runPath}/{runId}.json'
         shutil.copy(experimentConfigPath, runConfigPath)
-        return runName
-    except Exception as err:
-        print(err)
-        return None
+        return True, runId
+    except:
+        return False, 'Create run failed'
 
-def get_runs():
+def find_run(projectPath, runId):
     try:
-        runQueueJsonPath = f"main/run_queue.json"
-        if not os.path.exists(runQueueJsonPath):
-            return False, "there is no run queue"
-        with open(runQueueJsonPath) as jsonFile:
-            jsonDict = json.load(jsonFile)
-        #     queue = jsonDict["queue"]
-        # if len(queue) <= 0:
-        #     return False, "There is no run"
-        return True, jsonDict
-    except Exception as err:
-        print(err)
-        return False, err
-
-def get_queue_process(runDict, mode):
-    try:
-        if mode == "work":
-            wrongMsg = "Training has not started"
+        runJsonPath = f'{projectPath}/runs/{runId}/{runId}.json'
+        if os.path.isfile(runJsonPath):
+            return True, runJsonPath
         else:
-            wrongMsg = "This run has been deleted"
-        runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/model{runDict["task"]}ing.json'
-        if not os.path.exists(runProcessPath):
-            runDict["process"] = wrongMsg
-            return False, runDict
-        with open(runProcessPath) as jsonFile:
-            trainingProcess = json.load(jsonFile)
-            runDict["process"] = trainingProcess
-        return True, runDict
-    except Exception as err:
-        print(err)
-        return False, err
+            return False, 'Run does not exist'
+    except:
+        return False, 'Find Run failed'
 
 def delete_run_in_queue(projectName, runId):
     try:
         runQueueJsonPath = f"main/run_queue.json"
-        if not os.path.exists(runQueueJsonPath):
-            return False, "there is no run queue"
+        if not os.path.isfile(runQueueJsonPath):
+            return False, 'there is no run queue'
         with open(runQueueJsonPath) as jsonFile:
             jsonDict = json.load(jsonFile)
             doneList = jsonDict["done"]
             workList = jsonDict["work"]
         if len(workList) > 0:
             if workList[0]["projectName"] == projectName and workList[0]["runId"] == runId:
-                return False, "This run is running"
+                return False, 'This run is running'
         newDoneList = []
         for done in doneList:
             if done["projectName"] != projectName or done["runId"] != runId:
@@ -332,9 +307,85 @@ def delete_run_in_queue(projectName, runId):
         with open(runQueueJsonPath, 'w') as jsonFile:
             json.dump(jsonDict, jsonFile, indent=4)
         return True, jsonDict
-    except Exception as err:
-        print(err)
-        return False, err
+    except:
+        return False, 'delete run in queue failed'
+
+def delete_run(projectPath, runId):
+    try:
+        print(f'{projectPath}/runs/{runId}')
+        shutil.rmtree(f'{projectPath}/runs/{runId}')
+        return True, 'Success'
+    except:
+        return False, 'Delete run failed'
+
+def get_runs():
+    try:
+        runQueueJsonPath = f'main/run_queue.json'
+        if not os.path.isfile(runQueueJsonPath):
+            return False, 'there is no run queue'
+        with open(runQueueJsonPath) as jsonFile:
+            jsonDict = json.load(jsonFile)
+            if not 'done' in jsonDict or not 'work' in jsonDict:
+                return False, 'run queue has no done or work'
+        return True, jsonDict
+    except:
+        return False, 'get run queue failed'
+
+def get_queue_process(runDict, mode):
+    try:
+        if mode == 'model':
+            taskList = ['Train', 'Test']
+            for task in taskList:
+                runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/model{task}ing.json'
+                if os.path.isfile(runProcessPath):
+                    with open(runProcessPath) as jsonFile:
+                        trainingProcess = json.load(jsonFile)
+                        runDict[task] = trainingProcess
+            return True, runDict
+        else:
+            if mode == 'work':
+                wrongMsg = 'Task has not started'
+            else:
+                wrongMsg = 'This run has been deleted'
+            runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/model{runDict["task"]}ing.json'
+            if not os.path.isfile(runProcessPath):
+                runDict["process"] = wrongMsg
+                return False, runDict
+            with open(runProcessPath) as jsonFile:
+                trainingProcess = json.load(jsonFile)
+                runDict["process"] = trainingProcess
+            return True, runDict
+    except:
+        return False, 'get queue process failed'
+
+def get_models(projectPath):
+    try:
+        modelList = []
+        for root, folder, files in os.walk(projectPath):
+            for filename in files:
+                if filename.endswith('.onnx'):
+                    modelInfo = root.replace('\\', '/').split('/')
+                    model = {
+                        "projectName": modelInfo[2],
+                        "runId": modelInfo[4],
+                    }
+                    modelList.append(model)
+        return True, modelList
+    except:
+        return False, 'get models failed'
+
+def get_model_architecture(projectPath, runDict):
+    try:
+        runJsonPath = f'{projectPath}/runs/{runDict["runId"]}/{runDict["runId"]}.json'
+        if os.path.isfile(runJsonPath):
+            with open(runJsonPath) as jsonFile:
+                config = json.load(jsonFile)
+                model = config["ConfigPytorchModel"]["SelectedModel"]["model"]["structure"]
+                runDict["model"] = model
+            return True, runDict
+
+    except:
+        return False, 'get model architecture failed'
 
 def find_onnx(projectPath: str, runId: str):
     try:
