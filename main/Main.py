@@ -404,23 +404,23 @@ def download_model(header, payload, signature):
     ok, data = ProjectUtil.decode_key(jwt)
     print(data)
     if not ok or not data:
-        return response(1, "There is no data")
+        return ('', 204)
     elif not 'projectName' in data or not 'runId' in data or not 'filename' in data:
-        return response(1, "There is no data")
+        return ('', 204)
     
     ok, projectPath = ProjectUtil.find_project(data['projectName'])
     if not ok:
-        return response(1, projectPath)
+        return ('', 204)
 
     ok, onnxPath = ProjectUtil.find_onnx(projectPath, data['runId'])
     if not ok:
-        return response(1, onnxPath)
+        return ('', 204)
     print(onnxPath)
 
     return send_file(onnxPath, download_name=f"{data['filename']}.onnx")
 
 def main():
-    app.run(host='0.0.0.0', port=5028)
+    app.run(host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     main()
