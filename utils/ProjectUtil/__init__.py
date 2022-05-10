@@ -382,6 +382,7 @@ def get_model_architecture(projectPath, runDict):
                 config = json.load(jsonFile)
                 model = config["ConfigPytorchModel"]["SelectedModel"]["model"]["structure"]
                 runDict["model"] = model
+                runDict["datasetPath"] = config["Config"]["PrivateSetting"]["datasetPath"]
             return True, runDict
 
     except:
