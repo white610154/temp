@@ -87,7 +87,7 @@ def output_result_csv(nameList:list, predict:tensor, labels:tensor, confidence:t
         if mode == "Test":
             fileName = 'Test_result.csv'
             title = ['Filename', 'Ground truth', 'Prediction']
-        elif mode =="Inference":
+        elif mode == "Inference":
             fileName = 'Inference_result.csv'
             title = ['Filename', 'Prediction']
 

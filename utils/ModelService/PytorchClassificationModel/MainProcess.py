@@ -13,7 +13,6 @@ from utils.ResultStorage import DrawPlot, SaveAcc, SelectStorageMethod
 from utils.Evaluation import ShowResult, SelectShowMethod
 from config.ConfigPytorchModel import ClsModelPara, ClsPath
 from config.Config import BasicSetting
-from unitTest import trainformTest
 
 ### REPRODUCIBILITY
 torch.manual_seed(0)
@@ -178,6 +177,7 @@ def test():
 
     ##### Show predicted result #####
     SelectShowMethod.select_show_method('Test', testSet, totalCorrect, classTotal, classCorrect, cfMatrix)
+    SelectStorageMethod.test_acc(totalCorrect, classTotal, classCorrect)
     DrawPlot.plot_confusion_matrix(cfMatrix, classes=testSet.className, normalize=True, title='Prediction result')
 
 
