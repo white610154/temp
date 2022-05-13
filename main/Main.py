@@ -420,7 +420,7 @@ def download_model(header, payload, signature):
     return send_file(onnxPath, download_name=f"{data['filename']}.onnx")
 
 def main():
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5028)
 
 if __name__ == '__main__':
     main()

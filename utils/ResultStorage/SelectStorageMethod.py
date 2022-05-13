@@ -1,7 +1,7 @@
 from utils.ResultStorage.SaveOnnxModel import onnx_pack
 from config.ConfigResultStorage import ResultStorage
 from config.ConfigPytorchModel import ClsModelPara
-from utils.ResultStorage import SaveWeight, SaveAcc
+from utils.ResultStorage import SaveWeight, SaveAcc, TestAcc
 
 def save_model(model, optimizer, bestAcc, currentAcc, epoch):
     """
@@ -38,3 +38,7 @@ def save_acc(epoch:int, total:int, totalCorrect:int, classTotal:list, classCorre
     
     if ResultStorage.saveAccJson["switch"]:
         SaveAcc.save_epoch_acc_json(epoch, ClsModelPara.epochs, total, totalCorrect)
+
+def test_acc(totalCorrect:int, classTotal:list, classCorrect:list):
+    if ResultStorage.testAccJson["switch"]:
+        TestAcc.test_epoch_acc_json(classTotal, classCorrect)
