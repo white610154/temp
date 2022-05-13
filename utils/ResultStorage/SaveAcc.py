@@ -1,8 +1,8 @@
-import os, csv, json
+import os, json
 from torch import tensor
 from config.Config import BasicSetting, PrivateSetting
 from config.ConfigResultStorage import ResultStorage
-
+from .csvModule import UsingCsv
 
 def save_epoch_acc_txt(epoch:int, total:int, totalCorrect:int, classTotal:list, classCorrect:list, className:list):
     """
@@ -82,31 +82,84 @@ def output_result_csv(nameList:list, predict:tensor, labels:tensor, confidence:t
         Filename | Ground truth | Prediction | Confidence of each class
 
     """
-    ### Create csv file and title
-    if mode == "Test":
-        fileName = 'Test_result.csv'
-        title = ['Filename', 'Ground truth', 'Prediction']
-    elif mode =="Inference":
-        fileName = 'Inference_result.csv'
-        title = ['Filename', 'Prediction']
-    if count == 0 :
-        with open(os.path.join(PrivateSetting.outputPath, fileName), 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            title.extend(className)
-            writer.writerow(title)
-            csvfile.close()
+    if ResultStorage.savePredictResult["switch"]:
+        ### Create csv file and title
+        if mode == "Test":
+            fileName = 'Test_result.csv'
+            title = ['Filename', 'Ground truth', 'Prediction']
+        elif mode =="Inference":
+            fileName = 'Inference_result.csv'
+            title = ['Filename', 'Prediction']
 
-    ### Write result to csv file
-    confidence = confidence.tolist()
-    for i in range(len(predict)):
-        fullname = nameList[count]
-        with open(os.path.join(PrivateSetting.outputPath, fileName), 'a', newline='') as csvfile:
+        title.extend(className)
+        saveAccCsv = UsingCsv(fileName, PrivateSetting.outputPath , title)
+        if count == 0 :
+            saveAccCsv.create_csv()
+
+        ### Write result to csv file
+        confidence = confidence.tolist()
+        for i in range(len(predict)):
+            fullname = nameList[count]
             if mode == "Test":
                 result = [fullname, className[int(labels[i])], className[int(predict[i])]]
             elif mode == "Inference":
                 result = [fullname, className[int(predict[i])]]
             result.extend(confidence[i][:len(className)])
-            writer = csv.writer(csvfile)
-            writer.writerow(result)
-        count += 1
+            saveAccCsv.writing(result, 'a')
+            count += 1
+        return count
+
+def unknown_threshold(nameList, predict:tensor, labels:tensor, confidence:tensor, className, count:int, mode=BasicSetting.task):
+    """
+    Filter out images with scores below the threshold 
+
+    Args:
+        nameList: list include all file names
+        predict: model prediction (dtype: tensor)
+        labels: correct label (dtype:tensor)
+        confidence: predicted confidence
+        className: class name of each class  
+        count: use to record current file
+    """
+    if ResultStorage.unknownFilter["switch"]:
+        filterDict = ResultStorage.unknownFilter["filter"]  # {tagName:threshold}
+        reverse = ResultStorage.unknownFilter["reverse"]
+        filter = sorted(filterDict.items(), key=lambda x:x[1], reverse=reverse) # x[1]: score
+        if mode == "Test":
+            fileName = f'Test_filter.csv' 
+            title = ['Filename', 'Ground truth', 'Prediction', 'sorce']
+        else:
+            fileName = f'Inference_filter.csv'
+            title = ['Filename', 'Prediction', 'sorce']
+
+        unknownCsv = UsingCsv(fileName, PrivateSetting.outputPath, title)
+        if count == 0 and ResultStorage.unknownFilter["saveCsvMode"] != 0:
+            unknownCsv.create_csv()
+
+        confid = confidence.cpu().numpy()
+        for i in range(len(predict)):
+            score = confid[i, predict[i]] if not reverse else -1*confid[i, predict[i]]
+            fullname = nameList[count]
+            result = []
+            for tagName, threshold in filter:
+                if reverse:  threshold = -1*threshold 
+                if mode == "Test":
+                    if  score < threshold: 
+                        print(f'{tagName} file: {fullname}, Label: {className[int(labels[i])]}',
+                            f'sorce({score:.2f}) < threshold({threshold})' if not reverse else f'sorce({score*-1:.2f}) > threshold({threshold*-1})')
+                        result = [fullname, className[int(labels[i])], tagName, f'{score if not reverse else score*-1:.2f}']
+                        break  
+                    elif ResultStorage.unknownFilter["saveCsvMode"] == 2:
+                        result =  [fullname, className[int(labels[i])], className[int(predict[i])], f'{score if not reverse else score*-1:.2f}']
+        
+                else:
+                    if score < threshold: 
+                        print(f'{tagName} file: {fullname}',
+                            f'sorce({score:.2f}) < threshold({threshold})' if not reverse else f'sorce({score*-1:.2f}) > threshold({threshold*-1})')
+                        result = [fullname, tagName, f'{score if not reverse else score*-1:.2f}']  
+                        break
+                    elif ResultStorage.unknownFilter["saveCsvMode"] == 2:
+                        result = [fullname, className[int(predict[i])], f'{score if not reverse else score*-1:.2f}']
+            if len(result) != 0: unknownCsv.writing(result, 'a')                     
+            count += 1
     return count

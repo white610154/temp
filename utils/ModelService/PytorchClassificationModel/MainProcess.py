@@ -1,6 +1,5 @@
 import torch
 import time
-import copy
 import numpy as np
 from torch.utils.data import DataLoader
 from .CustomDataset import ImageDataset, InferenceDataset
@@ -10,11 +9,11 @@ from .SelectLossFunction import select_loss_function
 from .SelectOptimizer import select_optimizer
 from .SelectScheduler import select_scheduler
 from utils.Postprocess.SetPostprocess import select_postprocess
-from utils.ResultStorage import DrawPlot, SaveAcc, SelectStorageMethod, SaveUnknown
+from utils.ResultStorage import DrawPlot, SaveAcc, SelectStorageMethod
 from utils.Evaluation import ShowResult, SelectShowMethod
-from config.ConfigPostprocess import PostProcessPara
 from config.ConfigPytorchModel import ClsModelPara, ClsPath
 from config.Config import BasicSetting
+from unitTest import trainformTest
 
 ### REPRODUCIBILITY
 torch.manual_seed(0)
@@ -36,8 +35,7 @@ def train():
 
     ##### Prepare data #####
     trainTransform, normalization = select_train_transform()
-    print("normalize in train: ", normalization)
-    print("trainTransform: ", trainTransform)
+    print(trainTransform)
 
     trainSet = ImageDataset(ClsPath.trainPath, trainTransform)
     trainLoader = DataLoader(dataset=trainSet, batch_size=ClsModelPara.batchSize, shuffle=True, num_workers=0)
@@ -74,9 +72,10 @@ def train():
         validAcc = valid(cudaDevice, model, epoch, normalization)
         accRecord.append(validAcc)
         scheduler.step()
+        print(scheduler.last_epoch, scheduler.get_last_lr())
 
         ##### Save weight #####
-        bestAcc = SelectStorageMethod.save_weight(model, bestAcc, validAcc, epoch)
+        bestAcc = SelectStorageMethod.save_model(model, optimizer, bestAcc, validAcc, epoch)
     DrawPlot.draw_acc_curve(accRecord)
 
 
@@ -94,13 +93,12 @@ def valid(device, model, epoch, normalization):
     """
     print("========================= valid =========================")
     validTransform = select_valid_transform(normalization)
-    # print("validTransform: ", validTransform)
+    print(validTransform)
     validSet = ImageDataset(ClsPath.validPath, validTransform)
     validLoader = DataLoader(dataset=validSet, batch_size=ClsModelPara.batchSize, shuffle=False, num_workers=0)
 
     classCorrect = [0.] * validSet.numClasses
     classTotal = [0.] * validSet.numClasses
-    cfMatrix = np.zeros([len(validSet.className), len(validSet.className)])
     totalCorrect = 0
     total = 0
     model.eval()
@@ -117,9 +115,10 @@ def valid(device, model, epoch, normalization):
             for i in range(labels.size(0)):
                 classCorrect[labels[i]] += c[i].item()
                 classTotal[labels[i]] += 1
+
         SelectStorageMethod.save_acc(epoch, total, totalCorrect, classTotal, classCorrect, validSet.className)
     ##### Show predicted result #####
-    SelectShowMethod.select_show_method('Valid', validSet, totalCorrect, classTotal, classCorrect, cfMatrix)
+    SelectShowMethod.select_show_method('Valid', validSet, totalCorrect, classTotal, classCorrect)
     return float(100 * totalCorrect / total)
 
 
@@ -141,6 +140,9 @@ def test():
     ##### Model define #####
     model = select_model()
     model.load_state_dict(torch.load(ClsPath.weightPath), strict=False)
+    # model_scripted = torch.jit.script(model)
+    # model_scripted.save('VRSmodelScripted.pt')
+    # exit()
     model = model.cuda(cudaDevice)
     model.eval()
     print('Number of class : ', testSet.numClasses)
@@ -150,33 +152,32 @@ def test():
     cfMatrix = np.zeros([testSet.numClasses, testSet.numClasses])
     with torch.no_grad():
         count, countW, countUnknown = 0, 0, 0
-
         for data in testLoader:
             inputs, labels = data[0].to(cudaDevice), data[1].to(cudaDevice)
             outputs = model(inputs)
+            outputs = outputs[0][:testSet.numClasses]
+            outputs = outputs[None, :]
 
             ##### Post process #####
             newOutputs = select_postprocess(outputs, testSet.className)
             _, predicted = torch.max(newOutputs, 1)
 
             ##### Record the result #####
-
             totalCorrect += (predicted == labels).sum().item()
             c = (predicted == labels)
             for i in range(labels.size(0)):
                 classCorrect[labels[i]] += c[i].item()
                 classTotal[labels[i]] += 1
-                # cfMatrix[int(labels[i]), int(predicted[i])] += 1
+                cfMatrix[int(labels[i]), int(predicted[i])] += 1
 
             ##### Output prediction csv #####
             confidence = torch.nn.functional.softmax(newOutputs, dim=1)
-            countUnknown = SaveUnknown.unknown_threshold(testSet.filename, predicted, labels, confidence, testSet.className, countUnknown)
-            # count = SaveAcc.output_result_csv(testSet.filename, predicted, labels, confidence, testSet.className, count)
+            countUnknown = SaveAcc.unknown_threshold(testSet.filename, predicted, labels, confidence, testSet.className, countUnknown)
+            count = SaveAcc.output_result_csv(testSet.filename, predicted, labels, confidence, testSet.className, count)
             countW = ShowResult.show_wrong_file(testSet.filename, predicted, labels, confidence, testSet.className, countW)
 
     ##### Show predicted result #####
     SelectShowMethod.select_show_method('Test', testSet, totalCorrect, classTotal, classCorrect, cfMatrix)
-    SelectStorageMethod.test_acc(totalCorrect, classTotal, classCorrect)
     DrawPlot.plot_confusion_matrix(cfMatrix, classes=testSet.className, normalize=True, title='Prediction result')
 
 
@@ -192,6 +193,9 @@ def inference():
     print("inferenceTransform: ", inferenceTransform)
     dataSet = InferenceDataset(ClsPath.inferencePath, inferenceTransform)
     dataLoader = DataLoader(dataset=dataSet, batch_size=1, shuffle=False, num_workers=0)
+    
+    ##### For Unit Test #####
+    # trainsformsTest(dataLoader, cudaDevice)
 
     ##### Load model #####
     model = select_model()
@@ -207,6 +211,8 @@ def inference():
         for data in dataLoader:
             inputs, labels = data[0].to(cudaDevice), data[1].to(cudaDevice)
             outputs = model(inputs)
+            outputs = outputs[0][:len(className)]
+            outputs = outputs[None, :]
 
             ##### Post process #####
             newOutputs = select_postprocess(outputs, className)
@@ -215,5 +221,82 @@ def inference():
             ##### Output result #####
             confidence = torch.nn.functional.softmax(outputs, dim=1)
 
-            countUnknown = SaveUnknown.unknown_threshold(dataSet.filename, predicted, labels, confidence, className, countUnknown)
+            countUnknown = SaveAcc.unknown_threshold(dataSet.filename, predicted, labels, confidence, className, countUnknown)
             count = SaveAcc.output_result_csv(dataSet.filename, predicted, labels, confidence, className, count)
+
+
+def checkpoint_train():
+    """
+    Training procedure: Use training data for model training, and record epoch acc, best weight, and draw validation curve.
+
+    Return:
+        CheckPoint.pth、BestWeight.pth、FinalWeight.pth
+        ValidAcc.txt: Record the validation accuracy of each epochs.
+        ValidCurve.jpg: Draw the validation accuracy curve.
+    """
+    ##### GPU setting #####
+    cudaDevice = torch.device('cuda:{}'.format(ClsModelPara.cudaDevice) if torch.cuda.is_available() else 'cpu')
+
+    ##### Prepare data #####
+    trainTransform, normalization = select_train_transform()
+
+    trainSet = ImageDataset(ClsPath.trainPath, trainTransform)
+    trainLoader = DataLoader(dataset=trainSet, batch_size=ClsModelPara.batchSize, shuffle=True, num_workers=0)
+    print('Number of class : ', trainSet.numClasses)
+    
+    ##### save model by pickle #####
+    # import pickle
+    # f = open('output/whole_checkpoint.pickle', 'rb')
+    # checkpoint = pickle.load(f)
+    # model = checkpoint["model"]
+    # model = model.to(cudaDevice)
+
+    # criterion = select_loss_function()
+    # optimizer = checkpoint["optim"]
+    # scheduler = select_scheduler(optimizer)
+
+    # print("Optimizer's state_dict:")
+    # for var_name in optimizer.state_dict():
+    #     print(var_name, "\t", optimizer.state_dict()[var_name])
+
+    ##### load model, optimizer, and define scheduler #####
+    checkpoint = torch.load('output/VRSmodel.pth')
+    model = checkpoint['model']
+    model = model.to(cudaDevice)
+
+    criterion = select_loss_function()
+    optimizer = checkpoint['optimizer']
+    scheduler = select_scheduler(optimizer)
+
+    print("Optimizer's state_dict:")
+    for var_name in optimizer.state_dict():
+        print(var_name, "\t", optimizer.state_dict()[var_name])
+
+
+    ##### Start training #####
+    accRecord = []
+    bestAcc = 0
+    for epoch in range(ClsModelPara.epochs):
+        localtime = time.asctime(time.localtime(time.time()))
+        print('-' * len('Epoch: {}/{} --- < Starting Time : {} >'.format(epoch + 1, ClsModelPara.epochs,localtime)))
+        print('Epoch: {}/{} --- < Starting Time : {} >'.format(epoch + 1, ClsModelPara.epochs, localtime))
+        trainCorrect = 0
+        model.train()
+        for data in trainLoader:
+            inputs, labels = data[0].to(cudaDevice), data[1].to(cudaDevice)
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            _, preds = torch.max(outputs.data, 1)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            trainCorrect += torch.sum(preds == labels)
+        ShowResult.show_total_acc('Train', len(trainSet), trainCorrect)
+        validAcc = valid(cudaDevice, model, epoch, normalization)
+        accRecord.append(validAcc)
+        scheduler.step()
+        print(scheduler.last_epoch, scheduler.get_last_lr())
+
+        ##### Save weight #####
+        # bestAcc = SelectStorageMethod.save_model(model, optimizer, bestAcc, validAcc, epoch)
+    DrawPlot.draw_acc_curve(accRecord)
