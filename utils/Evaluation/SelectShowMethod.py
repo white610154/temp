@@ -1,7 +1,7 @@
 from config.ConfigEvaluation import EvaluationPara
 from .ShowResult import *
 
-def select_show_method(mode, dataSet, totalCorrect, classTotal, classCorrect, cfMatrix):
+def select_show_method(mode, dataSet, totalCorrect, classTotal, classCorrect, cfMatrix=None):
     """
     According to configs in ConfigEvaluation, select evaluation methods.
     """

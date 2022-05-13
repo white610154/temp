@@ -4,7 +4,7 @@ class SelectedModel:
     model            = {'structure': 'regnet_y_400mf', 'pretrained': True}
 
 class ClsModelPara:
-    cudaDevice       = 2
+    cudaDevice       = 0
     batchSize        = 16
     epochs           = 2
 
