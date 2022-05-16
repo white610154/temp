@@ -177,7 +177,7 @@ def test():
 
     ##### Show predicted result #####
     SelectShowMethod.select_show_method('Test', testSet, totalCorrect, classTotal, classCorrect, cfMatrix)
-    SelectStorageMethod.test_acc(totalCorrect, classTotal, classCorrect)
+    SelectStorageMethod.test_acc(totalCorrect, classTotal, classCorrect, testSet.className)
     DrawPlot.plot_confusion_matrix(cfMatrix, classes=testSet.className, normalize=True, title='Prediction result')
 
 

@@ -37,8 +37,8 @@ def save_acc(epoch:int, total:int, totalCorrect:int, classTotal:list, classCorre
         SaveAcc.save_epoch_acc_txt(epoch, total, totalCorrect, classTotal, classCorrect, className)
     
     if ResultStorage.saveAccJson["switch"]:
-        SaveAcc.save_epoch_acc_json(epoch, ClsModelPara.epochs, total, totalCorrect)
+        SaveAcc.save_epoch_acc_json(epoch, ClsModelPara.epochs, total, totalCorrect, classTotal, classCorrect, className)
 
-def test_acc(totalCorrect:int, classTotal:list, classCorrect:list):
+def test_acc(totalCorrect:int, classTotal:list, classCorrect:list, className:list):
     if ResultStorage.testAccJson["switch"]:
-        TestAcc.test_epoch_acc_json(classTotal, classCorrect)
+        TestAcc.test_epoch_acc_json(classTotal, classCorrect, className)

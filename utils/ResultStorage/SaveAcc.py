@@ -31,7 +31,7 @@ def save_epoch_acc_txt(epoch:int, total:int, totalCorrect:int, classTotal:list, 
                     print('- Accuracy of class {:.5s} : {:.4f} %'.format(cls, 100 * classCorrect[i] / classTotal[i]), file = fAcc)
 
 
-def save_epoch_acc_json(epoch:int, totalEpoch: int, total:int, totalCorrect:int):
+def save_epoch_acc_json(epoch:int, totalEpoch: int, total:int, totalCorrect:int, classTotal:list, classCorrect:list, className:list):
     """
     Save epoch accuracy and class accuracy into json file.
 
@@ -47,13 +47,17 @@ def save_epoch_acc_json(epoch:int, totalEpoch: int, total:int, totalCorrect:int)
         modelTraining.json
     """
     jsonFilePath = f'./{PrivateSetting.outputPath}/modelTraining.json'
+    classAccDict = {}
+    for i, cls in enumerate(className):
+        classAccDict[cls] = 100 * classCorrect[i] / classTotal[i]
     epochDict = {
         "model": {
             "epoch": epoch + 1,
             "total": totalEpoch
         },
         "valid": {
-            "accuracy": totalCorrect / total
+            "accuracy": totalCorrect / total,
+            "classAccuracy": classAccDict
         }
     }
     infoDict = {}

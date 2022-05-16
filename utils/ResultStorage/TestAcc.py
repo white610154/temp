@@ -3,7 +3,7 @@ from torch import tensor
 from config.Config import BasicSetting, PrivateSetting
 from config.ConfigResultStorage import ResultStorage
 
-def test_epoch_acc_json(classTotal:list, classCorrect:list):
+def test_epoch_acc_json(classTotal:list, classCorrect:list, className:list):
     """
     Save epoch accuracy and class accuracy into json file.
 
@@ -14,9 +14,13 @@ def test_epoch_acc_json(classTotal:list, classCorrect:list):
         modelTesting.json
     """
     jsonFilePath = f'./{PrivateSetting.outputPath}/modelTesting.json'
+    classAccDict = {}
+    for i, cls in enumerate(className):
+        classAccDict[cls] = 100 * classCorrect[i] / classTotal[i]
     epochDict = {
         "test": {
-            "accuracy": sum(classCorrect) / sum(classTotal)
+            "accuracy": sum(classCorrect) / sum(classTotal),
+            "classAccuracy": classAccDict
         }
     }
     infoDict = {}
