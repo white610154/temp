@@ -49,7 +49,7 @@ def save_epoch_acc_json(epoch:int, totalEpoch: int, total:int, totalCorrect:int,
     jsonFilePath = f'./{PrivateSetting.outputPath}/modelTraining.json'
     classAccDict = {}
     for i, cls in enumerate(className):
-        classAccDict[cls] = 100 * classCorrect[i] / classTotal[i]
+        classAccDict[cls] = classCorrect[i] / classTotal[i]
     epochDict = {
         "model": {
             "epoch": epoch + 1,

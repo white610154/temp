@@ -16,7 +16,7 @@ def test_epoch_acc_json(classTotal:list, classCorrect:list, className:list):
     jsonFilePath = f'./{PrivateSetting.outputPath}/modelTesting.json'
     classAccDict = {}
     for i, cls in enumerate(className):
-        classAccDict[cls] = 100 * classCorrect[i] / classTotal[i]
+        classAccDict[cls] = classCorrect[i] / classTotal[i]
     epochDict = {
         "test": {
             "accuracy": sum(classCorrect) / sum(classTotal),
