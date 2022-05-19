@@ -419,6 +419,50 @@ def download_model(header, payload, signature):
 
     return send_file(onnxPath, download_name=f"{data['filename']}.onnx")
 
+@app.route('/set-deploy-path', methods=['POST'])
+def set_deploy_path():
+    '''
+    set deploy path
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'deployPath' in data:
+        return response(1, "There is no data.")
+
+    ok, projectPath = ProjectUtil.find_project(data["projectName"])
+    if not ok:
+        return response(1, projectPath)
+
+    ok, info = ProjectUtil.get_deploy_path_information(projectPath, data['deployPath'])
+    if not ok:
+        return response(1, info)
+
+    ok = ProjectUtil.set_deploy_path(projectPath, data['deployPath'])
+    if not ok:
+        return response(1, "Set deploy path failed")
+    return response(0, info)
+
+@app.route('/deploy', methods=['POST'])
+def deploy():
+    '''
+    deploy onnx to certain folder, and version control
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'runId' in data or 'filename' in data:
+        return response(1, "There is no data.")
+
+    ok, projectPath = ProjectUtil.find_project(data["projectName"])
+    if not ok:
+        return response(1, projectPath)
+
+    ok, result = ProjectUtil.deploy(data["projectName"], data['runId'], data['filename'])
+    if not ok:
+        return response(1, result)
+    return response(0, result)
+
 def main():
     app.run(host='0.0.0.0', port=5028)
 

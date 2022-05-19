@@ -5,6 +5,7 @@ Created on FRI MAR 4 17:00:00 2021
 @author: ShanYang
 """
 
+import hashlib
 import json, jwt, os, shutil
 from datetime import datetime
 
@@ -397,3 +398,111 @@ def find_onnx(projectPath: str, runId: str):
     except Exception as err:
         print(err)
         return False, err
+
+def get_deploy_path_information(projectName, deployPath: str):
+    if not os.path.isdir(deployPath):
+        return False, "folder not exists"
+
+    infoPath = f'{deployPath}/.auosala'
+    info = {}
+    if os.path.isfile(infoPath):
+        with open(infoPath, 'r') as f:
+            info = json.load(f)
+
+    if not projectName in info:
+        info[projectName] = []
+
+    with open(infoPath, 'w') as f:
+        json.dump(info, f)
+
+    return True, info
+
+def set_deploy_path_information(projectName, deployPath, deployInfo):
+    if not os.path.isdir(deployPath):
+        return False, "folder not exists"
+
+    try:
+        infoPath = f'{deployPath}/.auosala'
+        info = {}
+        with open(infoPath, 'r') as f:
+            info = json.load(f)
+
+        info[projectName].append({
+            'date': datetime.today().strftime("%Y%m%d"),
+            **deployInfo,
+        })
+        with open(infoPath, 'w') as f:
+            json.dump(info, f)
+
+        return True, None
+    except Exception as err:
+        return False, f"Set deploy information failed: {err}"
+
+
+def get_deploy_path(projectPath):
+    try:
+        deploySettingPath = f'{projectPath}/deploy.json'
+        if os.path.isfile(deploySettingPath):
+            with open(deploySettingPath, 'r') as fin:
+                deployPathList = json.load(fin)
+        else:
+            return False, "Deploy path not set"
+        return True, deployPathList[0]
+    except:
+        return False, "Get deploy path failed"
+
+def set_deploy_path(projectPath, deployPath):
+    try:
+        deploySettingPath = f'{projectPath}/deploy.json'
+        deployPathList = []
+        if os.path.isfile(deploySettingPath):
+            with open(deploySettingPath, 'r') as fin:
+                deployPathList = json.load(fin)
+        deployPathList = [deployPath]
+        with open(deploySettingPath, 'w') as fout:
+            json.dump(deployPathList, fout)
+        return True
+    except:
+        return False
+
+def deploy(projectName, runId, filename):
+    try:
+        ok, projectPath = find_project(projectName)
+        if not ok:
+            return False, projectPath
+
+        ok, deployPath = get_deploy_path(projectPath)
+        if not ok:
+            return False, deployPath
+
+        ok, onnxPath = find_onnx(projectPath, runId)
+        if not ok:
+            return False, onnxPath
+
+        try:
+            dst = onnxPath.replace(os.path.basename(onnxPath), f'{filename}.onnx')
+            shutil.copy(onnxPath, dst)
+
+            ok, message = set_deploy_path_information(projectName, deployPath, {
+                'runId': runId,
+                'fileChecksum': get_md5(onnxPath),
+            })
+            if not ok:
+                return False, message
+
+            return True, "Deploy successed"
+        except Exception as err:
+            return False, f"Deploy failed: {err}"
+
+    except Exception as err:
+        return False, f"Deploy failed: {err}"
+
+def get_md5(filepath):
+    md5_hash = hashlib.md5()
+
+    with open(filepath, "rb") as f:
+        content = f.read()
+        md5_hash.update(content)
+
+    digest = md5_hash.hexdigest()
+    return digest
