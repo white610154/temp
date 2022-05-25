@@ -1,6 +1,7 @@
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, request, send_file
 from flask_cors import CORS
 from utils import ProjectUtil
+from utils.ProjectUtil import DeployUtil
 
 def response(code, message, data=None):
     # code=0 for success, code=1 for fail
@@ -379,7 +380,15 @@ def get_model_information():
     ok, projectPath = ProjectUtil.find_project(data["projectName"])
     if not ok:
         return response(1, projectPath)
-    
+
+    ok, deployPath = DeployUtil.get_deploy_path(projectPath)
+    if not ok:
+        return response(1, deployPath)
+
+    ok, deployInfo = DeployUtil.get_deploy_path_information(data["projectName"], deployPath)
+    if not ok:
+        return response(1, deployInfo)
+
     ok, modelList = ProjectUtil.get_models(projectPath)
     if not ok:
         return response(1, modelList)
@@ -393,7 +402,12 @@ def get_model_information():
     for model in modelList:
         ok, newModel = ProjectUtil.get_model_architecture(projectPath, model)
         newModelList.append(newModel)
-    return response(0, "success", newModelList)
+
+    return response(0, "success", {
+        'deployPath': deployPath,
+        'deployInfo': deployInfo[data['projectName']],
+        'modelList': newModelList,
+    })
 
 @app.route('/download-model/<string:header>/<string:payload>/<string:signature>', methods=['GET'])
 def download_model(header, payload, signature):
@@ -412,7 +426,7 @@ def download_model(header, payload, signature):
     if not ok:
         return ('', 204)
 
-    ok, onnxPath = ProjectUtil.find_onnx(projectPath, data['runId'])
+    ok, onnxPath = DeployUtil.find_onnx(projectPath, data['runId'])
     if not ok:
         return ('', 204)
     print(onnxPath)
@@ -434,14 +448,37 @@ def set_deploy_path():
     if not ok:
         return response(1, projectPath)
 
-    ok, info = ProjectUtil.get_deploy_path_information(projectPath, data['deployPath'])
+    ok, info = DeployUtil.get_deploy_path_information(data["projectName"], data['deployPath'])
     if not ok:
-        return response(1, info)
+        ok, deployPath = DeployUtil.get_deploy_path(projectPath)
+        if not ok:
+            return response(1, deployPath)
 
-    ok = ProjectUtil.set_deploy_path(projectPath, data['deployPath'])
+        ok, info = DeployUtil.get_deploy_path_information(data['projectName'], deployPath)
+        if not ok:
+            return response(1, info)
+        return response(1, "Set deploy path failed", {
+            'deployPath': deployPath,
+            'info': info[data['projectName']]
+        })
+
+    ok = DeployUtil.set_deploy_path(projectPath, data['deployPath'])
     if not ok:
-        return response(1, "Set deploy path failed")
-    return response(0, info)
+        ok, deployPath = DeployUtil.get_deploy_path(projectPath)
+        if not ok:
+            return response(1, deployPath)
+
+        ok, info = DeployUtil.get_deploy_path_information(data['projectName'], deployPath)
+        if not ok:
+            return response(1, info)
+        return response(1, "Set deploy path failed", {
+            'deployPath': deployPath,
+            'info': info[data['projectName']]
+        })
+    return response(0, {
+        'deployPath': data['deployPath'],
+        'info': info[data['projectName']]
+    })
 
 @app.route('/deploy', methods=['POST'])
 def deploy():
@@ -451,17 +488,17 @@ def deploy():
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
-    elif not 'projectName' in data or not 'runId' in data or 'filename' in data:
+    elif not 'projectName' in data or not 'runId' in data or not 'filename' in data:
         return response(1, "There is no data.")
 
     ok, projectPath = ProjectUtil.find_project(data["projectName"])
     if not ok:
         return response(1, projectPath)
 
-    ok, result = ProjectUtil.deploy(data["projectName"], data['runId'], data['filename'])
+    ok, result = DeployUtil.deploy(data["projectName"], projectPath, data['runId'], data['filename'])
     if not ok:
         return response(1, result)
-    return response(0, result)
+    return response(0, "success", result[data['projectName']])
 
 def main():
     app.run(host='0.0.0.0', port=5028)
