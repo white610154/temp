@@ -1,6 +1,5 @@
-from fileinput import filename
 import os
-from flask import Flask, request, send_file, send_from_directory
+from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from utils import ProjectUtil
 from utils.ProjectUtil import DeployUtil
@@ -504,8 +503,7 @@ def deploy():
 
 @app.route('/images/<path:path>', methods=['GET'])
 def send_report(path):
-    print('get', path)
-    return send_from_directory(os.path.abspath('assets/images'), path=path)
+    return send_from_directory(os.path.abspath('projects'), path=path)
 
 def main():
     app.run(host='0.0.0.0', port=5028)
