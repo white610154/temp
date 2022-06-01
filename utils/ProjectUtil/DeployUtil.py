@@ -116,10 +116,16 @@ def get_md5(filepath):
 
 def find_onnx(projectPath: str, runId: str):
     try:
-        onnxPath = os.path.abspath(f'{projectPath}/runs/{runId}/{runId}.onnx')
-        if not os.path.isfile(onnxPath):
+        onnxPath = os.path.abspath(f'{projectPath}/runs/{runId}')
+        onnxFile = f'{runId}.onnx'
+        if not os.path.isfile(os.path.join(onnxPath, onnxFile)):
             return False, "Model not found"
-        return True, onnxPath
+        return True, onnxPath, onnxFile
     except Exception as err:
         print(err)
-        return False, err
+        return False, err, None
+
+def checkFile(deployPath, modelName, fileChecksum):
+    if os.path.isfile(os.path.join('deploy', deployPath, f'{modelName}.onnx')):
+        return get_md5(modelName) == fileChecksum
+    return False

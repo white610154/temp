@@ -1,4 +1,6 @@
-from flask import Flask, request, send_file
+from fileinput import filename
+import os
+from flask import Flask, request, send_file, send_from_directory
 from flask_cors import CORS
 from utils import ProjectUtil
 from utils.ProjectUtil import DeployUtil
@@ -8,6 +10,7 @@ def response(code, message, data=None):
     return {'code': code, 'message': message, 'data': data}
 
 app = Flask(__name__)
+app.debug = True
 CORS(app)
 
 ### project
@@ -383,11 +386,11 @@ def get_model_information():
 
     ok, deployPath = DeployUtil.get_deploy_path(projectPath)
     if not ok:
-        return response(1, deployPath)
+        deployPath = ""
 
     ok, deployInfo = DeployUtil.get_deploy_path_information(data["projectName"], deployPath)
     if not ok:
-        return response(1, deployInfo)
+        deployInfo = {data['projectName']: []}
 
     ok, modelList = ProjectUtil.get_models(projectPath)
     if not ok:
@@ -426,12 +429,12 @@ def download_model(header, payload, signature):
     if not ok:
         return ('', 204)
 
-    ok, onnxPath = DeployUtil.find_onnx(projectPath, data['runId'])
+    ok, onnxPath, onnxFile = DeployUtil.find_onnx(projectPath, data['runId'])
     if not ok:
         return ('', 204)
-    print(onnxPath)
+    print(onnxPath, onnxFile)
 
-    return send_file(onnxPath, download_name=f"{data['filename']}.onnx")
+    return send_from_directory(onnxPath, onnxFile, download_name=f"{data['filename']}.onnx", as_attachment=True)
 
 @app.route('/set-deploy-path', methods=['POST'])
 def set_deploy_path():
@@ -499,6 +502,11 @@ def deploy():
     if not ok:
         return response(1, result)
     return response(0, "success", result[data['projectName']])
+
+@app.route('/images/<path:path>', methods=['GET'])
+def send_report(path):
+    print('get', path)
+    return send_from_directory(os.path.abspath('assets/images'), path=path)
 
 def main():
     app.run(host='0.0.0.0', port=5028)
