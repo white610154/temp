@@ -10,7 +10,6 @@ def response(code, message, data=None):
     return {'code': code, 'message': message, 'data': data}
 
 app = Flask(__name__)
-app.debug = True
 CORS(app)
 
 ### project
