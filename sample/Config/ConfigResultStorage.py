@@ -7,7 +7,7 @@ class ResultStorage:
     savePredictResult   = {"switch": True}
     testAccJson         = {"switch": True}
     drawAccCurve        = {"switch": False}
-    drawConfusionMatrix = {"switch": False}
+    drawConfusionMatrix = {"switch": True}
     saveOnnxModel       = {"switch": True,  "fileName": BasicSetting.runId}
     saveCheckpoint      = {"switch": False, "saveIter": 1}
     unknownFilter       = {"switch": False,  "filter": {"unknown": 0.5}, "reverse": False, "saveCsv": 1}

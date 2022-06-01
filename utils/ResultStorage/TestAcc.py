@@ -14,13 +14,15 @@ def test_epoch_acc_json(classTotal:list, classCorrect:list, className:list):
         modelTesting.json
     """
     jsonFilePath = f'./{PrivateSetting.outputPath}/modelTesting.json'
+    ConfusionMatrixFilePath = f'./{PrivateSetting.outputPath}/ConfusionMatrix.jpg'
     classAccDict = {}
     for i, cls in enumerate(className):
         classAccDict[cls] = classCorrect[i] / classTotal[i]
     epochDict = {
         "test": {
             "accuracy": sum(classCorrect) / sum(classTotal),
-            "classAccuracy": classAccDict
+            "classAccuracy": classAccDict,
+            "ConfusionMatrix": ConfusionMatrixFilePath
         }
     }
     infoDict = {}

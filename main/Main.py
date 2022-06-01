@@ -347,7 +347,7 @@ def remove_run():
 @app.route('/get-queue-information', methods=['POST'])
 def get_queue_information():
     '''
-    get queueinformation
+    get queue information
     '''
     ok, queue = ProjectUtil.get_runs()
     if not ok:
@@ -503,7 +503,7 @@ def deploy():
 
 @app.route('/images/<path:path>', methods=['GET'])
 def send_report(path):
-    return send_from_directory(os.path.abspath('projects'), path=path)
+    return send_from_directory(os.path.abspath(''), path=path)
 
 def main():
     app.run(host='0.0.0.0', port=5028)
