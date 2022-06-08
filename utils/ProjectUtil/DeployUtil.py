@@ -80,25 +80,23 @@ def deploy(projectName, projectPath, runId, filename):
         if not ok:
             return False, deployPath
 
-        ok, onnxPath = find_onnx(projectPath, runId)
+        ok, onnxPath, onnxFile = find_onnx(projectPath, runId)
         if not ok:
             return False, onnxPath
 
-        try:
-            dst = os.path.join('deploy', deployPath, f'{filename}.onnx')
-            shutil.copy(onnxPath, dst)
+        src = os.path.join(onnxPath, onnxFile)
+        dst = os.path.join('deploy', deployPath, f'{filename}.onnx')
+        shutil.copy(src, dst)
 
-            ok, message = set_deploy_path_information(projectName, deployPath, {
-                'runId': runId,
-                'fileChecksum': get_md5(onnxPath),
-                'filename': filename,
-            })
-            if not ok:
-                return False, message
+        ok, message = set_deploy_path_information(projectName, deployPath, {
+            'runId': runId,
+            'fileChecksum': get_md5(src),
+            'filename': filename,
+        })
+        if not ok:
+            return False, message
 
-            return True, message
-        except Exception as err:
-            return False, f"Deploy failed: {err}"
+        return True, message
 
     except Exception as err:
         return False, f"Deploy failed: {err}"
@@ -119,7 +117,7 @@ def find_onnx(projectPath: str, runId: str):
         onnxPath = os.path.abspath(f'{projectPath}/runs/{runId}')
         onnxFile = f'{runId}.onnx'
         if not os.path.isfile(os.path.join(onnxPath, onnxFile)):
-            return False, "Model not found"
+            return False, "Model not found", None
         return True, onnxPath, onnxFile
     except Exception as err:
         print(err)
