@@ -507,15 +507,21 @@ def send_report(path):
 
 # folder select and edit
 
-@app.route('/get-dataset-folder', methods=['POST'])
-def get_dataset_folder():
-    folder = FolderUtil.list_folder('datasets')
+@app.route('/list-folder', methods=['POST'])
+def list_folder():
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'root' in data:
+        return response(1, "There is no data.")
+
+    folder = FolderUtil.list_folder(**data)
     if folder == None:
         return response(1, "get dataset folder failed")
     return response(0, "success", folder)
 
-@app.route('/create-dataset-folder', methods=['POST'])
-def create_dataset_folder():
+@app.route('/create-folder', methods=['POST'])
+def create_folder():
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
@@ -526,8 +532,8 @@ def create_dataset_folder():
         return response(0, "success")
     return response(1, "create folder failed")
 
-@app.route('/remove-dataset-folder', methods=['POST'])
-def remove_dataset_folder():
+@app.route('/remove-folder', methods=['POST'])
+def remove_folder():
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
@@ -538,51 +544,8 @@ def remove_dataset_folder():
         return response(0, "success")
     return response(1, "remove folder failed")
 
-@app.route('/rename-dataset-folder', methods=['POST'])
-def rename_dataset_folder():
-    data = request.get_json()
-    if not data:
-        return response(1, "There is no data.")
-    elif not 'root' in data or not 'src' in data or not 'dst' in data:
-        return response(1, "There is no data.")
-
-    if FolderUtil.rename_folder(**data):
-        return response(0, "success")
-    return response(1, "rename folder failed")
-
-@app.route('/list-deploy-folder', methods=['POST'])
-def list_deploy_folder():
-    folder = FolderUtil.list_folder('deploy')
-    if folder == None:
-        return response(1, "get deploy folder failed")
-    return response(0, "success", folder)
-
-@app.route('/create-deploy-folder', methods=['POST'])
-def create_deploy_folder():
-    data = request.get_json()
-    if not data:
-        return response(1, "There is no data.")
-    elif not 'root' in data or not 'dir' in data:
-        return response(1, "There is no data.")
-
-    if FolderUtil.create_folder(**data):
-        return response(0, "success")
-    return response(1, "create folder failed")
-
-@app.route('/remove-deploy-folder', methods=['POST'])
-def remove_deploy_folder():
-    data = request.get_json()
-    if not data:
-        return response(1, "There is no data.")
-    elif not 'root' in data or not 'dir' in data:
-        return response(1, "There is no data.")
-
-    if FolderUtil.remove_folder(**data):
-        return response(0, "success")
-    return response(1, "remove folder failed")
-
-@app.route('/rename-deploy-folder', methods=['POST'])
-def rename_deploy_folder():
+@app.route('/rename-folder', methods=['POST'])
+def rename_folder():
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
