@@ -1,13 +1,6 @@
 import os
 import shutil
-from typing import List, TypedDict
-
-class Folder:
-    pass
-class Folder(TypedDict):
-    name: str
-    fullpath: str
-    children: List[Folder]
+from typing import List
 
 def __subfolder(folder, layers):
     ans: dict = folder
@@ -24,7 +17,10 @@ def __subfolder(folder, layers):
     return ans
 
 def list_folder(root):
-    folder: dict = Folder(name=root, children=[])
+    folder: dict = {
+        'name': root,
+        'children': []
+    }
     for dir, subdirs, _ in os.walk(root):
         layers = dir.split('/')
         sub = __subfolder(folder, layers[1:])
@@ -34,7 +30,7 @@ def list_folder(root):
         sub['fullpath'] = dir
         if len(subdirs) > 0:
             sub['children'] = [
-                Folder(name=subdir)
+                {'name': subdir}
                 for subdir in subdirs
             ]
     return folder
