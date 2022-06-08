@@ -17,23 +17,21 @@ def __subfolder(folder, layers):
     return ans
 
 def list_folder(root):
-    folder: dict = {
-        'name': root,
-        'children': []
-    }
+    rel = lambda path: os.path.relpath(path, root) # find relative path under root
+    folder: dict = {'name': rel(root), 'children': []}
     for dir, subdirs, _ in os.walk(root):
         layers = dir.split('/')
         sub = __subfolder(folder, layers[1:])
         if sub == None:
             return None
 
-        sub['fullpath'] = dir
+        sub['fullpath'] = rel(dir)
         if len(subdirs) > 0:
             sub['children'] = [
                 {'name': subdir}
                 for subdir in subdirs
             ]
-    return folder
+    return folder['children']
 
 def create_folder(root, dir) -> bool:
     if os.path.isdir(root):
