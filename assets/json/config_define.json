@@ -1,0 +1,11 @@
+{
+	"type": "資料類型 list[int] dict[str, float]",
+	"default": "預設值",
+	"max": "上限",
+	"min": "下限",
+	"enums": "枚舉 custom",
+    "len": "陣列長度",
+    "nullable": "可否為空",
+    "orderable": "陣列有排序",
+    "orderable_2": "陣列2個一數有排序"
+}
