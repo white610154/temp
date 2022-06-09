@@ -1,85 +1,664 @@
 {
-    "Key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDb25maWciOnsiUHJpdmF0ZVNldHRpbmciOnsiZGF0YXNldFBhdGgiOiIifX0sIkNvbmZpZ0F1Z21lbnRhdGlvbiI6eyJBdWdtZW50YXRpb25QYXJhIjp7fX0sIkNvbmZpZ0V2YWx1YXRpb24iOnsiRXZhbHVhdGlvblBhcmEiOnsic2hvd0FjYyI6eyJzd2l0Y2giOjF9LCJzaG93Q2xhc3NBY2MiOnsic3dpdGNoIjoxfX19LCJDb25maWdNb2RlbFNlcnZpY2UiOnsiTG9zc0Z1bmN0aW9uUGFyYSI6eyJsb3NzRnVuY3Rpb24iOiJDcm9zc0VudHJvcHlMb3NzIn0sIkxlYXJuaW5nUmF0ZSI6eyJsZWFybmluZ1JhdGUiOjAuMDAxfSwiT3B0aW1pemVyUGFyYSI6eyJTR0QiOnsic3dpdGNoIjp0cnVlLCJtb21lbnR1bSI6MC45LCJkYW1wZW5pbmciOjAsIndlaWdodERlY2F5IjowLjAwMDUsIm5lc3Rlcm92IjpmYWxzZX19LCJTY2hlZHVsZXJQYXJhIjp7InN0ZXBMUiI6eyJzd2l0Y2giOjEsInN0ZXBTaXplIjoxLCJnYW1tYSI6MC4xfX19LCJDb25maWdQcmVwcm9jZXNzIjp7IlByZXByb2Nlc3NQYXJhIjp7Im5vcm1hbGl6ZSI6eyJzd2l0Y2giOjEsIm1vZGUiOiJJbWFnZU5ldCIsIm1lYW4iOm51bGwsInN0ZCI6bnVsbH0sInJlc2l6ZSI6eyJzd2l0Y2giOnRydWUsImltYWdlU2l6ZSI6WzIyNCwyMjRdLCJpbnRlcnBvbGF0aW9uIjoiQklMSU5FQVIifX19LCJDb25maWdQeXRvcmNoTW9kZWwiOnsiU2VsZWN0ZWRNb2RlbCI6eyJtb2RlbCI6eyJzdHJ1Y3R1cmUiOiJhdW9fdW5yZXN0cmljdGVkX3Bvd2VyZnVsX21vZGVsIiwicHJldHJhaW5lZCI6MX19LCJDbHNNb2RlbFBhcmEiOnsiYmF0Y2hTaXplIjoxNiwiZXBvY2hzIjoyfX0sIkNvbmZpZ1Jlc3VsdFN0b3JhZ2UiOnsidW5rbm93bkZpbHRlciI6eyJzd2l0Y2giOjAsImZpbHRlciI6eyJ1bmtub3duIjowLjl9LCJyZXZlcnNlIjowLCJzYXZlQ3N2IjoyfSwiZHJhd0NvbmZ1c2lvbk1hdHJpeCI6eyJzd2l0Y2giOjF9fX0.u05NTZ3SsHRMJi3yLJ9U5lELwk7qfDuqBp12jmVP_Vs",
     "Config": {
         "PrivateSetting": {
-            "datasetPath": ""
+            "datasetPath": {
+                "type": "string"
+            }
         }
     },
     "ConfigAugmentation": {
-        "AugmentationPara": {}
+        "AugmentationPara": {
+            "randomHorizontalFlip": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "probability": {
+                    "type": "flaot",
+                    "default": 0.5,
+                    "max": 1,
+	                "min": 0
+                }
+            },
+            "randomVerticalFlip": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "probability": {
+                    "type": "flaot",
+                    "default": 0.5,
+                    "max": 1,
+	                "min": 0
+                }
+            },
+            "randomRotation": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "degress": {
+                    "type": "list[float]",
+                    "default": [-360, 360],
+                    "max": 360,
+                    "min": -360,
+                    "len": 2,
+                    "orderable": "True"
+                }
+            },
+            "randomTranslate": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "translate": {
+                    "type": "list[float]",
+                    "default": [0, 0],
+                    "max": 1,
+                    "min": 0,
+                    "len": 2
+                }
+            },
+            "randomScale": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "scale": {
+                    "type": "list[float]",
+                    "default": [1, 1],
+                    "min": 0,
+                    "len": 2,
+                    "orderable": "True"
+                }
+            },
+            "randomShear": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "shear": {
+                    "type": "list[float]",
+                    "default": [0, 0, 0, 0],
+                    "max": 360,
+                    "min": -360,
+                    "len": 4,
+                    "orderable_2": "True"
+                }
+            },
+            "randomGrayscale": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "probability": {
+                    "type": "flaot",
+                    "default": 0.5,
+                    "max": 1,
+	                "min": 0
+                }
+            },
+            "randomBrightness": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "brightness": {
+                    "type": "list[float]",
+                    "default": [1, 1],
+                    "min": 0,
+                    "len": 2,
+                    "orderable": "True"
+                }
+            },
+            "randomContrast": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "contrast": {
+                    "type": "list[float]",
+                    "default": [1, 1],
+                    "min": 0,
+                    "len": 2,
+                    "orderable": "True"
+                }
+            },
+            "randomSaturation": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "saturation": {
+                    "type": "list[float]",
+                    "default": [1, 1],
+                    "min": 0,
+                    "len": 2,
+                    "orderable": "True"
+                }
+            },
+            "randomHue": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "hue": {
+                    "type": "list[float]",
+                    "default": [0, 0],
+                    "max": 0.5,
+                    "min": -0.5,
+                    "len": 2,
+                    "orderable": "True"
+                }
+            },
+            "randomErasing": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "probability": {
+                    "type": "flaot",
+                    "default": 0.5,
+                    "max": 1,
+	                "min": 0
+                },
+                "scale": {
+                    "type": "list[float]",
+                    "default": [0.02, 0.33],
+                    "max": 1,
+                    "min": 0,
+                    "len": 2,
+                    "orderable": "True"
+                },
+                "ratio": {
+                    "type": "list[float]",
+                    "default": [0.3, 3.3],
+                    "min": 0,
+                    "len": 2,
+                    "orderable": "True"
+                },
+                "value": {
+                    "type": "list[int]",
+                    "default": [0, 0, 0],
+                    "max": 255,
+                    "min": 0,
+                    "len": 3
+                }
+            },
+            "randomPerspective": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "distortion" : {
+                    "type": "float",
+                    "default": 0,
+                    "max": 1,
+                    "min": 0
+                },
+                "probability": {
+                    "type": "flaot",
+                    "default": 0.5,
+                    "max": 1,
+	                "min": 0
+                },
+                "interpolation": {
+                    "type": "string",
+                    "default": "BILINEAR",
+                    "enums": "BILINEAR, NEAREST, BICUBIC"
+                },
+                "fill": {
+                    "type": "list[int]",
+                    "default": [0, 0, 0],
+                    "max": 255,
+                    "min": 0,
+                    "len": 3
+                }
+            }
+        }
     },
     "ConfigEvaluation": {
         "EvaluationPara": {
             "showAcc": {
-                "switch": 1
+                "switch": {
+                    "type": "boolean",
+                    "default": "True"
+                }
             },
             "showClassAcc": {
-                "switch": 1
+                "switch": {
+                    "type": "boolean",
+                    "default": "True"
+                }
+            },
+            "showNumOfClasses": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                }
+            },
+            "showWrongFile": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                }
             }
         }
     },
     "ConfigModelService": {
         "LossFunctionPara": {
-            "lossFunction": "CrossEntropyLoss"
+            "lossFunction": {
+                "type": "string",
+                "default": "CrossEntropyLoss",
+                "enums": "CrossEntropyLoss, MSELoss, L1Loss, SmoothL1Loss, BCELoss"
+            }
         },
         "LearningRate": {
-            "learningRate": 0.001
+            "learningRate": {
+                "type": "float",
+                "default": 0.001,
+                "min": 0
+            }
         },
         "OptimizerPara": {
             "SGD": {
-                "switch": true,
-                "momentum": 0.9,
-                "dampening": 0,
-                "weightDecay": 5e-4,
-                "nesterov": false
-            }
+                "switch": {
+                    "type": "boolean",
+                    "default": "True"
+                },
+                "momentum": {
+                    "type": "float",
+                    "default": 0.9,
+                    "max": 1,
+                    "min": 0
+                },
+                "dampening": {
+                    "type": "float",
+                    "default": 0,
+                    "max": 1,
+                    "min": 0
+                },
+                "weightDecay": {
+                    "type": "float",
+                    "default": 5e-4,
+                    "max": 1,
+                    "min": 0
+                },
+                "nesterov": {
+                    "type": "boolean",
+                    "default": "False"
+                }
+            },
+            "Adam": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "betas": {
+                    "type": "list[float]",
+                    "default": [0.9, 0.999],
+                    "max": 1,
+                    "min": 0,
+                    "len": 2
+                },
+                "eps": {
+                    "type": "float",
+                    "default": 1e-8,
+                    "max": 1,
+                    "min": 0
+                },
+                "weightDecay": {
+                    "type": "float",
+                    "default": 0,
+                    "max": 1,
+                    "min": 0
+                },
+                "amsgrad": {
+                    "type": "boolean",
+                    "default": "False"
+                }
+            },
+            "Adadelta": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "rho":  {
+                    "type": "float",
+                    "default": 0.9,
+                    "max": 1,
+                    "min": 0
+                },
+                "eps": {
+                    "type": "float",
+                    "default": 1e-6,
+                    "max": 1,
+                    "min": 0
+                },
+                "weightDecay": {
+                    "type": "float",
+                    "default": 0,
+                    "max": 1,
+                    "min": 0
+                }
+            },
+            "AdamW": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "betas": {
+                    "type": "list[float]",
+                    "default": [0.9, 0.999],
+                    "max": 1,
+                    "min": 0,
+                    "len": 2
+                },
+                "eps": {
+                    "type": "float",
+                    "default": 1e-8,
+                    "max": 1,
+                    "min": 0
+                },
+                "weightDecay": {
+                    "type": "float",
+                    "default": 0.01,
+                    "max": 1,
+                    "min": 0
+                },
+                "amsgrad": {
+                    "type": "boolean",
+                    "default": "False"
+                }
+            },
+            "NAdam": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "betas": {
+                    "type": "list[float]",
+                    "default": [0.9, 0.999],
+                    "max": 1,
+                    "min": 0,
+                    "len": 2
+                },
+                "eps": {
+                    "type": "float",
+                    "default": 1e-8,
+                    "max": 1,
+                    "min": 0
+                },
+                "weightDecay": {
+                    "type": "float",
+                    "default": 0.01,
+                    "max": 1,
+                    "min": 0
+                },
+                "momentumDecay": {
+                    "type": "float",
+                    "default": 0.004,
+                    "max": 1,
+                    "min": 0
+                }
+            }        
         },
         "SchedulerPara": {
             "stepLR": {
-                "switch": 1,
-                "stepSize": 1,
-                "gamma": 0.1
+                "switch": {
+                    "type": "boolean",
+                    "default": "True"
+                },
+                "stepSize": {
+                    "type": "int",
+                    "default": 10,
+                    "min": 1
+                },
+                "gamma": {
+                    "type": "float",
+                    "default": 0.1
+                }
+            },
+            "cosineAnnealingLR": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "tMax": {
+                    "type": "int",
+                    "min": 1
+                },
+                "etaMin": {
+                    "type": "float",
+                    "default": 0,
+                    "min": 0
+                }
             }
         }
     },
     "ConfigPreprocess": {
         "PreprocessPara": {
             "normalize": {
-                "switch": 1,
-                "mode": "ImageNet",
-                "mean": null,
-                "std": null
+                "switch": {
+                    "type": "boolean",
+                    "default": "True"
+                },
+                "mode": {
+                    "type": "int",
+                    "default": 0,
+                    "enums": "0, 1, 2, 3, 4"
+                },
+                "mean": {
+                    "type": "list[float]",
+                    "default": [0.5, 0.5, 0.5],
+                    "min": 0,
+                    "len": 3,
+                    "nullable": "True"
+                },
+                "std": {
+                    "type": "list[float]",
+                    "default": [0.5, 0.5, 0.5],
+                    "min": 0,
+                    "len": 3,
+                    "nullable": "True"
+                }
             },
             "resize": {
-                "switch": true,
-                "imageSize": [224, 224],
-                "interpolation": "BILINEAR"
+                "switch": {
+                    "type": "boolean",
+                    "default": "True"
+                },
+                "imageSize": {
+                    "type": "list[int]",
+                    "default": [224, 224],
+                    "min": 1,
+                    "len": 2
+                },
+                "interpolation": {
+                    "type": "string",
+                    "default": "BILINEAR",
+                    "enums": "BILINEAR, NEAREST, BICUBIC"
+                }
+            },
+            "centerCrop": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "size": {
+                    "type": "list[int]",
+                    "default": [1, 1],
+                    "min": 0,
+                    "len": 2
+                }
+            },
+            "pad": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "padding":  {
+                    "type": "list[int]",
+                    "default": [0, 0, 0, 0],
+                    "min": 0,
+                    "len": 4
+                },
+                "fill": {
+                    "type": "list[int]",
+                    "default": [0, 0, 0],
+                    "max": 255,
+                    "min": 0,
+                    "len": 3,
+                    "nullable": "True"
+                },
+                "paddingModel": {
+                    "type": "string",
+                    "default": "constant",
+                    "enums": "constant, edge, reflect, symmetric"
+                }
+            },
+            "gaussianBlur": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "kernelSize": 
+                {
+                    "type": "list[int]",
+                    "default": [3, 3],
+                    "min": 1,
+                    "len": 2
+                },
+                "sigma": {
+                    "type": "float",
+                    "default": 0,
+                    "min": 0
+                }
+            },
+            "brightness": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "brightness": {
+                    "type": "float",
+                    "default": 1,
+                    "min": 0
+                }
+            },
+            "contrast": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "contrast": {
+                    "type": "float",
+                    "default": 1,
+                    "min": 0
+                }
+            },
+            "saturation": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "saturation": {
+                    "type": "float",
+                    "default": 1,
+                    "min": 0
+                }
+            },
+            "hue": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "hue": {
+                    "type": "float",
+                    "default": 0,
+                    "max": 0.5,
+                    "min": -0.5
+                }
             }
         }
     },
     "ConfigPytorchModel": {
         "SelectedModel": {
             "model": {
-                "structure": "auo_unrestricted_powerful_model",
-                "pretrained": 1
-            }
-        },
+                "structure": {
+                    "type": "string",
+                    "default": "auo_unrestricted_powerful_model",
+                    "enums": "auo_tiny_focus_model, auo_classic_deep_model, auo_anti_degeneration_mode, auo_transform_aggregate_model, auo_narrow_intensive_model, auo_feature_enhance_model_a, auo_feature_enhance_model_b, auo_feature_enhance_model_c, auo_faster_convergency_mode, auo_unrestricted_powerful_model, auo_feature_reuse_model, auo_lighten_efficient_model, auo_horizontal_sample_model"
+                    }
+                },
+                "pretrained": {
+                    "type": "boolean",
+                    "default": "True"
+                }
+            },
         "ClsModelPara": {
-            "batchSize": 16,
-            "epochs": 2
+            "batchSize": {
+                "type": "int",
+                "default": 1,
+                "min": 1
+            },
+            "epochs": {
+                "type": "int",
+                "default": 1,
+                "min": 1
+            }
         }
     },
     "ConfigResultStorage": {
-        "unknownFilter": {
-            "switch": 0,
-            "filter": {
-                "unknown": 0.9
+        "ResultStorage": {
+            "saveFinalWeight": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                }
             },
-            "reverse": 0,
-            "saveCsv": 2
-        },
-        "drawConfusionMatrix": {
-            "switch": 1
+            "saveAccTxt": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                }
+            },
+            "savePredictResult": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "True"
+                }
+            },
+            "unknownFilter": {
+                "switch": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "filter": {
+                    "type": "dict[str, float]",
+                    "default": {"unknown": 0.5},
+                    "max": 1,
+                    "min": 0
+                },
+                "reverse": {
+                    "type": "boolean",
+                    "default": "False"
+                },
+                "saveCsv": {
+                    "type": "int",
+                    "default": 2,
+                    "enums": "0, 1, 2"
+                }
+            }
         }
+    },
+    "ConfigPass":{
+        "confidenceFilter": "False",
+        "showRate": "False",
+        "cudaDevice": 0,
+        "saveAccJson": "True",
+        "testAccJson": "True",
+        "drawAccCurve": "False",
+        "drawConfusionMatrix": "True"
     }
 }
