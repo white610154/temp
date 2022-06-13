@@ -1,4 +1,65 @@
 {
-    "done": [],
+    "done": [
+        {
+            "projectName": "test01",
+            "experimentId": "20220526024804",
+            "runId": "20220601084642",
+            "task": "Train"
+        },
+        {
+            "projectName": "test01",
+            "experimentId": "20220526024804",
+            "runId": "20220601084642",
+            "task": "Test"
+        },
+        {
+            "projectName": "test01",
+            "experimentId": "20220526024804",
+            "runId": "20220601085604",
+            "task": "Train"
+        },
+        {
+            "projectName": "test01",
+            "experimentId": "20220526024804",
+            "runId": "20220601085604",
+            "task": "Test"
+        },
+        {
+            "projectName": "kinsus",
+            "experimentId": "20220525055239",
+            "runId": "20220602084726",
+            "task": "Train"
+        },
+        {
+            "projectName": "kinsus",
+            "experimentId": "20220525055239",
+            "runId": "20220602084726",
+            "task": "Test"
+        },
+        {
+            "projectName": "test01",
+            "experimentId": "20220526024804",
+            "runId": "20220606091042",
+            "task": "Train"
+        },
+        {
+            "projectName": "test01",
+            "experimentId": "20220526024804",
+            "runId": "20220606091042",
+            "task": "Test"
+        },
+        {
+            "projectName": "test01",
+            "experimentId": "20220526024804",
+            "runId": "20220606091629",
+            "task": "Train"
+        },
+        {
+            "projectName": "test01",
+            "experimentId": "20220526024804",
+            "runId": "20220606091629",
+            "task": "Test"
+        }
+    ],
     "work": []
 }

@@ -37,7 +37,7 @@
                     "type": "boolean",
                     "default": "False"
                 },
-                "degress": {
+                "degrees": {
                     "type": "list[float]",
                     "default": [-360, 360],
                     "max": 360,

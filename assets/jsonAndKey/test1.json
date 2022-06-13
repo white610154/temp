@@ -13,7 +13,7 @@
             },
             "randomRotation": {
                 "switch": 1,
-                "degress": [0, 90]
+                "degrees": [0, 90]
             }
         }
     },

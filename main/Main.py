@@ -594,7 +594,7 @@ def rename_deploy_folder():
     return response(1, "rename deploys folder failed")
 
 def main():
-    app.run(host='0.0.0.0', port=5028)
+    app.run(host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     main()

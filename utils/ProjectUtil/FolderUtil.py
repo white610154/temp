@@ -31,7 +31,7 @@ def list_folder(root):
                 {'name': subdir}
                 for subdir in subdirs
             ]
-    return folder['children']
+    return folder
 
 def create_folder(root, dir) -> bool:
     if os.path.isdir(root):

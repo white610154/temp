@@ -1,7 +1,7 @@
 class AugmentationPara:
     randomHorizontalFlip = {"switch": False,  "probability": 0.5}
     randomVerticalFlip   = {"switch": False, "probability": 0.5}
-    randomRotation       = {"switch": False, "degress"    : [-360, 360]}
+    randomRotation       = {"switch": False, "degrees"    : [-360, 360]}
     randomTranslate      = {"switch": False, "translate"  : [0, 0]}
     randomScale          = {"switch": False, "scale"      : [1, 1]}
     randomShear          = {"switch": False, "shear"      : [0, 0, 0, 0]}

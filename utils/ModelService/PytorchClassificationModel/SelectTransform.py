@@ -58,7 +58,7 @@ def augmentation_transform(augTransformList):
         augTransformList.append(transforms.RandomVerticalFlip(p=augPara.randomHorizontalFlip["probability"]))
     
     if augPara.randomRotation["switch"]:
-        augTransformList.append(transforms.RandomAffine(degrees=augPara.randomRotation["degress"]))
+        augTransformList.append(transforms.RandomAffine(degrees=augPara.randomRotation["degrees"]))
 
     if augPara.randomTranslate["switch"]:
         augTransformList.append(transforms.RandomAffine(degrees=0, translate=augPara.randomTranslate["translate"]))
