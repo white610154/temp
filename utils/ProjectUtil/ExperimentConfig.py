@@ -114,7 +114,7 @@ config = {
                 }
             },
             "randomBrightness": {
-                "brightnessRange": {
+                "brightness": {
                     "type": "list",
                     "children": {
                         "min": {
