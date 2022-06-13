@@ -137,7 +137,7 @@ def unknown_threshold(nameList, predict:tensor, labels:tensor, confidence:tensor
             title = ['Filename', 'Prediction', 'sorce']
 
         unknownCsv = UsingCsv(fileName, PrivateSetting.outputPath, title)
-        if count == 0 and ResultStorage.unknownFilter["saveCsvMode"] != 0:
+        if count == 0 and ResultStorage.unknownFilter["saveCsv"] != 0:
             unknownCsv.create_csv()
 
         confid = confidence.cpu().numpy()
@@ -153,7 +153,7 @@ def unknown_threshold(nameList, predict:tensor, labels:tensor, confidence:tensor
                             f'sorce({score:.2f}) < threshold({threshold})' if not reverse else f'sorce({score*-1:.2f}) > threshold({threshold*-1})')
                         result = [fullname, className[int(labels[i])], tagName, f'{score if not reverse else score*-1:.2f}']
                         break  
-                    elif ResultStorage.unknownFilter["saveCsvMode"] == 2:
+                    elif ResultStorage.unknownFilter["saveCsv"] == 2:
                         result =  [fullname, className[int(labels[i])], className[int(predict[i])], f'{score if not reverse else score*-1:.2f}']
         
                 else:
@@ -162,7 +162,7 @@ def unknown_threshold(nameList, predict:tensor, labels:tensor, confidence:tensor
                             f'sorce({score:.2f}) < threshold({threshold})' if not reverse else f'sorce({score*-1:.2f}) > threshold({threshold*-1})')
                         result = [fullname, tagName, f'{score if not reverse else score*-1:.2f}']  
                         break
-                    elif ResultStorage.unknownFilter["saveCsvMode"] == 2:
+                    elif ResultStorage.unknownFilter["saveCsv"] == 2:
                         result = [fullname, className[int(predict[i])], f'{score if not reverse else score*-1:.2f}']
             if len(result) != 0: unknownCsv.writing(result, 'a')                     
             count += 1
