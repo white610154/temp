@@ -118,6 +118,27 @@ def get_experiments():
 
     return response(0, "success", config)
 
+@app.route('/set-experiments', methods=['POST'])
+def set_experiments():
+    '''
+    input: projectName, experiment/ output: experiment
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'experimentId' in data or not 'experiment' in data:
+        return response(1, "There is no projectName.")
+    
+    ok, projectPath = ProjectUtil.find_project(data['projectName'])
+    if not ok:
+        return response(1, projectPath)
+
+    ok, config = ProjectUtil.set_config(projectPath, data['experimentId'], data['experiment'])
+    if not ok:
+        return response(1, config)
+
+    return response(0, "success", config)
+
 @app.route('/check-experiment', methods=['POST'])
 def check_experiments():
     '''
@@ -552,7 +573,7 @@ def rename_dataset_folder():
 
 @app.route('/list-deploy-folder', methods=['POST'])
 def list_deploy_folder():
-    folder = FolderUtil.list_folder('deploys')
+    folder = FolderUtil.list_folder('deploy')
     if folder == None:
         return response(1, "get deploy folder failed")
     return response(0, "success", folder)
@@ -565,7 +586,7 @@ def create_deploy_folder():
     elif not 'root' in data or not 'dir' in data:
         return response(1, "There is no data.")
 
-    if FolderUtil.create_folder(os.path.join('deploys', data['root']), data['dir']):
+    if FolderUtil.create_folder(os.path.join('deploy', data['root']), data['dir']):
         return response(0, "success")
     return response(1, "create deploys folder failed")
 
@@ -577,7 +598,7 @@ def remove_deploy_folder():
     elif not 'root' in data or not 'dir' in data:
         return response(1, "There is no data.")
 
-    if FolderUtil.remove_folder(os.path.join('deploys', data['root']), data['dir']):
+    if FolderUtil.remove_folder(os.path.join('deploy', data['root']), data['dir']):
         return response(0, "success")
     return response(1, "remove deploys folder failed")
 

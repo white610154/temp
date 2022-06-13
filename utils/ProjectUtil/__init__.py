@@ -77,6 +77,16 @@ def get_config(projectPath):
     except:
         return False, 'Get config failed'
 
+def set_config(projectPath, experimentId, experiment):
+    try:
+        configPath = os.path.join(projectPath, 'experiments', f'{experimentId}.json')
+        if os.path.isfile(configPath):
+            with open(configPath) as jsonFile:
+                json.dump(experiment, jsonFile)
+        return True, experiment
+    except:
+        return False, 'Get config failed'
+
 def find_experiment(projectPath, experimentId):
     try:
         experimentJsonPath = f'{projectPath}/experiments/{experimentId}.json'

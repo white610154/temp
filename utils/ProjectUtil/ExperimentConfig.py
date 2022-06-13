@@ -824,9 +824,9 @@ config = {
                         "type": "int",
                         "default": 2,
                         "enums": {
-                            "none": 0,
-                            "filtered": 1,
-                            "both": 2
+                            "unknownFilterNone": 0,
+                            "unknownFilterFiltered": 1,
+                            "unknownFilterAll": 2
                         }
                     }
                 }
