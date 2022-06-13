@@ -19,6 +19,7 @@ config = {
             },
             "randomRotation": {
                 "degrees": {
+                    "type": "list",
                     "children": {
                         "min": {
                             "type": "float",
@@ -37,6 +38,7 @@ config = {
             },
             "randomTranslate": {
                 "translate": {
+                    "type": "list",
                     "children": {
                         "horizontalRatio": {
                             "type": "float",
@@ -55,6 +57,7 @@ config = {
             },
             "randomScale": {
                 "scale": {
+                    "type": "list",
                     "children": {
                         "horizontalRatio": {
                             "type": "float",
@@ -73,6 +76,7 @@ config = {
             },
             "randomShear": {
                 "shear": {
+                    "type": "list",
                     "children": {
                         "horizontalDegreeMin": {
                             "type": "float",
@@ -111,6 +115,7 @@ config = {
             },
             "randomBrightness": {
                 "brightnessRange": {
+                    "type": "list",
                     "children": {
                         "min": {
                             "type": "float",
@@ -127,6 +132,7 @@ config = {
             },
             "randomContrast": {
                 "contrast": {
+                    "type": "list",
                     "children": {
                         "min": {
                             "type": "float",
@@ -143,6 +149,7 @@ config = {
             },
             "randomSaturation": {
                 "saturation": {
+                    "type": "list",
                     "children": {
                         "min": {
                             "type": "float",
@@ -159,6 +166,7 @@ config = {
             },
             "randomHue": {
                 "hue": {
+                    "type": "list",
                     "children": {
                         "min": {
                             "type": "float",
@@ -183,6 +191,7 @@ config = {
                     "min": 0
                 },
                 "scale": {
+                    "type": "list",
                     "children": {
                         "min": {
                             "type": "float",
@@ -199,6 +208,7 @@ config = {
                     }
                 },
                 "ratio": {
+                    "type": "list",
                     "children": {
                         "min": {
                             "type": "float",
@@ -213,6 +223,7 @@ config = {
                     }
                 },
                 "value": {
+                    "type": "list",
                     "children": {
                         "R": {
                             "type": "int",
@@ -258,6 +269,7 @@ config = {
                     }
                 },
                 "fill": {
+                    "type": "list",
                     "children": {
                         "R": {
                             "type": "int",
@@ -358,6 +370,7 @@ config = {
             },
             "Adam": {
                 "betas": {
+                    "type": "list",
                     "children": {
                         "min": {
                             "type": "float",
@@ -412,6 +425,7 @@ config = {
             },
             "AdamW": {
                 "betas": {
+                    "type": "list",
                     "children": {
                         "min": {
                             "type": "float",
@@ -446,6 +460,7 @@ config = {
             },
             "NAdam": {
                 "betas": {
+                    "type": "list",
                     "children": {
                         "min": {
                             "type": "float",
@@ -521,6 +536,7 @@ config = {
                     }
                 },
                 "mean": {
+                    "type": "list",
                     "children": {
                         "R": {
                             "type": "float",
@@ -541,19 +557,42 @@ config = {
                     "nullable": True
                 },
                 "std": {
-                    "type": "list[float]",
-                    "default": [0.5, 0.5, 0.5],
-                    "min": 0,
-                    "len": 3,
+                    "type": "list",
+                    "children": {
+                        "R": {
+                            "type": "float",
+                            "default": 0.5,
+                            "min": 0,
+                        },
+                        "G": {
+                            "type": "float",
+                            "default": 0.5,
+                            "min": 0,
+                        },
+                        "B": {
+                            "type": "float",
+                            "default": 0.5,
+                            "min": 0,
+                        },
+                    },
                     "nullable": True
                 }
             },
             "resize": {
                 "imageSize": {
-                    "type": "list[int]",
-                    "default": [224, 224],
-                    "min": 1,
-                    "len": 2
+                    "type": "list",
+                    "children": {
+                        "width": {
+                            "type": "int",
+                            "default": 224,
+                            "min": 1,
+                        },
+                        "height": {
+                            "type": "int",
+                            "default": 224,
+                            "min": 1,
+                        },
+                    },
                 },
                 "interpolation": {
                     "type": "string",
@@ -567,25 +606,69 @@ config = {
             },
             "centerCrop": {
                 "size": {
-                    "type": "list[int]",
-                    "default": [1, 1],
-                    "min": 0,
-                    "len": 2
+                    "type": "list",
+                    "children": {
+                        "width": {
+                            "type": "int",
+                            "default": 1,
+                            "min": 0,
+                        },
+                        "height": {
+                            "type": "int",
+                            "default": 1,
+                            "min": 0,
+                        },
+                    },
                 }
             },
             "pad": {
                 "padding":  {
-                    "type": "list[int]",
-                    "default": [0, 0, 0, 0],
-                    "min": 0,
-                    "len": 4
+                    "type": "list",
+                    "children": {
+                        "left": {
+                            "type": "int",
+                            "default": 0,
+                            "min": 0
+                        },
+                        "top": {
+                            "type": "int",
+                            "default": 0,
+                            "min": 0
+                        },
+                        "right": {
+                            "type": "int",
+                            "default": 0,
+                            "min": 0
+                        },
+                        "bottom": {
+                            "type": "int",
+                            "default": 0,
+                            "min": 0
+                        }
+                    }
                 },
                 "fill": {
-                    "type": "list[int]",
-                    "default": [0, 0, 0],
-                    "max": 255,
-                    "min": 0,
-                    "len": 3,
+                    "type": "list",
+                    "children": {
+                        "R": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "G": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "B": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        }
+                    },
                     "nullable": True
                 },
                 "paddingModel": {
@@ -602,10 +685,19 @@ config = {
             "gaussianBlur": {
                 "kernelSize":
                 {
-                    "type": "list[int]",
-                    "default": [3, 3],
-                    "min": 1,
-                    "len": 2
+                    "type": "list",
+                    "children": {
+                        "width": {
+                            "type": "int",
+                            "default": 3,
+                            "min": 1
+                        },
+                        "height": {
+                            "type": "int",
+                            "default": 3,
+                            "min": 1
+                        }
+                    }
                 },
                 "sigma": {
                     "type": "float",
@@ -710,10 +802,19 @@ config = {
                         "default": False
                     },
                     "filter": {
-                        "type": "dict[str, float]",
-                        "default": {"unknown": 0.5},
-                        "max": 1,
-                        "min": 0
+                        "type": "dict",
+                        "children": {
+                            "name": {
+                                "type": "string",
+                                "default": "unknown",
+                            },
+                            "threshold": {
+                                "type": "float",
+                                "default": 0.5,
+                                "max": 1,
+                                "min": 0
+                            }
+                        }
                     },
                     "reverse": {
                         "type": "boolean",

@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from utils import ProjectUtil
-from utils.ProjectUtil import DeployUtil, FolderUtil
+from utils.ProjectUtil import DeployUtil, ExperimentConfig, FolderUtil
 
 def response(code, message, data=None):
     # code=0 for success, code=1 for fail
@@ -592,6 +592,11 @@ def rename_deploy_folder():
     if FolderUtil.rename_folder(os.path.join('deploys', data['root']), data['src'], data['dst']):
         return response(0, "success")
     return response(1, "rename deploys folder failed")
+
+# Experiment config
+@app.route('/get-experiment-configs', methods=['POST'])
+def get_experiment_configs():
+    return response(0, "success", ExperimentConfig.config)
 
 def main():
     app.run(host='0.0.0.0', port=5000)
