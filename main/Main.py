@@ -179,17 +179,19 @@ def check_dataset():
         'split': False
     }
 
-    ok, message = ProjectUtil.check_data_uploaded(data['datasetPath'])
+    path = os.path.join('datasets', data['datasetPath'])
+
+    ok, message = ProjectUtil.check_data_uploaded(path)
     if not ok:
         return response(1, message)
     status['uploaded'] = True
 
-    ok, message = ProjectUtil.check_data_split(data['datasetPath'])
+    ok, message = ProjectUtil.check_data_split(path)
     if ok:
         status['split'] = True
-        datasetPath = f'{data["datasetPath"]}/Train'
+        datasetPath = f'{path}/Train'
     elif not ok:
-        datasetPath = data["datasetPath"]
+        datasetPath = path
     
     ok, message = ProjectUtil.check_data_labeled(datasetPath)
     if not ok:
@@ -465,6 +467,8 @@ def set_deploy_path():
         return response(1, "There is no data.")
     elif not 'projectName' in data or not 'deployPath' in data:
         return response(1, "There is no data.")
+    
+    print(data)
 
     ok, projectPath = ProjectUtil.find_project(data["projectName"])
     if not ok:
@@ -497,7 +501,7 @@ def set_deploy_path():
             'deployPath': deployPath,
             'info': info[data['projectName']]
         })
-    return response(0, {
+    return response(0, "success", {
         'deployPath': data['deployPath'],
         'info': info[data['projectName']]
     })
@@ -523,7 +527,7 @@ def deploy():
     return response(0, "success", result[data['projectName']])
 
 @app.route('/images/<path:path>', methods=['GET'])
-def send_report(path):
+def show_image(path):
     return send_from_directory(os.path.abspath(''), path=path)
 
 # folder select and edit

@@ -3,7 +3,7 @@ config = {
         "AugmentationPara": {
             "randomHorizontalFlip": {
                 "probability": {
-                    "type": "flaot",
+                    "type": "float",
                     "default": 0.5,
                     "max": 1,
                     "min": 0
@@ -11,7 +11,7 @@ config = {
             },
             "randomVerticalFlip": {
                 "probability": {
-                    "type": "flaot",
+                    "type": "float",
                     "default": 0.5,
                     "max": 1,
                     "min": 0
@@ -107,7 +107,7 @@ config = {
             },
             "randomGrayscale": {
                 "probability": {
-                    "type": "flaot",
+                    "type": "float",
                     "default": 0.5,
                     "max": 1,
                     "min": 0
@@ -185,7 +185,7 @@ config = {
             },
             "randomErasing": {
                 "probability": {
-                    "type": "flaot",
+                    "type": "float",
                     "default": 0.5,
                     "max": 1,
                     "min": 0
@@ -254,7 +254,7 @@ config = {
                     "min": 0
                 },
                 "probability": {
-                    "type": "flaot",
+                    "type": "float",
                     "default": 0.5,
                     "max": 1,
                     "min": 0
