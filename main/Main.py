@@ -9,6 +9,7 @@ def response(code, message, data=None):
     return {'code': code, 'message': message, 'data': data}
 
 app = Flask(__name__)
+app.config["JSON_SORT_KEYS"] = False
 CORS(app)
 
 ### project
@@ -468,8 +469,6 @@ def set_deploy_path():
     elif not 'projectName' in data or not 'deployPath' in data:
         return response(1, "There is no data.")
     
-    print(data)
-
     ok, projectPath = ProjectUtil.find_project(data["projectName"])
     if not ok:
         return response(1, projectPath)
