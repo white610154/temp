@@ -1,6 +1,6 @@
 class PreprocessPara:
     normalize    = {"switch": False,  "mode": 0, "mean": [0.5, 0.5, 0.5], "std": [0.5, 0.5, 0.5]}
-    resize       = {"switch": False,  "imageSize":[1, 1], "interpolation": 'BILINEAR'}
+    resize       = {"switch": True,  "imageSize":[224, 224], "interpolation": 'BILINEAR'}
     centerCrop   = {"switch": False, "size": [1, 1]}
     pad          = {"switch": False, "padding": [0, 0, 0, 0], "fill": [0, 0, 0], "paddingModel": 'constant'}
     gaussianBlur = {"switch": False, "kernelSize": [1, 1], "sigma": 0}

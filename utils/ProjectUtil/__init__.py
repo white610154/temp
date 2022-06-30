@@ -81,10 +81,11 @@ def set_config(projectPath, experimentId, experiment):
     try:
         configPath = os.path.join(projectPath, 'experiments', f'{experimentId}.json')
         if os.path.isfile(configPath):
-            with open(configPath) as jsonFile:
-                json.dump(experiment, jsonFile)
+            with open(configPath, 'w') as jsonFile:
+                json.dump(experiment, jsonFile, indent=4)
         return True, experiment
-    except:
+    except Exception as err:
+        print(err)
         return False, 'Get config failed'
 
 def find_experiment(projectPath, experimentId):
@@ -371,7 +372,7 @@ def get_queue_process(runDict, mode):
 def get_models(projectPath):
     try:
         modelList = []
-        for root, folder, files in os.walk(projectPath):
+        for root, _, files in os.walk(projectPath):
             for filename in files:
                 if filename.endswith('.onnx'):
                     modelInfo = root.replace('\\', '/').split('/')

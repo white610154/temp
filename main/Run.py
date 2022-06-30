@@ -3,7 +3,7 @@ Created on TUE MAR 22 17:00:00 2021
 @author: ShanYang
 """
 
-import json, os, shutil, time, platform
+import json, os, shutil, time
 
 # statue
 # waiting/ training/ testing
@@ -36,6 +36,7 @@ def load_run_config(projectName, runId):
             config = json.load(configFile)
         if not config:
             return False, "There is no config"
+        config["Config"]["PrivateSetting"]["datasetPath"] = f'datasets/{config["Config"]["PrivateSetting"]["datasetPath"]}'
         return True, config
     except Exception as err:
         print(err)

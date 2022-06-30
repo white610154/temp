@@ -26,12 +26,14 @@ config = {
                             "default": -360,
                             "max": 360,
                             "min": -360,
+                            "unit": "degrees"
                         },
                         "max": {
                             "type": "float",
                             "default": 360,
                             "max": 360,
                             "min": -360,
+                            "unit": "degrees"
                         }
                     }
                 }
@@ -44,13 +46,13 @@ config = {
                             "type": "float",
                             "default": 0,
                             "max": 1,
-                            "min": 0,
+                            "min": 0
                         },
                         "verticalRatio": {
                             "type": "float",
                             "default": 0,
                             "max": 1,
-                            "min": 0,
+                            "min": 0
                         }
                     }
                 }
@@ -61,15 +63,17 @@ config = {
                     "children": {
                         "horizontalRatio": {
                             "type": "float",
-                            "default": 0,
-                            "max": 1,
+                            "default": 1,
+                            "max": 5,
                             "min": 0,
+                            "unit": "degrees"
                         },
                         "verticalRatio": {
                             "type": "float",
-                            "default": 0,
-                            "max": 1,
+                            "default": 1,
+                            "max": 5,
                             "min": 0,
+                            "unit": "degrees"
                         }
                     }
                 }
@@ -83,24 +87,28 @@ config = {
                             "default": -360,
                             "max": 360,
                             "min": -360,
+                            "unit": "degrees"
                         },
                         "horizontalDegreeMax": {
                             "type": "float",
                             "default": 360,
                             "max": 360,
                             "min": -360,
+                            "unit": "degrees"
                         },
                         "verticalDegreeMin": {
                             "type": "float",
                             "default": -360,
                             "max": 360,
                             "min": -360,
+                            "unit": "degrees"
                         },
                         "verticalDegreeMax": {
                             "type": "float",
                             "default": 360,
                             "max": 360,
                             "min": -360,
+                            "unit": "degrees"
                         }
                     }
                 }
@@ -121,11 +129,13 @@ config = {
                             "type": "float",
                             "default": 1,
                             "min": 0,
+                            "max": 5
                         },
                         "max": {
                             "type": "float",
                             "default": 1,
                             "min": 0,
+                            "max": 5
                         }
                     }
                 }
@@ -138,11 +148,13 @@ config = {
                             "type": "float",
                             "default": 1,
                             "min": 0,
+                            "max": 5
                         },
                         "max": {
                             "type": "float",
                             "default": 1,
                             "min": 0,
+                            "max": 5
                         }
                     }
                 }
@@ -155,11 +167,13 @@ config = {
                             "type": "float",
                             "default": 1,
                             "min": 0,
+                            "max": 5
                         },
                         "max": {
                             "type": "float",
                             "default": 1,
                             "min": 0,
+                            "max": 5
                         }
                     }
                 }
@@ -205,7 +219,8 @@ config = {
                             "max": 1,
                             "min": 0,
                         }
-                    }
+                    },
+                    "display": "erasingSizeRatio"
                 },
                 "ratio": {
                     "type": "list",
@@ -214,13 +229,16 @@ config = {
                             "type": "float",
                             "default": 0.3,
                             "min": 0,
+                            "max": 5
                         },
                         "max": {
                             "type": "float",
                             "default": 3.3,
                             "min": 0,
+                            "max": 5
                         }
-                    }
+                    },
+                    "display": "lengthWidthRatio"
                 },
                 "value": {
                     "type": "list",
@@ -243,7 +261,8 @@ config = {
                             "max": 255,
                             "min": 0,
                         }
-                    }
+                    },
+                    "display": "fill"
                 }
             },
             "randomPerspective": {
@@ -458,43 +477,6 @@ config = {
                     "default": False
                 }
             },
-            "NAdam": {
-                "betas": {
-                    "type": "list",
-                    "children": {
-                        "min": {
-                            "type": "float",
-                            "default": 0.9,
-                            "max": 1,
-                            "min": 0,
-                        },
-                        "max": {
-                            "type": "float",
-                            "default": 0.999,
-                            "max": 1,
-                            "min": 0,
-                        },
-                    }
-                },
-                "eps": {
-                    "type": "float",
-                    "default": 1e-8,
-                    "max": 1,
-                    "min": 0
-                },
-                "weightDecay": {
-                    "type": "float",
-                    "default": 0.01,
-                    "max": 1,
-                    "min": 0
-                },
-                "momentumDecay": {
-                    "type": "float",
-                    "default": 0.004,
-                    "max": 1,
-                    "min": 0
-                }
-            }
         },
         "SchedulerPara": {
             "stepLR": {
@@ -542,16 +524,19 @@ config = {
                             "type": "float",
                             "default": 0.5,
                             "min": 0,
+                            "max": 1
                         },
                         "G": {
                             "type": "float",
                             "default": 0.5,
                             "min": 0,
+                            "max": 1
                         },
                         "B": {
                             "type": "float",
                             "default": 0.5,
                             "min": 0,
+                            "max": 1
                         },
                     },
                     "nullable": True
@@ -563,16 +548,19 @@ config = {
                             "type": "float",
                             "default": 0.5,
                             "min": 0,
+                            "max": 1
                         },
                         "G": {
                             "type": "float",
                             "default": 0.5,
                             "min": 0,
+                            "max": 1
                         },
                         "B": {
                             "type": "float",
                             "default": 0.5,
                             "min": 0,
+                            "max": 1
                         },
                     },
                     "nullable": True
@@ -586,11 +574,13 @@ config = {
                             "type": "int",
                             "default": 224,
                             "min": 1,
+                            "unit": "pixels"
                         },
                         "height": {
                             "type": "int",
                             "default": 224,
                             "min": 1,
+                            "unit": "pixels"
                         },
                     },
                 },
@@ -612,11 +602,13 @@ config = {
                             "type": "int",
                             "default": 1,
                             "min": 0,
+                            "unit": "pixels"
                         },
                         "height": {
                             "type": "int",
                             "default": 1,
                             "min": 0,
+                            "unit": "pixels"
                         },
                     },
                 }
@@ -628,22 +620,26 @@ config = {
                         "left": {
                             "type": "int",
                             "default": 0,
-                            "min": 0
+                            "min": 0,
+                            "unit": "pixels"
                         },
                         "top": {
                             "type": "int",
                             "default": 0,
-                            "min": 0
+                            "min": 0,
+                            "unit": "pixels"
                         },
                         "right": {
                             "type": "int",
                             "default": 0,
-                            "min": 0
+                            "min": 0,
+                            "unit": "pixels"
                         },
                         "bottom": {
                             "type": "int",
                             "default": 0,
-                            "min": 0
+                            "min": 0,
+                            "unit": "pixels"
                         }
                     }
                 },
@@ -690,12 +686,14 @@ config = {
                         "width": {
                             "type": "int",
                             "default": 3,
-                            "min": 1
+                            "min": 1,
+                            "unit": "pixels"
                         },
                         "height": {
                             "type": "int",
                             "default": 3,
-                            "min": 1
+                            "min": 1,
+                            "unit": "pixels"
                         }
                     }
                 },
@@ -709,21 +707,24 @@ config = {
                 "brightness": {
                     "type": "float",
                     "default": 1,
-                    "min": 0
+                    "min": 0,
+                    "max": 5,
                 }
             },
             "contrast": {
                 "contrast": {
                     "type": "float",
                     "default": 1,
-                    "min": 0
+                    "min": 0,
+                    "max": 5,
                 }
             },
             "saturation": {
                 "saturation": {
                     "type": "float",
                     "default": 1,
-                    "min": 0
+                    "min": 0,
+                    "max": 5,
                 }
             },
             "hue": {
@@ -745,13 +746,13 @@ config = {
                     "enums": {
                         "auo_tiny_focus_model": "auo_tiny_focus_model",
                         "auo_classic_deep_model": "auo_classic_deep_model",
-                        "auo_anti_degeneration_mode": "auo_anti_degeneration_mode",
+                        "auo_anti_degeneration_model": "auo_anti_degeneration_model",
                         "auo_transform_aggregate_model": "auo_transform_aggregate_model",
                         "auo_narrow_intensive_model": "auo_narrow_intensive_model",
                         "auo_feature_enhance_model_a": "auo_feature_enhance_model_a",
                         "auo_feature_enhance_model_b": "auo_feature_enhance_model_b",
                         "auo_feature_enhance_model_c": "auo_feature_enhance_model_c",
-                        "auo_faster_convergency_mode": "auo_faster_convergency_mode",
+                        "auo_faster_convergency_model": "auo_faster_convergency_model",
                         "auo_unrestricted_powerful_model": "auo_unrestricted_powerful_model",
                         "auo_feature_reuse_model": "auo_feature_reuse_model",
                         "auo_lighten_efficient_model": "auo_lighten_efficient_model",
@@ -767,12 +768,14 @@ config = {
                 "batchSize": {
                     "type": "int",
                     "default": 1,
-                    "min": 1
+                    "min": 1,
+                    "unit": "/batch"
                 },
                 "epochs": {
                     "type": "int",
                     "default": 1,
-                    "min": 1
+                    "min": 1,
+                    "unit": "epochs"
                 }
             }
         },
