@@ -699,7 +699,7 @@ config = {
                 },
                 "sigma": {
                     "type": "float",
-                    "default": 0,
+                    "default": 1,
                     "min": 0
                 }
             },

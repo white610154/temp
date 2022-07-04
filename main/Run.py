@@ -235,7 +235,9 @@ def run_process():
         time.sleep(1)
         try:           
             ok, run = get_first_run()
-            print(run)
+            if ok:
+                print('==============================')
+                print(run)
             if not ok:
                 continue
             ok, config = load_run_config(run["projectName"], run["runId"])
