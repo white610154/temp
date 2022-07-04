@@ -1,39 +1,15 @@
 {
     "done": [
         {
-            "projectName": "kinsus",
-            "experimentId": "20220525055239",
-            "runId": "20220701074957",
+            "projectName": "test",
+            "experimentId": "20220704032117",
+            "runId": "20220704032205",
             "task": "Train"
         },
         {
-            "projectName": "kinsus",
-            "experimentId": "20220525055239",
-            "runId": "20220701074957",
-            "task": "Test"
-        },
-        {
-            "projectName": "kinsus",
-            "experimentId": "20220525055239",
-            "runId": "20220701075010",
-            "task": "Train"
-        },
-        {
-            "projectName": "kinsus",
-            "experimentId": "20220525055239",
-            "runId": "20220701075010",
-            "task": "Test"
-        },
-        {
-            "projectName": "kinsus0623",
-            "experimentId": "20220623072108",
-            "runId": "20220704013712",
-            "task": "Train"
-        },
-        {
-            "projectName": "kinsus0623",
-            "experimentId": "20220623072108",
-            "runId": "20220704013712",
+            "projectName": "test",
+            "experimentId": "20220704032117",
+            "runId": "20220704032205",
             "task": "Test"
         }
     ],

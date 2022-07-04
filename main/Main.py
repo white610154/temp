@@ -3,6 +3,9 @@ from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from utils import ProjectUtil
 from utils.ProjectUtil import DeployUtil, ExperimentConfig, FolderUtil, ModelDescription
+from main import LoggerConfig
+
+LoggerConfig.set_logger_config()
 
 def response(code, message, data=None):
     # code=0 for success, code=1 for fail
@@ -613,7 +616,7 @@ def rename_deploy_folder():
     elif not 'root' in data or not 'src' in data or not 'dst' in data:
         return response(1, "There is no data.")
 
-    if FolderUtil.rename_folder(os.path.join('deploys', data['root']), data['src'], data['dst']):
+    if FolderUtil.rename_folder(os.path.join('deploy', data['root']), data['src'], data['dst']):
         return response(0, "success")
     return response(1, "rename deploys folder failed")
 

@@ -4,6 +4,11 @@ Created on TUE MAR 22 17:00:00 2021
 """
 
 import json, os, shutil, time
+import subprocess
+from main import LoggerConfig
+from utils.Logger import Logger
+
+LoggerConfig.set_logger_config()
 
 # statue
 # waiting/ training/ testing
@@ -223,7 +228,10 @@ def run_model():
         modelMainPath = './sample/ModelMain.py'
         runModelMainPath = './ModelMain.py'
         shutil.copyfile(modelMainPath, runModelMainPath)
-        os.system('python ModelMain.py')
+        proc = subprocess.Popen(["python", "ModelMain.py"], stdout=subprocess.PIPE, shell=True)
+        out, err = proc.communicate()
+        Logger.info(str(out))
+        Logger.warning(str(err))
         os.remove(runModelMainPath)
         return True
     except Exception as err:
@@ -259,7 +267,7 @@ def run_process():
             if not ok:
                 continue
         except Exception as err:
-            _ = delete_first_run()
+            # _ = delete_first_run()
             _ = delete_config()
             print(err)
 
