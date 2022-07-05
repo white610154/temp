@@ -3,13 +3,25 @@
         {
             "projectName": "test",
             "experimentId": "20220704032117",
-            "runId": "20220704032205",
+            "runId": "20220705045600",
             "task": "Train"
         },
         {
             "projectName": "test",
             "experimentId": "20220704032117",
-            "runId": "20220704032205",
+            "runId": "20220705045600",
+            "task": "Test"
+        },
+        {
+            "projectName": "test",
+            "experimentId": "20220704032117",
+            "runId": "20220705045604",
+            "task": "Train"
+        },
+        {
+            "projectName": "test",
+            "experimentId": "20220704032117",
+            "runId": "20220705045604",
             "task": "Test"
         }
     ],
