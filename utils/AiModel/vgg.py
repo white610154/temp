@@ -1,5 +1,5 @@
 from typing import Union, List, Dict, Any, cast
-
+import numpy as np
 import torch
 import torch.nn as nn
 
@@ -59,11 +59,27 @@ class VGG(nn.Module):
                     nn.init.constant_(m.bias, 0)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # print(x.size())
         x = self.features(x)
+        # print(x[0, 0, :, :])
+        # print(x.size())
+        # x = self.replace_adaptive_avg_pooling_with_avg_pooling(x, np.array([x.size(2), x.size(3)]), np.array([7, 7]))
         x = self.avgpool(x)
+        # print(x[0, 0, :, :])
+        # print("after avgpool: ", x.size())
         x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x
+    
+    # def replace_adaptive_avg_pooling_with_avg_pooling(self, x, inputsz, outputsz):
+    #     stridesz = np.floor(inputsz/outputsz).astype(np.int32)
+    #     kernelsz = inputsz - (outputsz-1)*stridesz
+    #     print(stridesz, kernelsz)
+    #     for index, size in enumerate(stridesz):
+    #         if size == 0:
+    #             stridesz[index] = kernelsz[index]
+    #     return nn.AvgPool2d(kernel_size=list(kernelsz), stride=list(stridesz))(x)
+
 
 
 def make_layers(cfg: List[Union[str, int]], batch_norm: bool = False) -> nn.Sequential:

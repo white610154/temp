@@ -1,28 +1,37 @@
-import torch
+# -*- coding: utf-8 -*-
 
-def confidence_threshold(outputs, className, selectLabel:str, confidenTh:float):
+"""
+Created on Jun Tue 14 22:00:00 2022
+"""
+
+def confidence_filter(resultList:list, classThresDict:dict) -> list:
     '''
-    If the prediction is selectLabel which has the confidence lower than confidenTh, reduce the confidence to 0
+        過濾指定類別, 並選擇信心分數高於門檻, 否則選擇次高的結果, 輸出最高分數的結果
 
-    Args:
-        output: original logits from model output
-        className: the class name list which is corresponding to model output nodes
-        selectLabel: the class which need to be filtered
-        confidenTh: confidence threshold
-        
-    Return:
-        newOutput: new output logits after confidence_threshold filter
+        Args:
+            resultList: 模型輸出結果
+            'filename': 'BUMP_184_TOP_ok_70_31.bmp',
+            'label': 'OK',
+            'predict': 'OK',
+            'confidence': 0.9999998807907104
+            'output': {
+                'NG': 8.45041796537771e-08,
+                'OK': 0.9999998807907104
+            }
+            classThresDict: [分類類別: 信心分數門檻值]            
+        Return:
+            resultList: 過濾過的新輸出結果
     '''
-    outputsSoftmax = torch.nn.functional.softmax(outputs, dim=1)
-    confidenceScore, predicted = torch.max(outputsSoftmax, 1)
-    confidenLabelNumber = None
-    for i in range(len(className)):
-        if className[i] == selectLabel:
-            confidenLabelNumber = i   # obtain selectLabel index in the className
-    assert isinstance(confidenLabelNumber, int), f'you selected label: "{selectLabel}" does not exit, model label: {className}'
-    
-    if predicted[0] == confidenLabelNumber and confidenceScore[0] < confidenTh:  
-        print(f'{className[confidenLabelNumber]}\'s sorce is {confidenceScore[0]}, and it has been filtered out')
-        outputs[0][confidenLabelNumber] = 0 
-
-    return outputs
+    for result in resultList:
+        (oriResultPredict, oriResultConfidence) = (result["predict"], result["confidence"])
+        while result["predict"] in classThresDict.keys():
+            if result["confidence"] >= classThresDict[result["predict"]]:
+                break
+            else:
+                result["output"][result["predict"]] = 0
+                resultClassOrder = sorted(result["output"].items(), key=lambda x:(x[1]), reverse=True)
+                (result["predict"], result["confidence"]) = resultClassOrder[0]
+                if result["confidence"] == 0:
+                    (result["predict"], result["confidence"]) = (oriResultPredict, oriResultConfidence)
+                    break
+    return resultList

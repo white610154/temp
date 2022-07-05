@@ -11,6 +11,7 @@ class ImageDataset(Dataset):
         self.rootDir = os.path.abspath(rootDir)
         self.x = []
         self.y = []
+        self.imgSize = []
         self.filename = []
         self.transform = transform
         self.numClasses = 0
@@ -21,10 +22,11 @@ class ImageDataset(Dataset):
             fileList = os.listdir(os.path.join(self.rootDir, _dir))
             for j, file in enumerate(fileList):
                 try:
-                    np.asarray(Image.open(os.path.join(self.rootDir, _dir, file)))
+                    image = Image.open(os.path.join(self.rootDir, _dir, file))
                     self.x.append(os.path.join(self.rootDir, _dir, file))
                     self.y.append(i)
                     self.filename.append(fileList[j])
+                    self.imgSize = list(image.size)
                 except:
                     continue
             self.numClasses += 1

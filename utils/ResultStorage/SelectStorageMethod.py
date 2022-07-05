@@ -1,9 +1,32 @@
-from utils.ResultStorage.SaveOnnxModel import onnx_pack
 from config.ConfigResultStorage import ResultStorage
+from config.ConfigPostprocess import PostProcessPara
 from config.ConfigPytorchModel import ClsModelPara
-from utils.ResultStorage import SaveWeight, SaveAcc, TestAcc
+from utils.ResultStorage import SaveWeight, SaveResult
 
-def save_model(model, optimizer, bestAcc, currentAcc, epoch):
+def save_result(resultList:list, classNameList:list, outputPath:str, task:str) -> None:
+    """
+    output prediction for 3 types as csv file
+
+    Args:
+        resultList: whole model
+        classNameList: optimizer use for training
+        outputPath: best accuracy till now
+        task: accuracy of the current epoch
+    """
+    classNameList.sort()
+    classNameList.sort(key=lambda x:x)
+    for count, result in enumerate(resultList):
+        if PostProcessPara.unknownFilter["switch"] and PostProcessPara.unknownFilter["saveCsvMode"] > 0:
+            SaveResult.ResultCsv(result, count, task, outputPath, classNameList,
+                                 unknownMode=PostProcessPara.unknownFilter["saveCsvMode"]).write_unknown()
+        if ResultStorage.savePredictResult["switch"]:
+            SaveResult.ResultCsv(result, count, task, outputPath, classNameList).write_result()
+
+        if ResultStorage.saveWrongFile["switch"] and task == 'Test':
+            SaveResult.ResultCsv(result, count, task, outputPath, classNameList).write_wrong()
+
+def save_model(modelType, model, optimizer, cudaDevice, bestAcc:float, currentAcc:float, epoch:int):
+    ### 阿阿阿世亞對不起這個還給你了
     """
     According to configs in ConfigResultStorage, save different model weight.
 
@@ -18,27 +41,40 @@ def save_model(model, optimizer, bestAcc, currentAcc, epoch):
     """
     if bestAcc <= currentAcc:
         bestAcc = currentAcc
-        SaveWeight.save_weight(model, 'BestWeight')
-        if ResultStorage.saveOnnxModel["switch"]:
-            onnx_pack(model=model, packageName=ResultStorage.saveOnnxModel["fileName"])
+        if ResultStorage.saveBestDictPth["switch"]:
+            if modelType is not 'CustomModel':
+                SaveWeight.save_weight(model, 'BestDictPth')
+            else:
+                print('Warning: CustomModel(ScriptPth) is not supported DictPth model saving')
+        if ResultStorage.saveBestScriptPth["switch"]:
+            SaveWeight.save_script_model(model, 'BestScriptPth')
+        if ResultStorage.saveBestOnnx["switch"]:
+            try:
+                SaveWeight.onnx_pack(model, cudaDevice, 'BestOnnx')
+            except:
+                if modelType is 'CustomModel':
+                    print('Warning: CustomModel(ScriptPth) can not save as onnx model')
+                else:
+                    print('Warning: The official onnx module have not supported mobilenet(Hardswish) packing')
 
+    if ResultStorage.saveCheckpoint["switch"] and (epoch + 1) % ResultStorage.saveCheckpoint["saveIter"] == 0:
+        SaveWeight.save_model_optimizer(epoch, model, optimizer, 'CheckPoint')
 
-    if ResultStorage.saveFinalWeight["switch"] and epoch + 1 == ClsModelPara.epochs:
-        SaveWeight.save_weight(model, 'FinalWeight')
-
-    if ResultStorage.saveCheckpoint['switch'] and (epoch + 1) % ResultStorage.saveCheckpoint["saveIter"] == 0:
-        SaveWeight.save_model_optimizer(model, optimizer, 'CheckPoint')
+    if epoch + 1 == ClsModelPara.epochs:
+        if ResultStorage.saveFinalDictPth["switch"]:
+            if modelType is not 'CustomModel':
+                SaveWeight.save_weight(model, 'FinalDictPth')
+            else:
+                print('Warning: CustomModel(ScriptPth) is not supported DictPth model saving')
+        if ResultStorage.saveFinalScriptPth["switch"]:
+            SaveWeight.save_script_model(model, 'FinalScriptPth')
+        if ResultStorage.saveFinalOnnx["switch"]:
+            try:
+                SaveWeight.onnx_pack(model, cudaDevice, 'FinalOnnx')
+            except:
+                if modelType is 'CustomModel':
+                    print('Warning: CustomModel(ScriptPth) can not save as onnx model')
+                else:
+                    print('Warning: The official onnx module have not supported mobilenet(Hardswish) packing')
         
     return bestAcc
-
-
-def save_acc(epoch:int, total:int, totalCorrect:int, classTotal:list, classCorrect:list, className:list):
-    if ResultStorage.saveAccTxt["switch"]:
-        SaveAcc.save_epoch_acc_txt(epoch, total, totalCorrect, classTotal, classCorrect, className)
-    
-    if ResultStorage.saveAccJson["switch"]:
-        SaveAcc.save_epoch_acc_json(epoch, ClsModelPara.epochs, total, totalCorrect, classTotal, classCorrect, className)
-
-def test_acc(totalCorrect:int, classTotal:list, classCorrect:list, className:list):
-    if ResultStorage.testAccJson["switch"]:
-        TestAcc.test_epoch_acc_json(classTotal, classCorrect, className)

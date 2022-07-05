@@ -630,7 +630,7 @@ def get_model_description():
     return response(0, "success", ModelDescription.modelDescription)
 
 def main():
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5028)
 
 if __name__ == '__main__':
     main()

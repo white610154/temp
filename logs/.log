@@ -1,0 +1,18 @@
+[INFO] 2022-07-05 14:49:47 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 435516:434112 - b''
+[WARNING] 2022-07-05 14:49:47 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 435516:434112 - None
+[INFO] 2022-07-05 14:50:52 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 396104:435352 - b''
+[WARNING] 2022-07-05 14:50:52 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 396104:435352 - None
+[INFO] 2022-07-05 14:52:43 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 435952:431200 - b''
+[WARNING] 2022-07-05 14:52:43 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 435952:431200 - None
+[INFO] 2022-07-05 14:53:14 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 433448:428372 - b''
+[WARNING] 2022-07-05 14:53:14 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 433448:428372 - None
+[INFO] 2022-07-05 14:58:23 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 436172:216912 - b''
+[WARNING] 2022-07-05 14:58:23 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 436172:216912 - None
+[INFO] 2022-07-05 15:01:01 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 435608:435652 - b"......... Project: 20220705-a, Experiment: 20220705150047, Mode: Train .........\r\nStep 0: AI model Training\r\n'mean'\r\n"
+[WARNING] 2022-07-05 15:01:01 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 435608:435652 - None
+[INFO] 2022-07-05 15:08:55 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 437136:435452 - b"......... Project: 20220705-a, Experiment: 20220705150839, Mode: Train .........\r\nStep 0: AI model Training\r\n'mean'\r\n"
+[WARNING] 2022-07-05 15:08:55 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 437136:435452 - None
+[INFO] 2022-07-05 15:11:56 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 434188:435428 - b"......... Project: 20220705-a, Experiment: 20220705151142, Mode: Train .........\r\n'mean'\r\n"
+[WARNING] 2022-07-05 15:11:56 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 434188:435428 - None
+[INFO] 2022-07-05 15:16:18 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 427668:429708 - b"Step 0: AI model Training\r\n'mean'\r\n"
+[WARNING] 2022-07-05 15:16:18 "D:\Users\ShanYang\kinsus-classification-system\backend\utils\Logger\__init__.py:72" - 427668:429708 - None

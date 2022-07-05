@@ -305,7 +305,6 @@ class RegNet(nn.Module):
         block_type: Optional[Callable[..., nn.Module]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
         activation: Optional[Callable[..., nn.Module]] = None,
-        isAddlayer: bool = False,
         outputClassNum: int = 1000,
     ) -> None:
         super().__init__()
@@ -363,9 +362,6 @@ class RegNet(nn.Module):
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(in_features=current_width, out_features=num_classes)
-        self.isAddlayer = isAddlayer
-        if isAddlayer:
-            self.auoFc = nn.Linear(in_features=num_classes, out_features=outputClassNum)
         # Init weights and good to go
         self._reset_parameters()
 
@@ -376,8 +372,6 @@ class RegNet(nn.Module):
         x = self.avgpool(x)
         x = x.flatten(start_dim=1)
         x = self.fc(x)
-        if self.isAddlayer:
-            x = self.auoFc(x)
 
         return x
 
@@ -603,7 +597,6 @@ def regnet_y_400mf_cls7(pretrained: bool = False, progress: bool = True, outputC
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    kwargs['isAddlayer'] = True
     kwargs['outputClassNum'] = outputClassNum
     params = BlockParams.from_init_params(depth=16, w_0=48, w_a=27.89, w_m=2.09, group_width=8, se_ratio=0.25, **kwargs)
     return _regnet("regnet_y_400mf_cls7", params, pretrained, progress, **kwargs)

@@ -2,7 +2,7 @@ class BasicSetting:
     projectName = ''
     runId = ''
     task = ''
-    classNameList = ['NG', 'OK']
+    classNameList = []
 
 class PrivateSetting:
     datasetPath = ''

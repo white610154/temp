@@ -230,23 +230,26 @@ def run_model():
         shutil.copyfile(modelMainPath, runModelMainPath)
         proc = subprocess.Popen(["python", "ModelMain.py"], stdout=subprocess.PIPE, shell=True)
         out, err = proc.communicate()
-        Logger.info(str(out))
-        Logger.warning(str(err))
+        print(out.decode('utf-8'))
+        if err != None:
+            print(err.decode('utf-8'))
+            raise Exception(err.decode('utf-8'))
         os.remove(runModelMainPath)
-        return True
+        return True, None
     except Exception as err:
         print(err)
-        return False
+        return False, err
 
 def run_process():
     while True:
         time.sleep(1)
-        try:           
+        try:      
             ok, run = get_first_run()
             if ok:
-                print('==============================')
+                print('=' * len(str(run)))
                 print(run)
             if not ok:
+                print(run)
                 continue
             ok, config = load_run_config(run["projectName"], run["runId"])
             if not ok:
@@ -257,8 +260,9 @@ def run_process():
             ok = create_python_config(config, run["projectName"], run["runId"], run["task"])
             if not ok:
                 continue
-            ok = run_model()
+            ok, err = run_model()
             if not ok:
+                # 存結果 err
                 continue
             ok = move_first_run()
             if not ok:
