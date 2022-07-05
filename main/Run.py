@@ -228,10 +228,11 @@ def run_model():
         modelMainPath = './sample/ModelMain.py'
         runModelMainPath = './ModelMain.py'
         shutil.copyfile(modelMainPath, runModelMainPath)
-        proc = subprocess.Popen(["python", "ModelMain.py"], stdout=subprocess.PIPE, shell=True)
-        out, err = proc.communicate()
-        Logger.info(str(out))
-        Logger.warning(str(err))
+        os.system("python ModelMain.py")
+        # proc = subprocess.Popen(["python", "ModelMain.py"], stdout=subprocess.PIPE, shell=True)
+        # out, err = proc.communicate()
+        # Logger.info(str(out))
+        # Logger.warning(str(err))
         os.remove(runModelMainPath)
         return True
     except Exception as err:
