@@ -251,7 +251,7 @@ def run_process():
                 print('=' * len(str(run)))
                 print(run)
             if not ok:
-                print(run)
+                # print(run)
                 continue
             ok, config = load_run_config(run["projectName"], run["runId"])
             if not ok:
