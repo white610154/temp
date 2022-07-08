@@ -21,4 +21,10 @@ def select_scheduler(optimizer):
                            T_max=SchedulerPara.cosineAnnealingLR["tMax"],
                            eta_min=SchedulerPara.cosineAnnealingLR["etaMin"],
                            )
+    else:
+        method = getattr(SchedulerMethod, 'StepLR')
+        scheduler = method(optimizer=optimizer, 
+                           step_size=SchedulerPara.stepLR["stepSize"],
+                           gamma=SchedulerPara.stepLR["gamma"]
+                           )
     return scheduler
