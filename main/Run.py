@@ -228,7 +228,7 @@ def run_model():
         modelMainPath = './sample/ModelMain.py'
         runModelMainPath = './ModelMain.py'
         shutil.copyfile(modelMainPath, runModelMainPath)
-        proc = subprocess.Popen(["python", "ModelMain.py"], stdout=subprocess.PIPE, shell=True)
+        proc = subprocess.Popen(["python ModelMain.py"], stdout=subprocess.PIPE, shell=True)
         out, err = proc.communicate()
         print(out.decode('utf-8'))
         # Logger.info(out)
@@ -251,7 +251,7 @@ def run_process():
                 print('=' * len(str(run)))
                 print(run)
             if not ok:
-                print(run)
+                # print(run)
                 continue
             ok, config = load_run_config(run["projectName"], run["runId"])
             if not ok:
