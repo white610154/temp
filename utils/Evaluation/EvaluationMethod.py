@@ -217,8 +217,11 @@ def save_acc_json(task:str, accuracy:float=None, classAccuracy:float=None, class
             epochDict[task]["Leakage"] = otherRate["Leakage"]
             epochDict[task]["Overkill"] = otherRate["Overkill"]
             epochDict[task]["DefectAccuracy"] = otherRate["DefectAccuracy"]
+        ##### only for SALA platform #####
+        if task == 'Test':
+            epochDict[task]["ConfusionMatrix"] = f'./{PrivateSetting.outputPath}/ConfusionMatrix.jpg'
         
-        ##### Save record to json#####
+        ##### Save record to json #####
         infoDict = {}
         if epoch == None:
             infoDict[task] = epochDict

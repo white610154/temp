@@ -231,11 +231,11 @@ def run_model():
         proc = subprocess.Popen(["python", "ModelMain.py"], stdout=subprocess.PIPE, shell=True)
         out, err = proc.communicate()
         print(out.decode('utf-8'))
-        Logger.info(out.decode('utf-8'))
+        # Logger.info(out)
         if err != None:
             print(err.decode('utf-8'))
-            Logger.info(err.decode('utf-8'))
-            raise Exception(err.decode('utf-8'))
+        #     Logger.info(err.decode('utf-8'))
+        #     raise Exception(err.decode('utf-8'))
         os.remove(runModelMainPath)
         return True, None
     except Exception as err:
