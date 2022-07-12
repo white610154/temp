@@ -4,7 +4,7 @@ class SelectedModel:
     model = {'structure': '', 'pretrained': False}
 
 class ClsModelPara:
-    cudaDevice = 0
+    cudaDevice = 3
     batchSize = 1
     epochs = 1
 

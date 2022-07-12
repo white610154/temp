@@ -58,8 +58,18 @@ def create_config_folder():
         print(err)
         return False
 
-def create_python_config(config, projectName, runId, task):
+def modify_config_special_case(config, normalizeName=None):
+    if normalizeName != None:
+        try:
+            _ = config["ConfigPreprocess"]["PreprocessPara"]["normalize"]
+            if config["ConfigPreprocess"]["PreprocessPara"]["normalize"]["mode"] in ["CalculateFromData", "UserInput"]:
+                config["ConfigPreprocess"]["PreprocessPara"]["normalize"]["mode"] = normalizeName
+        except:
+            pass
+
+def create_python_config(config, projectName, experimentId, runId, task):
     try:
+        modify_config_special_case(config, normalizeName=f'{projectName}-{runId}')
         configFileList = ["Config", "ConfigAugmentation", "ConfigEvaluation", "ConfigModelService",
                           "ConfigPostprocess", "ConfigPreprocess", "ConfigPytorchModel", "ConfigResultStorage"]
         for configFileName in configFileList:
@@ -259,7 +269,7 @@ def run_process():
             ok = create_config_folder()
             if not ok:
                 continue
-            ok = create_python_config(config, run["projectName"], run["runId"], run["task"])
+            ok = create_python_config(config, **run)
             if not ok:
                 continue
             ok, err = run_model()

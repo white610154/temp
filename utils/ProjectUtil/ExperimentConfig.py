@@ -163,7 +163,7 @@ config = {
                     },
                     "nullable": True
                 },
-                "paddingModel": {
+                "paddingMode": {
                     "type": "string",
                     "default": "constant",
                     "enums": {
