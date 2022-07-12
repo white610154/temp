@@ -15,7 +15,7 @@ modelDescription = {
         "dataNeeded": "★★★☆☆",
         "easeOfUsage": "★★★★★",
         "trainSpeed": "★★★☆☆",
-        "introduction": "深度網路，加強卷積層連結，保留底層特徵資訊，並大幅提升可訓練程度。"
+        "introduction": "深度網路，加強卷積層連結，保留底層特徵資訊，並提升可訓練程度。"
     },
     "auo_transform_aggregate_model": {
         "dataNeeded": "★★★★☆",
