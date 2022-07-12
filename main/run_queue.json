@@ -1,4 +1,29 @@
 {
-    "done": [],
+    "done": [
+        {
+            "projectName": "T07112",
+            "experimentId": "20220711023647",
+            "runId": "20220712015304",
+            "task": "Train"
+        },
+        {
+            "projectName": "T07112",
+            "experimentId": "20220711023647",
+            "runId": "20220712015304",
+            "task": "Test"
+        },
+        {
+            "projectName": "T0711",
+            "experimentId": "20220711004855",
+            "runId": "20220712015310",
+            "task": "Train"
+        },
+        {
+            "projectName": "T0711",
+            "experimentId": "20220711004855",
+            "runId": "20220712015310",
+            "task": "Test"
+        }
+    ],
     "work": []
 }
