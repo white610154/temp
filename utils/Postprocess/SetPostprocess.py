@@ -1,19 +1,27 @@
-from config.ConfigPostprocess import PostProcessPara
-from .ConfidenceFilter import confidence_threshold
+# -*- coding: utf-8 -*-
 
-def select_postprocess(outputs, className):
+"""
+Created on Jun Tue 14 22:00:00 2022
+"""
+
+from config.ConfigPostprocess import PostProcessPara
+from .ConfidenceFilter import confidence_filter
+from .UnknownFilter import unknown_filter
+
+def select_postprocess(ResultList:list) -> None:
     """
     According to configs in ConfigPostprocess, select the post processing method.
 
     Args:
-        outputs: logits from model output
-        className: list of all class name
+        ResultList: result list form model
     Return:
-        outputs: new logits after post processing
+        ResultList: after post-processing
     """
-    className.sort()
-    className.sort(key=lambda x:x)
-
     if PostProcessPara.confidenceFilter["switch"]:
-        outputs = confidence_threshold(outputs, className, PostProcessPara.confidenceFilter["selectLabel"], PostProcessPara.confidenceFilter["threshold"])
-    return outputs
+        ResultList = confidence_filter(ResultList,
+                                       PostProcessPara.confidenceFilter["threshold"])
+    if PostProcessPara.unknownFilter["switch"]:
+        ResultList = unknown_filter(ResultList,
+                                    PostProcessPara.unknownFilter["threshold"],
+                                    PostProcessPara.unknownFilter["reverse"])
+    return ResultList

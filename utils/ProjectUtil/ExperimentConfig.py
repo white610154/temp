@@ -1,4 +1,238 @@
 config = {
+    "ConfigPreprocess": {
+        "PreprocessPara": {
+            "normalize": {
+                "mode": {
+                    "type": "string",
+                    "default": "ImageNet",
+                    "enums": {
+                        "ImageNet": "ImageNet",
+                        "CIFAR10": "CIFAR10",
+                        "MNIST": "MNIST",
+                        "CalculateFromData": "CalculateFromData",
+                        "UserInput": "UserInput"
+                    }
+                },
+                "mean": {
+                    "type": "list",
+                    "children": {
+                        "R": {
+                            "type": "float",
+                            "default": 0.5,
+                            "min": 0,
+                            "max": 1
+                        },
+                        "G": {
+                            "type": "float",
+                            "default": 0.5,
+                            "min": 0,
+                            "max": 1
+                        },
+                        "B": {
+                            "type": "float",
+                            "default": 0.5,
+                            "min": 0,
+                            "max": 1
+                        },
+                    },
+                    "nullable": True
+                },
+                "std": {
+                    "type": "list",
+                    "children": {
+                        "R": {
+                            "type": "float",
+                            "default": 0.5,
+                            "min": 0,
+                            "max": 1
+                        },
+                        "G": {
+                            "type": "float",
+                            "default": 0.5,
+                            "min": 0,
+                            "max": 1
+                        },
+                        "B": {
+                            "type": "float",
+                            "default": 0.5,
+                            "min": 0,
+                            "max": 1
+                        },
+                    },
+                    "nullable": True
+                }
+            },
+            "resize": {
+                "imageSize": {
+                    "type": "list",
+                    "children": {
+                        "width": {
+                            "type": "int",
+                            "default": 224,
+                            "min": 1,
+                            "unit": "pixels"
+                        },
+                        "height": {
+                            "type": "int",
+                            "default": 224,
+                            "min": 1,
+                            "unit": "pixels"
+                        },
+                    },
+                },
+                "interpolation": {
+                    "type": "string",
+                    "default": "BILINEAR",
+                    "enums": {
+                        "BILINEAR": "BILINEAR",
+                        "NEAREST": "NEAREST",
+                        "BICUBIC": "BICUBIC"
+                    }
+                }
+            },
+            "centerCrop": {
+                "size": {
+                    "type": "list",
+                    "children": {
+                        "width": {
+                            "type": "int",
+                            "default": 1,
+                            "min": 0,
+                            "unit": "pixels"
+                        },
+                        "height": {
+                            "type": "int",
+                            "default": 1,
+                            "min": 0,
+                            "unit": "pixels"
+                        },
+                    },
+                }
+            },
+            "pad": {
+                "padding":  {
+                    "type": "list",
+                    "children": {
+                        "left": {
+                            "type": "int",
+                            "default": 0,
+                            "min": 0,
+                            "unit": "pixels"
+                        },
+                        "top": {
+                            "type": "int",
+                            "default": 0,
+                            "min": 0,
+                            "unit": "pixels"
+                        },
+                        "right": {
+                            "type": "int",
+                            "default": 0,
+                            "min": 0,
+                            "unit": "pixels"
+                        },
+                        "bottom": {
+                            "type": "int",
+                            "default": 0,
+                            "min": 0,
+                            "unit": "pixels"
+                        }
+                    }
+                },
+                "fill": {
+                    "type": "list",
+                    "children": {
+                        "R": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "G": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "B": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        }
+                    },
+                    "nullable": True
+                },
+                "paddingMode": {
+                    "type": "string",
+                    "default": "constant",
+                    "enums": {
+                        "constant": "constant",
+                        "edge": "edge",
+                        "reflect": "reflect",
+                        "symmetric": "symmetric",
+                    }
+                }
+            },
+            "gaussianBlur": {
+                "kernelSize":
+                {
+                    "type": "list",
+                    "children": {
+                        "width": {
+                            "type": "int",
+                            "default": 3,
+                            "min": 1,
+                            "unit": "pixels"
+                        },
+                        "height": {
+                            "type": "int",
+                            "default": 3,
+                            "min": 1,
+                            "unit": "pixels"
+                        }
+                    }
+                },
+                "sigma": {
+                    "type": "float",
+                    "default": 1,
+                    "min": 0
+                }
+            },
+            "brightness": {
+                "brightness": {
+                    "type": "float",
+                    "default": 1,
+                    "min": 0,
+                    "max": 5,
+                }
+            },
+            "contrast": {
+                "contrast": {
+                    "type": "float",
+                    "default": 1,
+                    "min": 0,
+                    "max": 5,
+                }
+            },
+            "saturation": {
+                "saturation": {
+                    "type": "float",
+                    "default": 1,
+                    "min": 0,
+                    "max": 5,
+                }
+            },
+            "hue": {
+                "hue": {
+                    "type": "float",
+                    "default": 0,
+                    "max": 0.5,
+                    "min": -0.5
+                }
+            }
+        }
+    },
     "ConfigAugmentation": {
         "AugmentationPara": {
             "randomHorizontalFlip": {
@@ -36,6 +270,30 @@ config = {
                             "unit": "degrees"
                         }
                     }
+                },
+                "fill": {
+                    "type": "list",
+                    "children": {
+                        "R": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "G": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "B": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        }
+                    },
+                    "nullable": True
                 }
             },
             "randomTranslate": {
@@ -55,6 +313,30 @@ config = {
                             "min": 0
                         }
                     }
+                },
+                "fill": {
+                    "type": "list",
+                    "children": {
+                        "R": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "G": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "B": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        }
+                    },
+                    "nullable": True
                 }
             },
             "randomScale": {
@@ -76,6 +358,30 @@ config = {
                             "unit": "degrees"
                         }
                     }
+                },
+                "fill": {
+                    "type": "list",
+                    "children": {
+                        "R": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "G": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "B": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        }
+                    },
+                    "nullable": True
                 }
             },
             "randomShear": {
@@ -111,6 +417,30 @@ config = {
                             "unit": "degrees"
                         }
                     }
+                },
+                "fill": {
+                    "type": "list",
+                    "children": {
+                        "R": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "G": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        },
+                        "B": {
+                            "type": "int",
+                            "default": 0,
+                            "max": 255,
+                            "min": 0,
+                        }
+                    },
+                    "nullable": True
                 }
             },
             "randomGrayscale": {
@@ -313,34 +643,6 @@ config = {
             }
         }
     },
-    "ConfigEvaluation": {
-        "EvaluationPara": {
-            "showAcc": {
-                "switch": {
-                    "type": "boolean",
-                    "default": True
-                }
-            },
-            "showClassAcc": {
-                "switch": {
-                    "type": "boolean",
-                    "default": True
-                }
-            },
-            "showNumOfClasses": {
-                "switch": {
-                    "type": "boolean",
-                    "default": False
-                }
-            },
-            "showWrongFile": {
-                "switch": {
-                    "type": "boolean",
-                    "default": False
-                }
-            }
-        }
-    },
     "ConfigModelService": {
         "LossFunctionPara": {
             "lossFunction": {
@@ -348,10 +650,8 @@ config = {
                 "default": "CrossEntropyLoss",
                 "enums": {
                     "CrossEntropyLoss": "CrossEntropyLoss",
-                    "MSELoss": "MSELoss",
-                    "L1Loss": "L1Loss",
-                    "SmoothL1Loss": "SmoothL1Loss",
-                    "BCELoss": "BCELoss",
+                    "NLLLoss": "NLLLoss",
+                    "MultiMarginLoss": "MultiMarginLoss",
                 }
             }
         },
@@ -503,240 +803,6 @@ config = {
             }
         }
     },
-    "ConfigPreprocess": {
-        "PreprocessPara": {
-            "normalize": {
-                "mode": {
-                    "type": "int",
-                    "default": 0,
-                    "enums": {
-                        "ImageNet": 0,
-                        "CIFAR10": 1,
-                        "MNIST": 2,
-                        "CalculateFromData": 3,
-                        "UserInput": 4
-                    }
-                },
-                "mean": {
-                    "type": "list",
-                    "children": {
-                        "R": {
-                            "type": "float",
-                            "default": 0.5,
-                            "min": 0,
-                            "max": 1
-                        },
-                        "G": {
-                            "type": "float",
-                            "default": 0.5,
-                            "min": 0,
-                            "max": 1
-                        },
-                        "B": {
-                            "type": "float",
-                            "default": 0.5,
-                            "min": 0,
-                            "max": 1
-                        },
-                    },
-                    "nullable": True
-                },
-                "std": {
-                    "type": "list",
-                    "children": {
-                        "R": {
-                            "type": "float",
-                            "default": 0.5,
-                            "min": 0,
-                            "max": 1
-                        },
-                        "G": {
-                            "type": "float",
-                            "default": 0.5,
-                            "min": 0,
-                            "max": 1
-                        },
-                        "B": {
-                            "type": "float",
-                            "default": 0.5,
-                            "min": 0,
-                            "max": 1
-                        },
-                    },
-                    "nullable": True
-                }
-            },
-            "resize": {
-                "imageSize": {
-                    "type": "list",
-                    "children": {
-                        "width": {
-                            "type": "int",
-                            "default": 224,
-                            "min": 1,
-                            "unit": "pixels"
-                        },
-                        "height": {
-                            "type": "int",
-                            "default": 224,
-                            "min": 1,
-                            "unit": "pixels"
-                        },
-                    },
-                },
-                "interpolation": {
-                    "type": "string",
-                    "default": "BILINEAR",
-                    "enums": {
-                        "BILINEAR": "BILINEAR",
-                        "NEAREST": "NEAREST",
-                        "BICUBIC": "BICUBIC"
-                    }
-                }
-            },
-            "centerCrop": {
-                "size": {
-                    "type": "list",
-                    "children": {
-                        "width": {
-                            "type": "int",
-                            "default": 1,
-                            "min": 0,
-                            "unit": "pixels"
-                        },
-                        "height": {
-                            "type": "int",
-                            "default": 1,
-                            "min": 0,
-                            "unit": "pixels"
-                        },
-                    },
-                }
-            },
-            "pad": {
-                "padding":  {
-                    "type": "list",
-                    "children": {
-                        "left": {
-                            "type": "int",
-                            "default": 0,
-                            "min": 0,
-                            "unit": "pixels"
-                        },
-                        "top": {
-                            "type": "int",
-                            "default": 0,
-                            "min": 0,
-                            "unit": "pixels"
-                        },
-                        "right": {
-                            "type": "int",
-                            "default": 0,
-                            "min": 0,
-                            "unit": "pixels"
-                        },
-                        "bottom": {
-                            "type": "int",
-                            "default": 0,
-                            "min": 0,
-                            "unit": "pixels"
-                        }
-                    }
-                },
-                "fill": {
-                    "type": "list",
-                    "children": {
-                        "R": {
-                            "type": "int",
-                            "default": 0,
-                            "max": 255,
-                            "min": 0,
-                        },
-                        "G": {
-                            "type": "int",
-                            "default": 0,
-                            "max": 255,
-                            "min": 0,
-                        },
-                        "B": {
-                            "type": "int",
-                            "default": 0,
-                            "max": 255,
-                            "min": 0,
-                        }
-                    },
-                    "nullable": True
-                },
-                "paddingModel": {
-                    "type": "string",
-                    "default": "constant",
-                    "enums": {
-                        "constant": "constant",
-                        "edge": "edge",
-                        "reflect": "reflect",
-                        "symmetric": "symmetric",
-                    }
-                }
-            },
-            "gaussianBlur": {
-                "kernelSize":
-                {
-                    "type": "list",
-                    "children": {
-                        "width": {
-                            "type": "int",
-                            "default": 3,
-                            "min": 1,
-                            "unit": "pixels"
-                        },
-                        "height": {
-                            "type": "int",
-                            "default": 3,
-                            "min": 1,
-                            "unit": "pixels"
-                        }
-                    }
-                },
-                "sigma": {
-                    "type": "float",
-                    "default": 1,
-                    "min": 0
-                }
-            },
-            "brightness": {
-                "brightness": {
-                    "type": "float",
-                    "default": 1,
-                    "min": 0,
-                    "max": 5,
-                }
-            },
-            "contrast": {
-                "contrast": {
-                    "type": "float",
-                    "default": 1,
-                    "min": 0,
-                    "max": 5,
-                }
-            },
-            "saturation": {
-                "saturation": {
-                    "type": "float",
-                    "default": 1,
-                    "min": 0,
-                    "max": 5,
-                }
-            },
-            "hue": {
-                "hue": {
-                    "type": "float",
-                    "default": 0,
-                    "max": 0.5,
-                    "min": -0.5
-                }
-            }
-        }
-    },
     "ConfigPytorchModel": {
         "SelectedModel": {
             "model": {
@@ -754,6 +820,7 @@ config = {
                         "auo_feature_enhance_model_c": "auo_feature_enhance_model_c",
                         "auo_faster_convergency_model": "auo_faster_convergency_model",
                         "auo_unrestricted_powerful_model": "auo_unrestricted_powerful_model",
+                        "auo_cross_connection_model": "auo_cross_connection_model",
                         "auo_feature_reuse_model": "auo_feature_reuse_model",
                         "auo_lighten_efficient_model": "auo_lighten_efficient_model",
                         "auo_horizontal_sample_model": "auo_horizontal_sample_model"
@@ -778,71 +845,126 @@ config = {
                     "unit": "epochs"
                 }
             }
-        },
-        "ConfigResultStorage": {
-            "ResultStorage": {
-                "saveFinalWeight": {
-                    "switch": {
-                        "type": "boolean",
-                        "default": False
-                    }
-                },
-                "saveAccTxt": {
-                    "switch": {
-                        "type": "boolean",
-                        "default": False
-                    }
-                },
-                "savePredictResult": {
-                    "switch": {
-                        "type": "boolean",
-                        "default": True
-                    }
-                },
-                "unknownFilter": {
-                    "switch": {
-                        "type": "boolean",
-                        "default": False
-                    },
-                    "filter": {
-                        "type": "dict",
-                        "children": {
-                            "name": {
-                                "type": "string",
-                                "default": "unknown",
-                            },
-                            "threshold": {
-                                "type": "float",
-                                "default": 0.5,
-                                "max": 1,
-                                "min": 0
-                            }
-                        }
-                    },
-                    "reverse": {
-                        "type": "boolean",
-                        "default": False
-                    },
-                    "saveCsv": {
-                        "type": "int",
-                        "default": 2,
-                        "enums": {
-                            "unknownFilterNone": 0,
-                            "unknownFilterFiltered": 1,
-                            "unknownFilterAll": 2
-                        }
-                    }
-                }
-            }
-        },
-        "ConfigPass": {
-            "confidenceFilter": False,
-            "showRate": False,
-            "cudaDevice": 0,
-            "saveAccJson": True,
-            "testAccJson": True,
-            "drawAccCurve": False,
-            "drawConfusionMatrix": True
         }
-    }
+    },
+    # "ConfigEvaluation": {
+    #     "EvaluationPara": {
+    #         "accuracy": {
+    #             "mode": {
+    #                 "type": "list",
+    #                 "default": ['Train', 'Valid', 'Test'],
+    #                 "options": ['Train', 'Valid', 'Test']
+    #             },
+    #             "saveTxt": {
+    #                 "type": "boolean",
+    #                 "default": True
+    #             },
+    #             "saveJson": {
+    #                 "type": "boolean",
+    #                 "default": True
+    #             }
+    #         },
+    #         "accOfClasses": {
+    #             "mode": {
+    #                 "type": "list",
+    #                 "default": ['Valid', 'Test'],
+    #                 "options": ['Train', 'Valid', 'Test']
+    #             },
+    #             "saveTxt": {
+    #                 "type": "boolean",
+    #                 "default": True
+    #             },
+    #             "saveJson": {
+    #                 "type": "boolean",
+    #                 "default": True
+    #             }
+    #         },
+    #         "numOfClasses": {
+    #             "mode": {
+    #                 "type": "list",
+    #                 "default": ['Valid', 'Test'],
+    #                 "options": ['Train', 'Valid', 'Test']
+    #             },
+    #             "saveTxt": {
+    #                 "type": "boolean",
+    #                 "default": True
+    #             },
+    #             "saveJson": {
+    #                 "type": "boolean",
+    #                 "default": True
+    #             }
+    #         },
+    #         "otherClsRate": {
+    #             "posClass": ['OK'],
+    #             "negClass": ['NG'],
+    #             "saveTxt": {
+    #                 "type": "boolean",
+    #                 "default": True
+    #             },
+    #             "saveJson": {
+    #                 "type": "boolean",
+    #                 "default": True
+    #             }
+    #         },
+    #         "drawAccCurve": {
+    #             "switch": True
+    #         }
+    #     }
+    # },
+    # "ConfigResultStorage": {
+    #     "ResultStorage": {
+    #         "saveFinalWeight": {
+    #             "switch": {
+    #                 "type": "boolean",
+    #                 "default": False
+    #             }
+    #         },
+    #         "saveAccTxt": {
+    #             "switch": {
+    #                 "type": "boolean",
+    #                 "default": False
+    #             }
+    #         },
+    #         "savePredictResult": {
+    #             "switch": {
+    #                 "type": "boolean",
+    #                 "default": True
+    #             }
+    #         },
+    #         "unknownFilter": {
+    #             "switch": {
+    #                 "type": "boolean",
+    #                 "default": False
+    #             },
+    #             "filter": {
+    #                 "type": "dict",
+    #                 "children": {
+    #                         "name": {
+    #                             "type": "string",
+    #                             "default": "unknown",
+    #                         },
+    #                     "threshold": {
+    #                             "type": "float",
+    #                             "default": 0.5,
+    #                             "max": 1,
+    #                             "min": 0
+    #                         }
+    #                 }
+    #             },
+    #             "reverse": {
+    #                 "type": "boolean",
+    #                 "default": False
+    #             },
+    #             "saveCsv": {
+    #                 "type": "int",
+    #                 "default": 2,
+    #                 "enums": {
+    #                         "unknownFilterNone": 0,
+    #                         "unknownFilterFiltered": 1,
+    #                         "unknownFilterAll": 2
+    #                 }
+    #             }
+    #         }
+    #     }
+    # }
 }

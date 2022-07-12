@@ -347,7 +347,7 @@ def get_queue_process(runDict, mode):
         if mode == 'model':
             taskList = ['Train', 'Test']
             for task in taskList:
-                runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/model{task}ing.json'
+                runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/{task}Acc.json'
                 if os.path.isfile(runProcessPath):
                     with open(runProcessPath) as jsonFile:
                         trainingProcess = json.load(jsonFile)
@@ -358,7 +358,7 @@ def get_queue_process(runDict, mode):
                 wrongMsg = 'Task has not started'
             else:
                 wrongMsg = 'This run has been deleted'
-            runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/model{runDict["task"]}ing.json'
+            runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/{runDict["task"]}Acc.json'
             if not os.path.isfile(runProcessPath):
                 runDict["process"] = wrongMsg
                 return False, runDict

@@ -30,4 +30,4 @@ def get_std_mean(imageSize):
     
     mean = channelsSum / numBatches
     std = (channelsSquaredSum / numBatches - mean ** 2) ** 0.5
-    return mean, std
+    return mean.tolist(), std.tolist()

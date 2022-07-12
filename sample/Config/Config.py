@@ -1,9 +1,9 @@
 class BasicSetting:
-    projectName   = ''
-    runId         = ''
-    task          = ''
-    classNameList = ['NG', 'OK']
+    projectName = ''
+    runId = ''
+    task = ''
+    classNameList = []
 
 class PrivateSetting:
     datasetPath = ''
-    outputPath  = f'projects/{BasicSetting.projectName}/runs/{BasicSetting.runId}'
+    outputPath = f'projects/{BasicSetting.projectName}/runs/{BasicSetting.runId}'

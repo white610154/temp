@@ -56,9 +56,9 @@ class SELayer(nn.Module):
 
 class BasicBlock(nn.Module):
     expansion = 1
-    isAttention = False
+    
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
-                base_width=64, dilation=1, norm_layer=None):
+                base_width=64, dilation=1, norm_layer=None, isAttention=None):
         super(BasicBlock, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -74,6 +74,7 @@ class BasicBlock(nn.Module):
         self.bn2 = norm_layer(planes)
         self.downsample = downsample
         self.stride = stride
+        self.isAttention = isAttention
 
         if self.isAttention:
             self.se = SELayer(planes)
@@ -88,7 +89,7 @@ class BasicBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
 
-        if self.isAttention:
+        if self.isAttention is not None:
             out = self.se(out)
 
         if self.downsample is not None:
@@ -107,9 +108,8 @@ class Bottleneck(nn.Module):
     # https://ngc.nvidia.com/catalog/model-scripts/nvidia:resnet_50_v1_5_for_pytorch.
 
     expansion = 4
-    isAttention = False
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
-                base_width=64, dilation=1, norm_layer=None):
+                base_width=64, dilation=1, norm_layer=None, isAttention=None):
         super(Bottleneck, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -124,8 +124,9 @@ class Bottleneck(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
+        self.isAttention = isAttention
 
-        if self.isAttention:
+        if self.isAttention is not None:
             self.se = SELayer(planes * self.expansion, self.expansion)
 
     def forward(self, x):
@@ -142,7 +143,7 @@ class Bottleneck(nn.Module):
         out = self.conv3(out)
         out = self.bn3(out)
 
-        if self.isAttention:
+        if self.isAttention is not None:
             out = self.se(out)
 
         if self.downsample is not None:
@@ -156,13 +157,14 @@ class Bottleneck(nn.Module):
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes=1000, zero_init_residual=False,
                 groups=1, width_per_group=64, replace_stride_with_dilation=None,
-                norm_layer=None, isCBAM=False):
+                norm_layer=None, isCBAM=None, isAttention=None):
 
         super(ResNet, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
         self.isCBAM = isCBAM
+        self.isAttention = isAttention
         self.inplanes = 64
         self.dilation = 1
         if replace_stride_with_dilation is None:
@@ -230,12 +232,12 @@ class ResNet(nn.Module):
 
         layers = []
         layers.append(block(self.inplanes, planes, stride, downsample, self.groups,
-                            self.base_width, previous_dilation, norm_layer))
+                            self.base_width, previous_dilation, norm_layer, isAttention=self.isAttention))
         self.inplanes = planes * block.expansion
         for _ in range(1, blocks):
             layers.append(block(self.inplanes, planes, groups=self.groups,
                                 base_width=self.base_width, dilation=self.dilation,
-                                norm_layer=norm_layer))
+                                norm_layer=norm_layer, isAttention=self.isAttention))
 
         return nn.Sequential(*layers)
 
@@ -246,7 +248,7 @@ class ResNet(nn.Module):
         x = self.relu(x)
         x = self.maxpool(x)
 
-        if self.isCBAM:
+        if self.isCBAM is not None:
             x = self.ca(x) * x
             x = self.sa(x) * x
 
@@ -255,7 +257,7 @@ class ResNet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
-        if self.isCBAM:
+        if self.isCBAM is not None:
             x = self.ca1(x) * x
             x = self.sa1(x) * x
 

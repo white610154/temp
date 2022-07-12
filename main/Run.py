@@ -58,8 +58,18 @@ def create_config_folder():
         print(err)
         return False
 
-def create_python_config(config, projectName, runId, task):
+def modify_config_special_case(config, normalizeName=None):
+    if normalizeName != None:
+        try:
+            _ = config["ConfigPreprocess"]["PreprocessPara"]["normalize"]
+            if config["ConfigPreprocess"]["PreprocessPara"]["normalize"]["mode"] in ["CalculateFromData", "UserInput"]:
+                config["ConfigPreprocess"]["PreprocessPara"]["normalize"]["mode"] = normalizeName
+        except:
+            pass
+
+def create_python_config(config, projectName, experimentId, runId, task):
     try:
+        modify_config_special_case(config, normalizeName=f'{projectName}-{runId}')
         configFileList = ["Config", "ConfigAugmentation", "ConfigEvaluation", "ConfigModelService",
                           "ConfigPostprocess", "ConfigPreprocess", "ConfigPytorchModel", "ConfigResultStorage"]
         for configFileName in configFileList:
@@ -228,28 +238,30 @@ def run_model():
         modelMainPath = './sample/ModelMain.py'
         runModelMainPath = './ModelMain.py'
         shutil.copyfile(modelMainPath, runModelMainPath)
-        # os.system("python ModelMain.py")
         proc = subprocess.Popen(["python ModelMain.py"], stdout=subprocess.PIPE, shell=True)
         out, err = proc.communicate()
-        Logger.info(str(out))
+        print(out.decode('utf-8'))
+        # Logger.info(out)
         if err != None:
-            Logger.warning(str(err))
-            raise Exception(str(err))
+            print(err.decode('utf-8'))
+        #     Logger.info(err.decode('utf-8'))
+        #     raise Exception(err.decode('utf-8'))
         os.remove(runModelMainPath)
-        return True
+        return True, None
     except Exception as err:
         print(err)
-        return False
+        return False, err
 
 def run_process():
     while True:
         time.sleep(1)
-        try:           
+        try:      
             ok, run = get_first_run()
             if ok:
-                print('==============================')
+                print('=' * len(str(run)))
                 print(run)
             if not ok:
+                # print(run)
                 continue
             ok, config = load_run_config(run["projectName"], run["runId"])
             if not ok:
@@ -257,11 +269,12 @@ def run_process():
             ok = create_config_folder()
             if not ok:
                 continue
-            ok = create_python_config(config, run["projectName"], run["runId"], run["task"])
+            ok = create_python_config(config, **run)
             if not ok:
                 continue
-            ok = run_model()
+            ok, err = run_model()
             if not ok:
+                # 存結果 err
                 continue
             ok = move_first_run()
             if not ok:

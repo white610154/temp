@@ -115,7 +115,7 @@ def get_md5(filepath):
 def find_onnx(projectPath: str, runId: str):
     try:
         onnxPath = os.path.abspath(f'{projectPath}/runs/{runId}')
-        onnxFile = f'{runId}.onnx'
+        onnxFile = f'BestOnnx.onnx'
         if not os.path.isfile(os.path.join(onnxPath, onnxFile)):
             return False, "Model not found", None
         return True, onnxPath, onnxFile
