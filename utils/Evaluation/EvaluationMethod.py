@@ -45,7 +45,7 @@ def eval_class_acc(perClassNumbers:list, perClassCorrect:list, className:list) -
             perClassAccuracy[c] = 0
         else:
             perClassAccuracy[c] = float(perClassCorrect[i] / perClassNumbers[i])
-        print(f'- Accuracy of class {c:.5s} : {100 * perClassCorrect[i] / perClassNumbers[i]:.4f} %')
+        print(f'- Accuracy of class {c:.5s} : {100 * perClassAccuracy[c]:.4f} %')
     return perClassAccuracy
 
 def show_num_acc(perClassNumbers:list, perClassCorrect:list, className:list) -> dict:
