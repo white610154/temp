@@ -2,6 +2,7 @@ config = {
     "ConfigPreprocess": {
         "PreprocessPara": {
             "normalize": {
+                "description": "將根據輸入模式找到對應各通道的平均、標準差，進行影像正規化",
                 "mode": {
                     "type": "string",
                     "default": "ImageNet",
@@ -63,6 +64,7 @@ config = {
                 }
             },
             "resize": {
+                "description": "調整影像大小至給定的數值",
                 "imageSize": {
                     "type": "list",
                     "children": {
@@ -91,6 +93,7 @@ config = {
                 }
             },
             "centerCrop": {
+                "description": "以影像中心點切出給定數值大小的影像",
                 "size": {
                     "type": "list",
                     "children": {
@@ -110,6 +113,7 @@ config = {
                 }
             },
             "pad": {
+                "description": "向外進行影像填充",
                 "padding":  {
                     "type": "list",
                     "children": {
@@ -175,6 +179,7 @@ config = {
                 }
             },
             "gaussianBlur": {
+                "description": "對影像做高斯模糊",
                 "kernelSize":
                 {
                     "type": "list",
@@ -200,6 +205,7 @@ config = {
                 }
             },
             "brightness": {
+                "description": "對影像做亮度調整",
                 "brightness": {
                     "type": "float",
                     "default": 1,
@@ -208,6 +214,7 @@ config = {
                 }
             },
             "contrast": {
+                "description": "對影像做對比度調整",
                 "contrast": {
                     "type": "float",
                     "default": 1,
@@ -216,6 +223,7 @@ config = {
                 }
             },
             "saturation": {
+                "description": "對影像做飽和度調整",
                 "saturation": {
                     "type": "float",
                     "default": 1,
@@ -224,6 +232,7 @@ config = {
                 }
             },
             "hue": {
+                "description": "對影像做色調調整",
                 "hue": {
                     "type": "float",
                     "default": 0,
@@ -236,6 +245,7 @@ config = {
     "ConfigAugmentation": {
         "AugmentationPara": {
             "randomHorizontalFlip": {
+                "description": "以給定的機率隨機對影像做水平翻轉",
                 "probability": {
                     "type": "float",
                     "default": 0.5,
@@ -244,6 +254,7 @@ config = {
                 }
             },
             "randomVerticalFlip": {
+                "description": "以給定的機率隨機對影像做垂直翻轉",
                 "probability": {
                     "type": "float",
                     "default": 0.5,
@@ -252,6 +263,7 @@ config = {
                 }
             },
             "randomRotation": {
+                "description": "在給定角度範圍內隨機對影像做旋轉",
                 "degrees": {
                     "type": "list",
                     "children": {
@@ -297,6 +309,7 @@ config = {
                 }
             },
             "randomTranslate": {
+                "description": "在給定平移範圍內隨機對影像做平移",
                 "translate": {
                     "type": "list",
                     "children": {
@@ -340,6 +353,7 @@ config = {
                 }
             },
             "randomScale": {
+                "description": "在給定縮放範圍內隨機對影像做縮放",
                 "scale": {
                     "type": "list",
                     "children": {
@@ -385,6 +399,7 @@ config = {
                 }
             },
             "randomShear": {
+                "description": "在給定斜變範圍內隨機以軸對影像做斜變",
                 "shear": {
                     "type": "list",
                     "children": {
@@ -444,6 +459,7 @@ config = {
                 }
             },
             "randomGrayscale": {
+                "description": "以給定的機率隨機對影像做灰階轉換",
                 "probability": {
                     "type": "float",
                     "default": 0.5,
@@ -452,6 +468,7 @@ config = {
                 }
             },
             "randomBrightness": {
+                "description": "在給定亮度範圍內隨機對影像做亮度調整",
                 "brightness": {
                     "type": "list",
                     "children": {
@@ -471,6 +488,7 @@ config = {
                 }
             },
             "randomContrast": {
+                "description": "在給定對比度範圍內隨機對影像對比度調整",
                 "contrast": {
                     "type": "list",
                     "children": {
@@ -490,6 +508,7 @@ config = {
                 }
             },
             "randomSaturation": {
+                "description": "在給定飽和度範圍內隨機對影像做飽和度調整",
                 "saturation": {
                     "type": "list",
                     "children": {
@@ -509,6 +528,7 @@ config = {
                 }
             },
             "randomHue": {
+                "description": "在給定色調範圍內隨機對影像做色調調整",
                 "hue": {
                     "type": "list",
                     "children": {
@@ -528,6 +548,7 @@ config = {
                 }
             },
             "randomErasing": {
+                "description": "在給定範圍內產生一個矩形，隨機對影像做遮罩",
                 "probability": {
                     "type": "float",
                     "default": 0.5,
@@ -596,6 +617,7 @@ config = {
                 }
             },
             "randomPerspective": {
+                "description": "以給定的機率隨機對影像做視角轉換",
                 "distortion": {
                     "type": "float",
                     "default": 0,
