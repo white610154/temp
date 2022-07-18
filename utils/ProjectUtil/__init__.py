@@ -358,6 +358,15 @@ def get_queue_process(runDict, mode):
                 wrongMsg = 'Task has not started'
             else:
                 wrongMsg = 'This run has been deleted'
+
+            runConfigPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/{runDict["runId"]}.json'
+            if not os.path.isfile(runConfigPath):
+                runDict["config"] = wrongMsg
+                return False, runDict
+            with open(runConfigPath) as jsonFile:
+                runConfig = json.load(jsonFile)
+                runDict["config"] = runConfig
+
             runProcessPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/{runDict["task"]}Acc.json'
             if not os.path.isfile(runProcessPath):
                 runDict["process"] = wrongMsg
