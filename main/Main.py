@@ -60,6 +60,10 @@ def remove_projects():
     ok, projectPath = ProjectUtil.find_project(data["projectName"])
     if not ok:
         return response(1, projectPath)
+
+    ok, msg = ProjectUtil.delete_run_in_queue(data["projectName"], 'All')
+    if not ok:
+        return response(1, msg)
     
     ok, message = ProjectUtil.delete_project(projectPath)
     if not ok:

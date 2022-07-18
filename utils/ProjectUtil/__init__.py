@@ -304,15 +304,15 @@ def delete_run_in_queue(projectName, runId):
             doneList = jsonDict["done"]
             workList = jsonDict["work"]
         if len(workList) > 0:
-            if workList[0]["projectName"] == projectName and workList[0]["runId"] == runId:
-                return False, 'This run is running'
+            if workList[0]["projectName"] == projectName and (workList[0]["runId"] == runId or runId == 'All'):
+                return False, 'This project / run is running'
         newDoneList = []
         for done in doneList:
-            if done["projectName"] != projectName or done["runId"] != runId:
+            if done["projectName"] != projectName or (done["runId"] != runId and runId != 'All'):
                 newDoneList.append(done)
         newWorkList = []
         for work in workList:
-            if work["projectName"] != projectName or work["runId"] != runId:
+            if work["projectName"] != projectName or (work["runId"] != runId and runId != 'All'):
                 newWorkList.append(work)
         jsonDict = {"done": newDoneList, "work": newWorkList}
         with open(runQueueJsonPath, 'w') as jsonFile:
