@@ -30,10 +30,11 @@ def check_auth(auth: str):
                 else:
                     return response(1, "Authorized failed")
                 user = EasyAuthService.authorize(token)
-                data = request.get_json()
-                authorized = EasyAuthService.check_auth(user.username, auth, data.get('projectName'))
-                if not authorized:
-                    return response(1, "Authorized failed")
+                if auth != None:
+                    data = request.get_json()
+                    authorized = EasyAuthService.check_auth(user.username, auth, data.get('projectName'))
+                    if not authorized:
+                        return response(1, "Authorized failed")
             except Exception as err:
                 print(err)
                 return response(1, "Authorized failed")
@@ -773,6 +774,20 @@ def remove_project_user(user: User):
     userId = EasyAuthService.group(data['projectName']).remove_user(data['username'])
     return response(0, "success", userId)
 
+@app.route('/change-password', methods=['POST'])
+@check_auth(None)
+def change_password(user: User):
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'password' in data:
+        return response(1, "There is no data.")
+
+    userId = EasyAuthService.change_password(user.username, data['password'])
+    if userId == 0:
+        return response(1, "user not found")
+
+    return response(0, "success", userId)
 
 def main():
     app.run(host='0.0.0.0', port=5000)

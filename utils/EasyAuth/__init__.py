@@ -209,6 +209,16 @@ class EasyAuthService:
         return group
 
     @classmethod
+    def change_password(cls, username: str, password: str) -> int:
+        userId = cls.catalog.get(username)
+        if userId == None:
+            return 0
+        user = cls.users[userId]
+        user.password = Encrypt.sha1_encode(password)
+
+        cls.save()
+
+    @classmethod
     def login(cls, username: str, password: str):
         id = cls.catalog[username]
         user = cls.users[id]
