@@ -1,9 +1,11 @@
+from datetime import datetime
 import os
 from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from utils import ProjectUtil
 from utils.ProjectUtil import DeployUtil, ExperimentConfig, FolderUtil, ModelDescription
 from main import LoggerConfig
+from utils.EasyAuth import EasyAuthService, Auth, User, AuthGroup
 
 LoggerConfig.set_logger_config()
 
@@ -632,6 +634,63 @@ def get_experiment_configs():
 @app.route('/get-model-description', methods=['POST'])
 def get_model_description():
     return response(0, "success", ModelDescription.modelDescription)
+
+# login and auth system
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'username' in data or not 'password' in data:
+        return response(1, "There is no data.")
+
+    user = EasyAuthService.login(data['username'], data['password'])
+    token = user.generate_token(datetime.now())
+    return response(0, "success", token)
+
+@app.route('/add-user', methods=['POST'])
+def add_user():
+    '''
+    Add user to login system, return userId and return 0 for add user failed.
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'username' in data or not 'password' in data:
+        return response(1, "There is no data.")
+
+    userId = EasyAuthService.add_user(data['username'], data['password'])
+    return response(0, "success", userId)
+
+@app.route('/remove-user', methods=['POST'])
+def remove_user():
+    '''
+    Remove user from login system, return userId and return 0 for add user failed.
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'username' in data:
+        return response(1, "There is no data.")
+
+    EasyAuthService.remove_user(data['username'])
+    return response(0, "success", None)
+
+@app.route('/add-project-user', methods=['POST'])
+def add_project_user():
+    '''
+    Add user to project and set auth to user
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'username' in data or not 'projectName' in data or not 'auth' in data:
+        return response(1, "There is no data.")
+
+    userId = EasyAuthService.add_user(data['username'], data['password'])
+    return response(0, "success", userId)
+
 
 def main():
     app.run(host='0.0.0.0', port=5000)
