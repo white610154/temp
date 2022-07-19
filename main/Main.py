@@ -5,7 +5,7 @@ from flask_cors import CORS
 from utils import ProjectUtil
 from utils.ProjectUtil import DeployUtil, ExperimentConfig, FolderUtil, ModelDescription
 from main import LoggerConfig
-from utils.EasyAuth import EasyAuthService, Auth, User, AuthGroup
+from utils.EasyAuth import EasyAuthService, Auth, User
 
 LoggerConfig.set_logger_config()
 
@@ -17,10 +17,36 @@ app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
 CORS(app)
 
+def check_auth(auth: str):
+    '''
+    Check user auth, check project auth if projectName in body
+    '''
+    def wrapper(func):
+        def func_with_auth(*args, **kwargs):
+            try:
+                token = request.headers.get('Authorization')
+                if token.startswith('Bearer'):
+                    token = token[7:]
+                else:
+                    return response(1, "Authorized failed")
+                user = EasyAuthService.authorize(token)
+                data = request.get_json()
+                authorized = EasyAuthService.check_auth(user.username, auth, data.get('projectName'))
+                if not authorized:
+                    return response(1, "Authorized failed")
+            except Exception as err:
+                print(err)
+                return response(1, "Authorized failed")
+            return func(user, *args, **kwargs)
+        setattr(func_with_auth, '__name__', func.__name__)
+        return func_with_auth
+    return wrapper
+
 ### project
 
 @app.route('/create-project-by-key', methods=['POST'])
-def create_project_by_key():
+@check_auth(Auth.maintainer)
+def create_project_by_key(user: User):
     '''
     input: name, config/ output: prejectList
     '''
@@ -38,6 +64,8 @@ def create_project_by_key():
     if not ok:
         return response(1, message)
 
+    EasyAuthService.add_group(data['name'], user.username)
+
     ok, configPath = ProjectUtil.save_config_as_json(data['name'], config)
     if not ok:
         return response(1, configPath)
@@ -49,7 +77,8 @@ def create_project_by_key():
     return response(0, "success", {"projects": projectList})
 
 @app.route('/remove-project', methods=['POST'])
-def remove_projects():
+@check_auth(Auth.admin)
+def remove_projects(user: User):
     '''
     input: projectName/ output: projectList
     '''
@@ -71,6 +100,8 @@ def remove_projects():
     if not ok:
         return response(1, message)
     
+    EasyAuthService.remove_group(data['projectName'])
+
     ok, projectList = ProjectUtil.get_projects()
     if not ok:
         return response(1, projectList)
@@ -78,13 +109,20 @@ def remove_projects():
     return response(0, "success", {'projects': projectList})
 
 @app.route('/get-projects', methods=['POST', 'GET'])
-def get_projects():
+@check_auth(Auth.user)
+def get_projects(user: User):
     '''
     input: / output: projectList
     '''
     ok, projectList = ProjectUtil.get_projects()
     if not ok:
         return response(1, projectList)
+
+    projectList = [
+        project
+        for project in projectList
+        if EasyAuthService.group(project).auth_of(user.username) != None
+    ]
 
     return response(0, "success", {'projects': projectList})
 
@@ -108,7 +146,8 @@ def check_project():
 ### experiment
 
 @app.route('/get-experiments', methods=['POST'])
-def get_experiments():
+@check_auth(Auth.user)
+def get_experiments(user: User):
     '''
     input: projectName/ output: config
     '''
@@ -129,7 +168,8 @@ def get_experiments():
     return response(0, "success", config)
 
 @app.route('/set-experiments', methods=['POST'])
-def set_experiments():
+@check_auth(Auth.user)
+def set_experiments(user: User):
     '''
     input: projectName, experiment/ output: experiment
     '''
@@ -173,7 +213,8 @@ def check_experiments():
 ### dataset
 
 @app.route('/check-dataset', methods=['POST'])
-def check_dataset():
+@check_auth(Auth.user)
+def check_dataset(user: User):
     '''
     input: projectName, datasetPath/ output: {uploaded: bool, labeled: bool, split: bool}
     '''
@@ -220,7 +261,8 @@ def check_dataset():
     return response(0, "success", status)
 
 @app.route('/remove-dataset', methods=['POST'])
-def remove_dataset():
+@check_auth(Auth.owner)
+def remove_dataset(user: User):
     '''
     input: projectName, datasetPath/ output: datasets
     '''
@@ -241,7 +283,8 @@ def remove_dataset():
     return response(0, "success", datasets)
 
 @app.route('/get-datasets', methods=['POST'])
-def get_datasets():
+@check_auth(Auth.user)
+def get_datasets(user: User):
     '''
     input: projectName/ output: datasets
     '''
@@ -262,7 +305,8 @@ def get_datasets():
     return response(0, "success", datasets)
 
 @app.route('/set-experiment-dataset', methods=['POST'])
-def set_experiment_dataset():
+@check_auth(Auth.user)
+def set_experiment_dataset(user: User):
     '''
     input: projectName, experimentId, dataPath/ output: config
     '''
@@ -285,7 +329,8 @@ def set_experiment_dataset():
 ### run
 
 @app.route('/run-experiment-train', methods=['POST'])
-def run_experiment_train():
+@check_auth(Auth.user)
+def run_experiment_train(user: User):
     '''
     input: projectName, experimentId/ output: projectName, experimentId, runId, task
     '''
@@ -309,7 +354,8 @@ def run_experiment_train():
     return response(0, "success", msg)
 
 @app.route('/run-experiment-test', methods=['POST'])
-def run_experiment_test():
+@check_auth(Auth.user)
+def run_experiment_test(user: User):
     '''
     input: projectName, experimentId/ output: projectName, experimentId, runId, task
     '''
@@ -337,7 +383,8 @@ def run_experiment_test():
     return response(0, "success", msg)
 
 @app.route('/remove-run-in-queue', methods=['POST'])
-def remove_run_in_queue():
+@check_auth(Auth.user)
+def remove_run_in_queue(user: User):
     '''
     input: projectName, runId/ output: none
     '''
@@ -353,7 +400,8 @@ def remove_run_in_queue():
     return response(0, "success")
 
 @app.route('/remove-run', methods=['POST'])
-def remove_run():
+@check_auth(Auth.owner)
+def remove_run(user: User):
     '''
     input: projectName, runId/ output: none
     '''
@@ -378,7 +426,8 @@ def remove_run():
     return response(0, "success")
 
 @app.route('/get-queue-information', methods=['POST'])
-def get_queue_information():
+@check_auth(Auth.user)
+def get_queue_information(user: User):
     '''
     get queue information
     '''
@@ -401,7 +450,8 @@ def get_queue_information():
     return response(0, "success", newQueue)
 
 @app.route('/get-model-information', methods=['POST'])
-def get_model_information():
+@check_auth(Auth.user)
+def get_model_information(user: User):
     '''
     get model information
     '''
@@ -444,7 +494,8 @@ def get_model_information():
     })
 
 @app.route('/download-model/<string:header>/<string:payload>/<string:signature>', methods=['GET'])
-def download_model(header, payload, signature):
+@check_auth(Auth.user)
+def download_model(user: User, header, payload, signature):
     '''
     download model with filename setting
     '''
@@ -468,7 +519,8 @@ def download_model(header, payload, signature):
     return send_from_directory(onnxPath, onnxFile, download_name=f"{data['filename']}.onnx", as_attachment=True)
 
 @app.route('/set-deploy-path', methods=['POST'])
-def set_deploy_path():
+@check_auth(Auth.owner)
+def set_deploy_path(user: User):
     '''
     set deploy path
     '''
@@ -515,7 +567,8 @@ def set_deploy_path():
     })
 
 @app.route('/deploy', methods=['POST'])
-def deploy():
+@check_auth(Auth.user)
+def deploy(user: User):
     '''
     deploy onnx to certain folder, and version control
     '''
@@ -535,20 +588,23 @@ def deploy():
     return response(0, "success", result[data['projectName']])
 
 @app.route('/images/<path:path>', methods=['GET'])
-def show_image(path):
+@check_auth(Auth.user)
+def show_image(user: User, path):
     return send_from_directory(os.path.abspath(''), path=path)
 
 # folder select and edit
 
 @app.route('/list-dataset-folder', methods=['POST'])
-def list_dataset_folder():
+@check_auth(Auth.user)
+def list_dataset_folder(user: User):
     folder = FolderUtil.list_folder('datasets')
     if folder == None:
         return response(1, "get dataset folder failed")
     return response(0, "success", folder)
 
 @app.route('/create-dataset-folder', methods=['POST'])
-def create_dataset_folder():
+@check_auth(Auth.maintainer)
+def create_dataset_folder(user: User):
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
@@ -560,7 +616,8 @@ def create_dataset_folder():
     return response(1, "create datasets folder failed")
 
 @app.route('/remove-dataset-folder', methods=['POST'])
-def remove_dataset_folder():
+@check_auth(Auth.maintainer)
+def remove_dataset_folder(user: User):
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
@@ -572,7 +629,8 @@ def remove_dataset_folder():
     return response(1, "remove datasets folder failed")
 
 @app.route('/rename-dataset-folder', methods=['POST'])
-def rename_dataset_folder():
+@check_auth(Auth.maintainer)
+def rename_dataset_folder(user: User):
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
@@ -584,14 +642,16 @@ def rename_dataset_folder():
     return response(1, "rename datasets folder failed")
 
 @app.route('/list-deploy-folder', methods=['POST'])
-def list_deploy_folder():
+@check_auth(Auth.user)
+def list_deploy_folder(user: User):
     folder = FolderUtil.list_folder('deploy')
     if folder == None:
         return response(1, "get deploy folder failed")
     return response(0, "success", folder)
 
 @app.route('/create-deploy-folder', methods=['POST'])
-def create_deploy_folder():
+@check_auth(Auth.maintainer)
+def create_deploy_folder(user: User):
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
@@ -603,7 +663,8 @@ def create_deploy_folder():
     return response(1, "create deploys folder failed")
 
 @app.route('/remove-deploy-folder', methods=['POST'])
-def remove_deploy_folder():
+@check_auth(Auth.maintainer)
+def remove_deploy_folder(user: User):
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
@@ -615,7 +676,8 @@ def remove_deploy_folder():
     return response(1, "remove deploys folder failed")
 
 @app.route('/rename-deploy-folder', methods=['POST'])
-def rename_deploy_folder():
+@check_auth(Auth.maintainer)
+def rename_deploy_folder(user: User):
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
@@ -628,11 +690,13 @@ def rename_deploy_folder():
 
 # Experiment config
 @app.route('/get-experiment-configs', methods=['POST'])
-def get_experiment_configs():
+@check_auth(Auth.user)
+def get_experiment_configs(user: User):
     return response(0, "success", ExperimentConfig.config)
 
 @app.route('/get-model-description', methods=['POST'])
-def get_model_description():
+@check_auth(Auth.user)
+def get_model_description(user: User):
     return response(0, "success", ModelDescription.modelDescription)
 
 # login and auth system
@@ -650,6 +714,7 @@ def login():
     return response(0, "success", token)
 
 @app.route('/add-user', methods=['POST'])
+@check_auth(Auth.admin)
 def add_user():
     '''
     Add user to login system, return userId and return 0 for add user failed.
@@ -664,6 +729,7 @@ def add_user():
     return response(0, "success", userId)
 
 @app.route('/remove-user', methods=['POST'])
+@check_auth(Auth.admin)
 def remove_user():
     '''
     Remove user from login system, return userId and return 0 for add user failed.
@@ -678,7 +744,8 @@ def remove_user():
     return response(0, "success", None)
 
 @app.route('/add-project-user', methods=['POST'])
-def add_project_user():
+@check_auth(Auth.owner)
+def add_project_user(user: User):
     '''
     Add user to project and set auth to user
     '''
@@ -688,7 +755,22 @@ def add_project_user():
     elif not 'username' in data or not 'projectName' in data or not 'auth' in data:
         return response(1, "There is no data.")
 
-    userId = EasyAuthService.add_user(data['username'], data['password'])
+    userId = EasyAuthService.group(data['projectName']).add_user(data['username'], data['auth'])
+    return response(0, "success", userId)
+
+@app.route('/remove-project-user', methods=['POST'])
+@check_auth(Auth.owner)
+def remove_project_user(user: User):
+    '''
+    Add user to project and set auth to user
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'username' in data or not 'projectName' in data or not 'auth' in data:
+        return response(1, "There is no data.")
+
+    userId = EasyAuthService.group(data['projectName']).remove_user(data['username'])
     return response(0, "success", userId)
 
 

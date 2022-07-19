@@ -1,11 +1,9 @@
-from asyncore import write
-import csv
 from datetime import datetime
 import json
 import math
 import os
 from typing import Dict, List
-from . import Encrypt
+from . import Encrypt, Functions
 
 AUTH_STORAGE_PATH = '.salaauth'
 
@@ -17,18 +15,36 @@ def deserialize_dict(c: str) -> dict:
 
 class Auth:
     admin = 'admin'
+    maintainer = 'maintainer'
     owner = 'owner'
     user = 'user'
     auomaintainer = 'auomaintainer'
 
-    @classmethod
-    def rationalize(cls, authName: str) -> str:
+    @staticmethod
+    def rationalize(authName: str) -> str:
         '''
         Make auth reasonable, admin should not been set.
         '''
         if authName in [Auth.admin, Auth.auomaintainer]:
             return Auth.user
         return authName
+
+    @staticmethod
+    def higher_than(a: str, b: str) -> bool:
+        '''
+        (auomaintainer) > admin > maintainer > owner > user
+        '''
+        if a == Auth.auomaintainer: return True
+        if b == Auth.auomaintainer: return False
+        if a == Auth.admin: return True
+        if b == Auth.admin: return False
+        if a == Auth.maintainer: return True
+        if b == Auth.maintainer: return False
+        if a == Auth.owner: return True
+        if b == Auth.owner: return False
+        if a == Auth.user: return True
+        if b == Auth.user: return False
+        return False
 
 class User:
     def __init__(self, id: int, username: str, password: str):
@@ -73,7 +89,16 @@ class AuthGroup:
         self.auths[username] = Auth.rationalize(auth)
 
     def remove_user(self, username: str):
-        del self.auths[username]
+        if self.auths.get(username):
+            del self.auths[username]
+
+    def auth_of(self, username: str) -> str:
+        '''
+        find auth of user in group, maintainer has auth only if it is an owner or user.
+        '''
+        if Auth.higher_than(username, Auth.admin):
+            return username
+        return self.auths.get(username)
 
     def serialize(self) -> str:
         '''
@@ -157,6 +182,9 @@ class EasyAuthService:
         del cls.catalog[username]
         cls.users[id] = None
 
+        for group in cls.auths.values():
+            group.remove_user(username)
+
         cls.save()
 
     @classmethod
@@ -165,13 +193,20 @@ class EasyAuthService:
         group.add_user(owner, Auth.owner)
         cls.auths[name] = group
 
+        cls.save()
+
     @classmethod
     def remove_group(cls, name: str):
         del cls.auths[name]
 
+        cls.save()
+
     @classmethod
     def group(cls, name: str) -> AuthGroup:
-        return cls.auths.get(name)
+        group = cls.auths.get(name)
+        if group == None:
+            return AuthGroup('unknown')
+        return group
 
     @classmethod
     def login(cls, username: str, password: str):
@@ -180,6 +215,23 @@ class EasyAuthService:
         if Encrypt.sha1_encode(password) == user.password:
             return user
         return None
+
+    @classmethod
+    def authorize(cls, token: str) -> User:
+        userInfo = Encrypt.jwt_decode(token)
+        timeValid = Functions.check_valid_time(userInfo['iat'])
+        if not timeValid: return
+
+        return cls.users[cls.catalog[userInfo['username']]]
+
+    @classmethod
+    def check_auth(cls, username: str, auth: str, groupName: str=None) -> bool:
+        if Auth.higher_than(username, Auth.maintainer):
+            return True
+        if groupName != None:
+            return Auth.higher_than(cls.auths[groupName].auths[username], auth)
+        else:
+            return Auth.higher_than(username, auth)
 
     @classmethod
     def save(cls):
