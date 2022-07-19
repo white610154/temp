@@ -82,6 +82,12 @@ class AuthGroup:
         self.name = name
         self.auths = {}
 
+    @classmethod
+    def with_auths(cls, name: str, auths):
+        group = cls(name)
+        group.auths = auths
+        return group
+
     def __repr__(self):
         return f'Group(name={self.name}, auths={self.auths}'
 
@@ -122,7 +128,12 @@ class EasyAuthService:
         User(0, Auth.auomaintainer, Encrypt.sha1_encode('auo@84149738')),
         User(1, Auth.admin, Encrypt.sha1_encode('admin'))
     ]
-    auths: Dict[str, AuthGroup] = {}
+    auths: Dict[str, AuthGroup] = {
+        "_all_": AuthGroup.with_auths("_all_", {
+            Auth.auomaintainer: Auth.auomaintainer,
+            Auth.admin: Auth.admin,
+        })
+    }
 
     @classmethod
     def init(cls):
@@ -150,7 +161,7 @@ class EasyAuthService:
         print(cls.auths)
 
     @classmethod
-    def add_user(cls, username, password) -> int:
+    def add_user(cls, username: str, password: str, isMaintainer: bool) -> int:
         '''
         Add new user and return userId.
             Parameters:
@@ -165,6 +176,9 @@ class EasyAuthService:
         id = len(cls.users)
         user = User(id, username, Encrypt.sha1_encode(password))
         cls.append_user_list(id, user)
+
+        if isMaintainer:
+            cls.group('_all_').add_user(username, Auth.maintainer)
 
         cls.save()
         return id

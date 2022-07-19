@@ -23,6 +23,7 @@ def check_auth(auth: str):
     '''
     def wrapper(func):
         def func_with_auth(*args, **kwargs):
+            user = None
             try:
                 token = request.headers.get('Authorization')
                 if token.startswith('Bearer'):
@@ -714,24 +715,56 @@ def login():
     token = user.generate_token(datetime.now())
     return response(0, "success", token)
 
+@app.route('/users/all', methods=['POST'])
+@check_auth(Auth.admin)
+def get_users():
+    users = {
+        'users': [user.username for user in EasyAuthService.users if user != None],
+        'maintainers': [
+            user
+            for user, auth in EasyAuthService.group("_all_").auths.items()
+            if auth == Auth.maintainer
+        ]
+    }
+    return response(0, "success", users)
+
+@app.route('/users/project', methods=['POST'])
+@check_auth(Auth.owner)
+def get_project_users():
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data:
+        return response(1, "There is no data.")
+
+    group = EasyAuthService.group(data['projectName'])
+    if group.name == 'Unknown':
+        return response(1, "Project auth settings not found")
+
+    users = {
+        'users': [user.username for user in EasyAuthService.users if user != None],
+        'members': group.auths
+    }
+    return response(0, "success", users)
+
 @app.route('/add-user', methods=['POST'])
 @check_auth(Auth.admin)
-def add_user():
+def add_user(user: User):
     '''
     Add user to login system, return userId and return 0 for add user failed.
     '''
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
-    elif not 'username' in data or not 'password' in data:
+    elif not 'username' in data or not 'password' in data or not 'maintainer' in data:
         return response(1, "There is no data.")
 
-    userId = EasyAuthService.add_user(data['username'], data['password'])
+    userId = EasyAuthService.add_user(data['username'], data['password'], data['maintainer'])
     return response(0, "success", userId)
 
 @app.route('/remove-user', methods=['POST'])
 @check_auth(Auth.admin)
-def remove_user():
+def remove_user(user: User):
     '''
     Remove user from login system, return userId and return 0 for add user failed.
     '''
@@ -742,6 +775,24 @@ def remove_user():
         return response(1, "There is no data.")
 
     EasyAuthService.remove_user(data['username'])
+    return response(0, "success", None)
+
+@app.route('/modify-user', methods=['POST'])
+@check_auth(Auth.admin)
+def modify_user(user: User):
+    '''
+    Modify user information
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'isMaintainer' in data:
+        return response(1, "There is no data.")
+
+    if data['isMaintainer']:
+        EasyAuthService.group('_all_').add_user(user.username, Auth.maintainer)
+    else:
+        EasyAuthService.group('_all_').remove_user(user.username)
     return response(0, "success", None)
 
 @app.route('/add-project-user', methods=['POST'])
@@ -756,8 +807,11 @@ def add_project_user(user: User):
     elif not 'username' in data or not 'projectName' in data or not 'auth' in data:
         return response(1, "There is no data.")
 
-    userId = EasyAuthService.group(data['projectName']).add_user(data['username'], data['auth'])
-    return response(0, "success", userId)
+    group = EasyAuthService.group(data['projectName'])
+    if group.name == 'Unknown':
+        return response(1, "Project auth settings not found")
+    group.add_user(data['username'], data['auth'])
+    return response(0, "success")
 
 @app.route('/remove-project-user', methods=['POST'])
 @check_auth(Auth.owner)
@@ -771,8 +825,29 @@ def remove_project_user(user: User):
     elif not 'username' in data or not 'projectName' in data or not 'auth' in data:
         return response(1, "There is no data.")
 
-    userId = EasyAuthService.group(data['projectName']).remove_user(data['username'])
-    return response(0, "success", userId)
+    group = EasyAuthService.group(data['projectName'])
+    if group.name == 'Unknown':
+        return response(1, "Project auth settings not found")
+    group.remove_user(data['username'])
+    return response(0, "success")
+
+@app.route('/modify-project-user', methods=['POST'])
+@check_auth(Auth.owner)
+def modify_project_user(user: User):
+    '''
+    Modify user information
+    '''
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'projectName' in data or not 'username' in data or not 'auth' in data:
+        return response(1, "There is no data.")
+
+    group = EasyAuthService.group(data['projectName'])
+    if group.name == 'Unknown':
+        return response(1, "Project auth settings not found")
+    group.add_user(data['username'], data['auth'])
+    return response(0, "success", None)
 
 @app.route('/change-password', methods=['POST'])
 @check_auth(None)
