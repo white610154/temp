@@ -701,6 +701,19 @@ def get_experiment_configs(user: User):
 def get_model_description(user: User):
     return response(0, "success", ModelDescription.modelDescription)
 
+@app.route('/get-model-pretrained-weight', methods=['POST'])
+@check_auth(Auth.user)
+def get_model_pretrained_weight(user: User):
+    data = request.get_json()
+    if not data:
+        return response(1, "There is no data.")
+    elif not 'model' in data:
+        return response(1, "There is no data.")
+
+    def hasPretrainedWeight(model: str):
+        return True
+    return response(0, "success", hasPretrainedWeight(data['model']))
+
 # login and auth system
 
 @app.route('/login', methods=['POST'])
@@ -717,7 +730,7 @@ def login():
 
 @app.route('/users/all', methods=['POST'])
 @check_auth(Auth.admin)
-def get_users():
+def get_users(user: User):
     users = {
         'users': [user.username for user in EasyAuthService.users if user != None],
         'maintainers': [
@@ -730,7 +743,7 @@ def get_users():
 
 @app.route('/users/project', methods=['POST'])
 @check_auth(Auth.owner)
-def get_project_users():
+def get_project_users(user: User):
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
