@@ -714,9 +714,11 @@ def get_model_pretrained_weight(user: User):
     if not ok:
         return response(1, modelId)
     
-    ok, pretrainedWeightPath = ProjectUtil.find_pretrained_weight(modelId)
+    ok, isPretrainedWeight = ProjectUtil.find_pretrained_weight(modelId)
+    if not ok:
+        return response(1, isPretrainedWeight)
 
-    return response(0, "success", hasPretrainedWeight(data['model']))
+    return response(0, "success", isPretrainedWeight)
 
 # login and auth system
 
