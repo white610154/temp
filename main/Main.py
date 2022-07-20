@@ -710,8 +710,12 @@ def get_model_pretrained_weight(user: User):
     elif not 'model' in data:
         return response(1, "There is no data.")
 
-    def hasPretrainedWeight(model: str):
-        return True
+    ok, modelId = ProjectUtil.transfer_model(data["model"])
+    if not ok:
+        return response(1, modelId)
+    
+    ok, pretrainedWeightPath = ProjectUtil.find_pretrained_weight(modelId)
+
     return response(0, "success", hasPretrainedWeight(data['model']))
 
 # login and auth system

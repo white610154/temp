@@ -408,3 +408,27 @@ def get_model_architecture(projectPath, runDict):
 
     except:
         return False, 'get model architecture failed'
+
+def transfer_model(modelId):
+    try:
+        modelJsonPath = f'sample/model_transform.json'
+        if os.path.isfile(runJsonPath):
+            with open(modelJsonPath) as jsonFile:
+                modelData = json.load(jsonFile)
+                modelRealId = modelData[modelId]
+            return True, modelRealId
+        else:
+            return False, 'there is no model'
+    except:
+        return False, 'the model does not exist'
+
+def find_pretrained_weight(modelId):
+    try:
+        modelFolderPath = f'sample/PretrainedWeight'
+        modelId = modelId + '.pth'
+        if os.path.isfile(os.path.json(modelFolderPath, modelId)):
+            return True, os.path.json(modelFolderPath, modelId)
+        else:
+            return False, 'there is no pretrained weight'
+    except:
+        return False, 'there is no model'
