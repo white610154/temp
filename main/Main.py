@@ -37,7 +37,7 @@ def check_auth(auth: str):
                     if not authorized:
                         return response(1, "Authorized failed")
             except Exception as err:
-                print(err)
+                print(request.url, err)
                 return response(1, "Authorized failed")
             return func(user, *args, **kwargs)
         setattr(func_with_auth, '__name__', func.__name__)
@@ -731,6 +731,8 @@ def login():
         return response(1, "There is no data.")
 
     user = EasyAuthService.login(data['username'], data['password'])
+    if user == None:
+        return response(0, "username or password incorrect")
     token = user.generate_token(datetime.now())
     return response(0, "success", token)
 
@@ -779,6 +781,8 @@ def add_user(user: User):
         return response(1, "There is no data.")
 
     userId = EasyAuthService.add_user(data['username'], data['password'], data['maintainer'])
+    if userId == 0:
+        return response(1, "user exists")
     return response(0, "success", userId)
 
 @app.route('/remove-user', methods=['POST'])
@@ -874,14 +878,18 @@ def change_password(user: User):
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
-    elif not 'password' in data:
+    elif not 'originPassword' or not 'password' in data:
         return response(1, "There is no data.")
+
+    userCheck = EasyAuthService.login(user.username, data['originPassword'])
+    if userCheck == None:
+        return response(1, "password incorrect")
 
     userId = EasyAuthService.change_password(user.username, data['password'])
     if userId == 0:
         return response(1, "user not found")
 
-    return response(0, "success", userId)
+    return response(0, "success")
 
 def main():
     app.run(host='0.0.0.0', port=5000)

@@ -116,7 +116,7 @@ class AuthGroup:
     @classmethod
     def deserialize(cls, name: str, code: str):
         group = cls(name)
-        group.auths = Encrypt.aes_decode(code)
+        group.auths = deserialize_dict(code)
         return group
 
 class EasyAuthService:
@@ -234,8 +234,10 @@ class EasyAuthService:
 
     @classmethod
     def login(cls, username: str, password: str):
-        id = cls.catalog[username]
-        user = cls.users[id]
+        userId = cls.catalog.get(username)
+        if userId == None: return
+
+        user = cls.users[userId]
         if Encrypt.sha1_encode(password) == user.password:
             return user
         return None
@@ -268,3 +270,4 @@ class EasyAuthService:
             json.dump(data, fout, indent=2)
 
 EasyAuthService.init()
+EasyAuthService.show()

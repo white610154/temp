@@ -286,7 +286,7 @@ config = {
             "stepLR": {
                 "stepSize": {
                     "type": "int",
-                    "default": 10,
+                    "default": 1,
                     "min": 1
                 },
                 "gamma": {
