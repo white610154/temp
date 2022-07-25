@@ -809,13 +809,13 @@ def modify_user(user: User):
     data = request.get_json()
     if not data:
         return response(1, "There is no data.")
-    elif not 'isMaintainer' in data:
+    elif not 'username' or not 'isMaintainer' in data:
         return response(1, "There is no data.")
 
     if data['isMaintainer']:
-        EasyAuthService.group('_all_').add_user(user.username, Auth.maintainer)
+        EasyAuthService.group('_all_').add_user(data['username'], Auth.maintainer)
     else:
-        EasyAuthService.group('_all_').remove_user(user.username)
+        EasyAuthService.group('_all_').remove_user(data['username'])
     return response(0, "success", None)
 
 @app.route('/add-project-user', methods=['POST'])
