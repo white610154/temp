@@ -590,8 +590,7 @@ def deploy(user: User):
     return response(0, "success", result[data['projectName']])
 
 @app.route('/images/<path:path>', methods=['GET'])
-@check_auth(Auth.user)
-def show_image(user: User, path):
+def show_image(path):
     return send_from_directory(os.path.abspath(''), path=path)
 
 # folder select and edit
@@ -734,10 +733,18 @@ def login():
     if user == None:
         return response(0, "username or password incorrect")
     token = user.generate_token(datetime.now())
-    return response(0, "success", token)
+    auth = EasyAuthService.group('_all_').auth_of(user.username)
+    if auth == None:
+        auth = 'user'
+
+    return response(0, "success", {
+        'token': token,
+        'username': user.username,
+        'auth': auth
+    })
 
 @app.route('/users/all', methods=['POST'])
-@check_auth(Auth.admin)
+@check_auth(Auth.maintainer)
 def get_users(user: User):
     users = {
         'users': [user.username for user in EasyAuthService.users if user != None],
@@ -775,6 +782,7 @@ def add_user(user: User):
     Add user to login system, return userId and return 0 for add user failed.
     '''
     data = request.get_json()
+    print(data)
     if not data:
         return response(1, "There is no data.")
     elif not 'username' in data or not 'password' in data or not 'maintainer' in data:

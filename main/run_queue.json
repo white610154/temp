@@ -1,15 +1,15 @@
 {
     "done": [
         {
-            "projectName": "sdf",
-            "experimentId": "20220718050136",
-            "runId": "20220718054840",
+            "projectName": "test",
+            "experimentId": "20220726021234",
+            "runId": "20220726051450",
             "task": "Train"
         },
         {
-            "projectName": "sdf",
-            "experimentId": "20220718050136",
-            "runId": "20220718054840",
+            "projectName": "test",
+            "experimentId": "20220726021234",
+            "runId": "20220726051450",
             "task": "Test"
         }
     ],

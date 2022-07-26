@@ -34,6 +34,8 @@ class Auth:
         '''
         (auomaintainer) > admin > maintainer > owner > user
         '''
+        if b == Auth.user: return True
+
         if a == Auth.auomaintainer: return True
         if b == Auth.auomaintainer: return False
         if a == Auth.admin: return True
@@ -42,8 +44,6 @@ class Auth:
         if b == Auth.maintainer: return False
         if a == Auth.owner: return True
         if b == Auth.owner: return False
-        if a == Auth.user: return True
-        if b == Auth.user: return False
         return False
 
 class User:
@@ -177,7 +177,7 @@ class EasyAuthService:
         user = User(id, username, Encrypt.sha1_encode(password))
         cls.append_user_list(id, user)
 
-        if isMaintainer:
+        if isMaintainer == True:
             cls.group('_all_').add_user(username, Auth.maintainer)
 
         cls.save()
@@ -264,7 +264,7 @@ class EasyAuthService:
         with open(AUTH_STORAGE_PATH, 'w') as fout:
             data = {
                 'catalog': serialize_dict(cls.catalog),
-                'users': {i: user.serialize() for i, user in enumerate(cls.users)},
+                'users': {i: user.serialize() for i, user in enumerate(cls.users) if user != None},
                 'auths': {name: group.serialize() for name, group in cls.auths.items()},
             }
             json.dump(data, fout, indent=2)
