@@ -33,9 +33,12 @@ def check_auth(auth: str):
                 user = EasyAuthService.authorize(token)
                 if auth != None:
                     data = request.get_json()
-                    authorized = EasyAuthService.check_auth(user.username, auth, data.get('projectName'))
+                    groupName = data.get('projectName')
+                    if groupName == None:
+                        groupName = '_all_'
+                    authorized = EasyAuthService.check_auth(user.username, auth, groupName)
                     if not authorized:
-                        return response(1, "Authorized failed")
+                        return response(1, "Permission denied")
             except Exception as err:
                 print(request.url, err)
                 return response(1, "Authorized failed")
@@ -732,16 +735,18 @@ def login():
     user = EasyAuthService.login(data['username'], data['password'])
     if user == None:
         return response(0, "username or password incorrect")
-    token = user.generate_token(datetime.now())
+    token = user.generate_token()
     auth = EasyAuthService.group('_all_').auth_of(user.username)
     if auth == None:
         auth = 'user'
 
-    return response(0, "success", {
-        'token': token,
-        'username': user.username,
-        'auth': auth
-    })
+    return response(0, "success", token)
+
+@app.route('/refresh-token', methods=['POST'])
+@check_auth(None)
+def refresh_token(user: User):
+    token = user.generate_token()
+    return response(0, "success", token)
 
 @app.route('/users/all', methods=['POST'])
 @check_auth(Auth.maintainer)

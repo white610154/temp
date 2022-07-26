@@ -70,7 +70,9 @@ class User:
     def deserialize(cls, code: str):
         return User(**deserialize_dict(code))
 
-    def generate_token(self, iat: datetime) -> str:
+    def generate_token(self, iat: datetime = None) -> str:
+        if iat == None:
+            iat = datetime.now()
         token = Encrypt.jwt_encode({
             'username': self.username,
             'iat': math.floor(iat.timestamp())
