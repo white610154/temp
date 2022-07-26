@@ -736,15 +736,8 @@ def login():
     if user == None:
         return response(0, "username or password incorrect")
     token = user.generate_token()
-    auth = EasyAuthService.group('_all_').auth_of(user.username)
-    if auth == None:
-        auth = 'user'
 
-    return response(0, "success", {
-        'token': token,
-        'username': user.username,
-        'auth': auth
-    })
+    return response(0, "success", token)
 
 @app.route('/refresh-token', methods=['POST'])
 @check_auth(None)
