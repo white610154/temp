@@ -123,11 +123,11 @@ def get_projects(user: User):
     if not ok:
         return response(1, projectList)
 
-    projectList = [
-        project
+    projectList = {
+        project: EasyAuthService.group(project).auth_of(user.username)
         for project in projectList
         if EasyAuthService.group(project).auth_of(user.username) != None
-    ]
+    }
 
     return response(0, "success", {'projects': projectList})
 
@@ -740,13 +740,25 @@ def login():
     if auth == None:
         auth = 'user'
 
-    return response(0, "success", token)
+    return response(0, "success", {
+        'token': token,
+        'username': user.username,
+        'auth': auth
+    })
 
 @app.route('/refresh-token', methods=['POST'])
 @check_auth(None)
 def refresh_token(user: User):
     token = user.generate_token()
-    return response(0, "success", token)
+    auth = EasyAuthService.group('_all_').auth_of(user.username)
+    if auth == None:
+        auth = 'user'
+
+    return response(0, "success", {
+        'token': token,
+        'username': user.username,
+        'auth': auth
+    })
 
 @app.route('/users/all', methods=['POST'])
 @check_auth(Auth.maintainer)
