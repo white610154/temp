@@ -1,4 +1,3 @@
-from datetime import datetime
 import os
 from flask import Flask, request, send_from_directory
 from flask_cors import CORS
@@ -33,12 +32,13 @@ def check_auth(auth: str):
                 user = EasyAuthService.authorize(token)
                 if auth != None:
                     data = request.get_json()
-                    groupName = data.get('projectName')
-                    if groupName == None:
-                        groupName = '_all_'
-                    authorized = EasyAuthService.check_auth(user.username, auth, groupName)
-                    if not authorized:
-                        return response(1, "Permission denied")
+                    if isinstance(data, dict):
+                        groupName = data.get('projectName')
+                        if groupName == None:
+                            groupName = '_all_'
+                        authorized = EasyAuthService.check_auth(user.username, auth, groupName)
+                        if not authorized:
+                            return response(1, "Permission denied")
             except Exception as err:
                 print(request.url, err)
                 return response(1, "Authorized failed")
@@ -757,7 +757,7 @@ def refresh_token(user: User):
 @check_auth(Auth.maintainer)
 def get_users(user: User):
     users = {
-        'users': [user.username for user in EasyAuthService.users if user != None],
+        'users': [user.username for user in EasyAuthService.users if user != None and user.username != Auth.auomaintainer],
         'maintainers': [
             user
             for user, auth in EasyAuthService.group("_all_").auths.items()
@@ -786,7 +786,7 @@ def get_project_users(user: User):
     return response(0, "success", users)
 
 @app.route('/add-user', methods=['POST'])
-@check_auth(Auth.admin)
+@check_auth(Auth.maintainer)
 def add_user(user: User):
     '''
     Add user to login system, return userId and return 0 for add user failed.

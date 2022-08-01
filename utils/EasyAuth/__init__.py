@@ -257,7 +257,7 @@ class EasyAuthService:
         if Auth.higher_than(username, Auth.maintainer):
             return True
         if groupName != None:
-            return Auth.higher_than(cls.auths[groupName].auths[username], auth)
+            return Auth.higher_than(cls.auths[groupName].auth_of(username), auth)
         else:
             return Auth.higher_than(username, auth)
 
