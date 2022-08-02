@@ -2,6 +2,7 @@ from config.ConfigResultStorage import ResultStorage
 from config.ConfigPostprocess import PostProcessPara
 from config.ConfigPytorchModel import ClsModelPara
 from utils.ResultStorage import SaveWeight, SaveResult
+import os
 
 def save_result(resultList:list, classNameList:list, outputPath:str, task:str) -> None:
     """
@@ -78,3 +79,25 @@ def save_model(modelType, model, optimizer, cudaDevice, bestAcc:float, currentAc
                     print('Warning: The official onnx module have not supported mobilenet(Hardswish) packing')
         
     return bestAcc
+
+def save_ini_file(outputPath, classNameList, unknownFilter):
+    """
+    save ini file
+
+    Args:
+        outputPath: outputPath
+        classNameList: classNameList
+        unknownFilter: unknownFilter
+    """
+    classNameList.sort()
+    classNameList.sort(key=lambda x:x)
+    with open(os.path.join(outputPath, 'BestOnnx.ini'), 'w') as txtfile:
+        txtfile.write(f'[CLASSES]\n')
+        count = 0
+        for className in classNameList:
+            txtfile.write(f'{count}={className}\n')
+            count = count + 1
+        txtfile.write(f'[POSTPROCESSING]\n')
+        for key in unknownFilter["threshold"].keys():
+            txtfile.write(f'{count}={key}\n')
+            count = count + 1
