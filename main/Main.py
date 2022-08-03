@@ -5,7 +5,7 @@ from flask_cors import CORS
 from utils import ProjectUtil
 from utils.ProjectUtil import DeployUtil, ExperimentConfig, FolderUtil, ModelDescription
 from main import LoggerConfig
-from utils.EasyAuth import EasyAuthService, Auth, User, AuthGroup
+from utils.EasyAuth import EasyAuthService
 
 LoggerConfig.set_logger_config()
 
