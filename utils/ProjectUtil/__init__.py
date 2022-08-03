@@ -360,9 +360,6 @@ def get_queue_process(runDict, mode):
                 wrongMsg = 'This run has been deleted'
 
             runConfigPath = f'./projects/{runDict["projectName"]}/runs/{runDict["runId"]}/{runDict["runId"]}.json'
-            if not os.path.isfile(runConfigPath):
-                runDict["config"] = wrongMsg
-                return False, runDict
             with open(runConfigPath) as jsonFile:
                 runConfig = json.load(jsonFile)
                 runDict["config"] = runConfig

@@ -132,8 +132,8 @@ class EasyAuthService:
     ]
     auths: Dict[str, AuthGroup] = {
         "_all_": AuthGroup.with_auths("_all_", {
-            Auth.auomaintainer: Auth.auomaintainer,
-            Auth.admin: Auth.admin,
+            Auth.auomaintainer: Auth.maintainer,
+            Auth.admin: Auth.maintainer,
         })
     }
 
@@ -272,3 +272,4 @@ class EasyAuthService:
             json.dump(data, fout, indent=2)
 
 EasyAuthService.init()
+EasyAuthService.show()
