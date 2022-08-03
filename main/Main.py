@@ -1,5 +1,7 @@
+from io import BytesIO
 import os
-from flask import Flask, request, send_from_directory
+from zipfile import ZipFile
+from flask import Flask, request, send_file, send_from_directory
 from flask_cors import CORS
 from utils import ProjectUtil
 from utils.ProjectUtil import DeployUtil, ExperimentConfig, FolderUtil, ModelDescription
@@ -506,7 +508,6 @@ def download_model(user: User, header, payload, signature):
     '''
     jwt = f'{header}.{payload}.{signature}'
     ok, data = ProjectUtil.decode_key(jwt)
-    print(data)
     if not ok or not data:
         return ('', 204)
     elif not 'projectName' in data or not 'runId' in data or not 'filename' in data:
@@ -516,12 +517,22 @@ def download_model(user: User, header, payload, signature):
     if not ok:
         return ('', 204)
 
-    ok, onnxPath, onnxFile = DeployUtil.find_onnx(projectPath, data['runId'])
+    ok, onnxPath, onnxFile, iniFile = DeployUtil.find_onnx(projectPath, data['runId'])
     if not ok:
         return ('', 204)
     print(onnxPath, onnxFile)
 
-    return send_from_directory(onnxPath, onnxFile, download_name=f"{data['filename']}.onnx", as_attachment=True)
+    stream = BytesIO()
+    with ZipFile(stream, 'w') as zf:
+        zf.write(os.path.join(onnxPath, onnxFile), onnxFile)
+        zf.write(os.path.join(onnxPath, iniFile), iniFile)
+    stream.seek(0)
+
+    return send_file(
+        stream,
+        as_attachment=True,
+        attachment_filename=f"{data['filename']}.zip"
+    )
 
 @app.route('/set-deploy-path', methods=['POST'])
 @check_auth(Auth.owner)

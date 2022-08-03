@@ -80,13 +80,17 @@ def deploy(projectName, projectPath, runId, filename):
         if not ok:
             return False, deployPath
 
-        ok, onnxPath, onnxFile = find_onnx(projectPath, runId)
+        ok, onnxPath, onnxFile, iniFile = find_onnx(projectPath, runId)
         if not ok:
             return False, onnxPath
 
         src = os.path.join(onnxPath, onnxFile)
         dst = os.path.join('deploy', deployPath, f'{filename}.onnx')
         shutil.copy(src, dst)
+
+        isrc = os.path.join(onnxPath, iniFile)
+        idst = os.path.join('deploy', deployPath, f'{filename}.ini')
+        shutil.copy(isrc, idst)
 
         ok, message = set_deploy_path_information(projectName, deployPath, {
             'runId': runId,
@@ -116,12 +120,13 @@ def find_onnx(projectPath: str, runId: str):
     try:
         onnxPath = os.path.abspath(f'{projectPath}/runs/{runId}')
         onnxFile = f'BestOnnx.onnx'
+        iniFile = f'BestOnnx.ini'
         if not os.path.isfile(os.path.join(onnxPath, onnxFile)):
             return False, "Model not found", None
-        return True, onnxPath, onnxFile
+        return True, onnxPath, onnxFile, iniFile
     except Exception as err:
         print(err)
-        return False, err, None
+        return False, err, None, None
 
 def checkFile(deployPath, modelName, fileChecksum):
     if os.path.isfile(os.path.join('deploy', deployPath, f'{modelName}.onnx')):
