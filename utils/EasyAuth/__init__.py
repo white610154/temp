@@ -3,7 +3,7 @@ import json
 import math
 import os
 from typing import Dict, List
-from . import Encrypt
+from . import Encrypt, Functions
 
 AUTH_STORAGE_PATH = '.salaauth'
 
@@ -15,18 +15,36 @@ def deserialize_dict(c: str) -> dict:
 
 class Auth:
     admin = 'admin'
+    maintainer = 'maintainer'
     owner = 'owner'
     user = 'user'
     auomaintainer = 'auomaintainer'
 
-    @classmethod
-    def rationalize(cls, authName: str) -> str:
+    @staticmethod
+    def rationalize(authName: str) -> str:
         '''
         Make auth reasonable, admin should not been set.
         '''
         if authName in [Auth.admin, Auth.auomaintainer]:
             return Auth.user
         return authName
+
+    @staticmethod
+    def higher_than(a: str, b: str) -> bool:
+        '''
+        (auomaintainer) > admin > maintainer > owner > user
+        '''
+        if b == Auth.user: return True
+
+        if a == Auth.auomaintainer: return True
+        if b == Auth.auomaintainer: return False
+        if a == Auth.admin: return True
+        if b == Auth.admin: return False
+        if a == Auth.maintainer: return True
+        if b == Auth.maintainer: return False
+        if a == Auth.owner: return True
+        if b == Auth.owner: return False
+        return False
 
 class User:
     def __init__(self, id: int, username: str, password: str):
@@ -52,7 +70,9 @@ class User:
     def deserialize(cls, code: str):
         return User(**deserialize_dict(code))
 
-    def generate_token(self, iat: datetime) -> str:
+    def generate_token(self, iat: datetime = None) -> str:
+        if iat == None:
+            iat = datetime.now()
         token = Encrypt.jwt_encode({
             'username': self.username,
             'iat': math.floor(iat.timestamp())
@@ -64,6 +84,12 @@ class AuthGroup:
         self.name = name
         self.auths = {}
 
+    @classmethod
+    def with_auths(cls, name: str, auths):
+        group = cls(name)
+        group.auths = auths
+        return group
+
     def __repr__(self):
         return f'Group(name={self.name}, auths={self.auths}'
 
@@ -71,7 +97,16 @@ class AuthGroup:
         self.auths[username] = Auth.rationalize(auth)
 
     def remove_user(self, username: str):
-        del self.auths[username]
+        if self.auths.get(username):
+            del self.auths[username]
+
+    def auth_of(self, username: str) -> str:
+        '''
+        find auth of user in group, maintainer has auth only if it is an owner or user.
+        '''
+        if Auth.higher_than(username, Auth.admin):
+            return username
+        return self.auths.get(username)
 
     def serialize(self) -> str:
         '''
@@ -83,7 +118,7 @@ class AuthGroup:
     @classmethod
     def deserialize(cls, name: str, code: str):
         group = cls(name)
-        group.auths = Encrypt.aes_decode(code)
+        group.auths = deserialize_dict(code)
         return group
 
 class EasyAuthService:
@@ -95,7 +130,12 @@ class EasyAuthService:
         User(0, Auth.auomaintainer, Encrypt.sha1_encode('auo@84149738')),
         User(1, Auth.admin, Encrypt.sha1_encode('admin'))
     ]
-    auths: Dict[str, AuthGroup] = {}
+    auths: Dict[str, AuthGroup] = {
+        "_all_": AuthGroup.with_auths("_all_", {
+            Auth.auomaintainer: Auth.auomaintainer,
+            Auth.admin: Auth.admin,
+        })
+    }
 
     @classmethod
     def init(cls):
@@ -123,7 +163,7 @@ class EasyAuthService:
         print(cls.auths)
 
     @classmethod
-    def add_user(cls, username, password) -> int:
+    def add_user(cls, username: str, password: str, isMaintainer: bool) -> int:
         '''
         Add new user and return userId.
             Parameters:
@@ -138,6 +178,9 @@ class EasyAuthService:
         id = len(cls.users)
         user = User(id, username, Encrypt.sha1_encode(password))
         cls.append_user_list(id, user)
+
+        if isMaintainer == True:
+            cls.group('_all_').add_user(username, Auth.maintainer)
 
         cls.save()
         return id
@@ -155,6 +198,9 @@ class EasyAuthService:
         del cls.catalog[username]
         cls.users[id] = None
 
+        for group in cls.auths.values():
+            group.remove_user(username)
+
         cls.save()
 
     @classmethod
@@ -163,30 +209,67 @@ class EasyAuthService:
         group.add_user(owner, Auth.owner)
         cls.auths[name] = group
 
+        cls.save()
+
     @classmethod
     def remove_group(cls, name: str):
         del cls.auths[name]
 
+        cls.save()
+
     @classmethod
     def group(cls, name: str) -> AuthGroup:
-        return cls.auths.get(name)
+        group = cls.auths.get(name)
+        if group == None:
+            return AuthGroup('unknown')
+        return group
+
+    @classmethod
+    def change_password(cls, username: str, password: str) -> int:
+        userId = cls.catalog.get(username)
+        if userId == None:
+            return 0
+        user = cls.users[userId]
+        user.password = Encrypt.sha1_encode(password)
+
+        cls.save()
 
     @classmethod
     def login(cls, username: str, password: str):
-        id = cls.catalog[username]
-        user = cls.users[id]
+        userId = cls.catalog.get(username)
+        if userId == None: return
+
+        user = cls.users[userId]
         if Encrypt.sha1_encode(password) == user.password:
             return user
         return None
+
+    @classmethod
+    def authorize(cls, token: str) -> User:
+        userInfo = Encrypt.jwt_decode(token)
+        timeValid = Functions.check_valid_time(userInfo['iat'])
+        if not timeValid: return
+
+        return cls.users[cls.catalog[userInfo['username']]]
+
+    @classmethod
+    def check_auth(cls, username: str, auth: str, groupName: str=None) -> bool:
+        if Auth.higher_than(username, Auth.maintainer):
+            return True
+        if groupName != None:
+            return Auth.higher_than(cls.auths[groupName].auth_of(username), auth)
+        else:
+            return Auth.higher_than(username, auth)
 
     @classmethod
     def save(cls):
         with open(AUTH_STORAGE_PATH, 'w') as fout:
             data = {
                 'catalog': serialize_dict(cls.catalog),
-                'users': {i: user.serialize() for i, user in enumerate(cls.users)},
+                'users': {i: user.serialize() for i, user in enumerate(cls.users) if user != None},
                 'auths': {name: group.serialize() for name, group in cls.auths.items()},
             }
             json.dump(data, fout, indent=2)
 
 EasyAuthService.init()
+EasyAuthService.show()

@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib.ticker import MaxNLocator
+import matplotlib
+matplotlib.use('TKAgg')
 
 def draw_acc_curve(accRecord:list, outputPath:str) -> None:
     """

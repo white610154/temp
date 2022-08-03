@@ -7,6 +7,7 @@ Created on Tue Jul 05 12:00:00 2022
 import os
 from config.Config import PrivateSetting, BasicSetting
 from config.ConfigPytorchModel import ClsPath
+from config.ConfigPostprocess import PostProcessPara
 from utils.ModelService.PytorchClassificationModel import MainProcess
 from utils.Postprocess import SetPostprocess
 from utils.Evaluation import SelectEvaluationMethod
@@ -18,6 +19,12 @@ def train():
     '''
     print("Step 0: AI model Training")
     MainProcess.train()
+    print("Step 1: Generating ini")
+    classNameList = []  
+    for folder in os.listdir(ClsPath.trainPath):
+        if os.path.isdir(os.path.join(ClsPath.trainPath, folder)):
+            classNameList.append(folder)
+    SelectStorageMethod.save_ini_file(PrivateSetting.outputPath, classNameList, PostProcessPara.unknownFilter)
 
 def test():
     '''
