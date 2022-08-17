@@ -272,4 +272,3 @@ class EasyAuthService:
             json.dump(data, fout, indent=2)
 
 EasyAuthService.init()
-EasyAuthService.show()
