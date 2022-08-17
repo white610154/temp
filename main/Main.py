@@ -5,10 +5,7 @@ from flask import Flask, request, send_file, send_from_directory
 from flask_cors import CORS
 from utils import ProjectUtil
 from utils.ProjectUtil import DeployUtil, ExperimentConfig, FolderUtil, ModelDescription
-from main import LoggerConfig
 from utils.EasyAuth import EasyAuthService, Auth, User
-
-LoggerConfig.set_logger_config()
 
 def response(code, message, data=None):
     # code=0 for success, code=1 for fail

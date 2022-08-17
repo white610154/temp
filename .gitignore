@@ -23,3 +23,5 @@ datasets
 deploy
 main/run_queue.json
 logs
+.salaauth
+build

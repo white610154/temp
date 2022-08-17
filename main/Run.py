@@ -5,10 +5,6 @@ Created on TUE MAR 22 17:00:00 2021
 
 import json, os, shutil, time
 import subprocess
-from main import LoggerConfig
-from utils.Logger import Logger
-
-LoggerConfig.set_logger_config()
 
 # statue
 # waiting/ training/ testing
@@ -241,11 +237,8 @@ def run_model():
         proc = subprocess.Popen(["python ModelMain.py"], stdout=subprocess.PIPE, shell=True)
         out, err = proc.communicate()
         print(out.decode('utf-8'))
-        # Logger.info(out)
         if err != None:
             print(err.decode('utf-8'))
-        #     Logger.info(err.decode('utf-8'))
-        #     raise Exception(err.decode('utf-8'))
         os.remove(runModelMainPath)
         return True, None
     except Exception as err:
