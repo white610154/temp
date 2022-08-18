@@ -25,3 +25,6 @@ main/run_queue.json
 logs
 .salaauth
 build
+dist
+
+.pyenv

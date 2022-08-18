@@ -234,15 +234,18 @@ def run_model():
         modelMainPath = './sample/ModelMain.py'
         runModelMainPath = './ModelMain.py'
         shutil.copyfile(modelMainPath, runModelMainPath)
-        proc = subprocess.Popen(["python ModelMain.py"], stdout=subprocess.PIPE, shell=True)
+        if os.path.isfile("ModelMain.exe"):
+            proc = subprocess.Popen(["ModelMain.exe"], stdout=subprocess.PIPE, shell=True)
+        else:
+            proc = subprocess.Popen(["python", "ModelMain.py"], stdout=subprocess.PIPE, shell=True)
         out, err = proc.communicate()
-        print(out.decode('utf-8'))
+        print(out)
         if err != None:
-            print(err.decode('utf-8'))
+            print(err)
         os.remove(runModelMainPath)
         return True, None
     except Exception as err:
-        print(err)
+        print("run train failed:", err)
         return False, err
 
 def run_process():

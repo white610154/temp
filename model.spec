@@ -3,8 +3,7 @@
 
 block_cipher = None
 
-
-a = Analysis(['enterModel.py'],
+a = Analysis(['ModelMain.py'],
              pathex=[
 				 'D:\\Projects\\Python\\temp\\.pyenv\\Lib\\site-packages\\', 
 				 'D:\\Projects\\Python\\temp\\main',
@@ -40,7 +39,7 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='main',
+          name='ModelMain',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
@@ -58,4 +57,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='main')
+               name='ModelMain')
